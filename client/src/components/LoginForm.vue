@@ -1,6 +1,8 @@
 <template>
   <div>
+    <!--Habría que poner otro div aquí para poner un título flow PORTAL LOGIN/ PORTAL REGISTRO-->
     <div class="mb-3 mt-3">
+      <!--Que hace esta línea  -->
       <label for="login">Login: </label>
       <input type="text" id="login" v-model="auxLogin" @keyup.enter="autenticarme()" />
     </div>

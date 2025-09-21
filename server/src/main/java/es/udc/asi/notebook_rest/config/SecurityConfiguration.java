@@ -63,7 +63,7 @@ public class SecurityConfiguration {
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/notes/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/notes/**").authenticated() // Ahora sólo podrán acceder a la lista de notas los usuarios autenticados
         .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(UserAuthority.ADMIN.toString())
         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll() // Debería ser authenticated, pero para poder tener un GET abierto para las pruebas lo dejamos en permitAllﬁ
         .requestMatchers("/**").authenticated())

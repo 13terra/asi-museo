@@ -11,9 +11,14 @@
       <p class="card-text">
         {{ note.content }}
       </p>
-      <p class="card-text"></p>
+      <p class="card-text">
+        <router-link :to="{ name: 'DetalleNota', params: { noteId: note.id } }">
+          Detalle de la nota
+        </router-link>
+      </p>
     </div>
     <div v-if="categoriesAsString" class="card-footer">{{ categoriesAsString }}</div>
+    <!-- Aquí aparecerian formateadas las categorias -->
   </div>
 </template>
 

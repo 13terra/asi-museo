@@ -6,6 +6,8 @@ export default {
   },
 
   async getAccount() {
+    /* Lo del .data era como cuando en ISD haciamos el .json 
+    lo que pasa es que la petición devuelve muchas más cosas de las que necesitamos  CREOOOO */
     return (await HTTP.get(`account`)).data;
   },
 

@@ -55,6 +55,7 @@
     </div>
   </nav>
   <router-view />
+  <!--se sustiye por la vista que toque -->
 </template>
 
 <script>

@@ -25,7 +25,7 @@ const routes = [
     component: ErrorNotFoundView,
     meta: { public: true }
   }
-].concat(notesRoutes);
+].concat(notesRoutes); //se concatena con los componentes de notes
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

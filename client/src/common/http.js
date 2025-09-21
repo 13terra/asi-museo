@@ -2,6 +2,8 @@ import axios from "axios";
 import { BACKEND_URL } from "../constants.js";
 import auth from "./auth.js";
 
+/* LO QUE HACE ES MANDAR TODAS LAS PETICIONES A ESTA URL 
+  DEFINE UNA CONSTANTE Y CREA LA URL BASE DE TODAS LAS PETICIONES */
 const HTTP = axios.create({
   baseURL: BACKEND_URL
 });

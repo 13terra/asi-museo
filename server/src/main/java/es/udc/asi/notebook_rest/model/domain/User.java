@@ -28,7 +28,7 @@ public class User {
   private String password;
 
   @Enumerated(EnumType.STRING)
-  private UserAuthority authority;
+  private UserAuthority authority;  // El tipo de autoridad es una de los atributos del usuario
 
   @OneToMany(mappedBy = "owner")
   private List<Note> notes = new ArrayList<>();

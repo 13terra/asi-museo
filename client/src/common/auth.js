@@ -27,6 +27,8 @@ function logout() {
   getStore().state.user.logged = false;
 }
 
+/* AQUÍ ES DONDE SE COMPRUEBA SI ES ADMIN SUPONGO QUE HAY QUE USARLA PARA CUANDO HAYA 
+   FUNCIONES QUE SOLO PUEDAN SER EJECUTADAS POR UN ADMIN. O TB PARA COMPROBAR QUE SEA UN USUARIO SIN PROPIEDAD DE ADMIN */
 function isAdmin() {
   return getStore().state.user.authority == "ADMIN";
 }
