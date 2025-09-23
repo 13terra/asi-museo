@@ -1,11 +1,11 @@
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { createApp } from "vue";
-import App from "./App.vue";
+import App from "./App.vue"; //importamos la raiz desde otro archivo
 import router from "./router";
 
-const app = createApp(App);
+const app = createApp(App); // creas la instancia de la app (sabe como renderizar la raiz)
 
 app.use(router);
 
-app.mount("#app");
+app.mount("#app"); // devuelve el componente raiz en lugar de la instancia de la app

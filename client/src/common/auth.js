@@ -4,6 +4,7 @@ import AccountRepository from "../repositories/AccountRepository";
 export default {
   login,
   logout,
+  register, // nuevo método para registrar nuevos usuarios
   getToken,
   isAdmin,
   isAuthenticationChecked: isAuthenticationChecked()
@@ -25,6 +26,20 @@ function logout() {
   getStore().state.user.login = "";
   getStore().state.user.authority = "";
   getStore().state.user.logged = false;
+}
+
+async function register(userData) {
+  // call to the AccountRepository to throw a POST
+  await AccountRepository.registerAccount({
+    login: userData.login,
+    password: userData.password
+  });
+
+  // authenticate and obtain the token
+  return login({
+    login: userData.login,
+    password: userData.password
+  });
 }
 
 /* AQUÍ ES DONDE SE COMPRUEBA SI ES ADMIN SUPONGO QUE HAY QUE USARLA PARA CUANDO HAYA 

@@ -13,8 +13,14 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
+      <div v-if="!store.state.user.logged">
+        <!-- Enlaces públicos (visibles cuando no hay usuario autenticado)-->
+        <router-link to="/" class="btn btn-primary me-2"> Iniciar Sesión </router-link>
+        <router-link to="/register" class="btn btn-outline-primary"> Crear Cuenta </router-link>
+      </div>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-if="store.state.user.logged">
+          <!-- si el user está logeado mostraría esto: -->
           <li class="nav-item">
             <router-link class="nav-link" to="/about" active-class="active">
               Acerca de

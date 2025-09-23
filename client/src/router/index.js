@@ -7,6 +7,7 @@ import auth from "@/common/auth";
 import { getStore } from "@/common/store";
 
 import notesRoutes from "@/components/notes/routes.js";
+import RegisterForm from "@/components/RegisterForm.vue";
 
 const routes = [
   {
@@ -21,11 +22,17 @@ const routes = [
     component: AboutView
   },
   {
+    path: "/register",
+    name: "Register",
+    component: RegisterForm,
+    meta: { public: true, isLoginPage: false }
+  },
+  {
     path: "/:catchAll(.*)*",
     component: ErrorNotFoundView,
     meta: { public: true }
   }
-].concat(notesRoutes); //se concatena con los componentes de notes
+].concat(notesRoutes); // concatena con las rutas de las notas
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
