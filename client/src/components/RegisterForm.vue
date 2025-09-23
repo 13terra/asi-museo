@@ -6,11 +6,16 @@
     </div>
     <div class="mb-3 mt-3">
       <label for="pass">Password: </label>
-      <input type="text" id="pass" v-model="auxPass" @keyup.enter="registrarme()" />
+      <input type="password" id="pass" v-model="auxPass" @keyup.enter="registrarme()" />
     </div>
     <div class="mb-3 mt-3">
       <label for="confirmPass">Confirm Password: </label>
-      <input type="text" id="confirmPass" v-model="auxConfirmPass" @keyup.enter="registrarme()" />
+      <input
+        type="password"
+        id="confirmPass"
+        v-model="auxConfirmPass"
+        @keyup.enter="registrarme()"
+      />
     </div>
     <div>
       <button @click="registrarme()">Register</button>
@@ -37,11 +42,11 @@ export default {
     async registrarme() {
       try {
         if (this.auxPass !== this.auxConfirmPass) {
-          alert("Passwords doesn`t match.");
+          alert("Las contraseñas no coinciden.");
           return;
         }
 
-        // try registering if passws match
+        // try registering if passwords match
         await auth.register({
           login: this.auxLogin,
           password: this.auxPass
