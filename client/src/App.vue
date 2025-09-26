@@ -1,7 +1,9 @@
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <router-link class="navbar-brand" to="/notes"> Notebook 2025/2026 </router-link>
+      <router-link class="navbar-brand" :to="store.state.user.logged ? '/notes' : '/'">
+        Notebook 2025/2026
+      </router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -14,8 +16,8 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- MENU SOLO SI LOGUEADO -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-if="store.state.user.logged">
-          <!-- si el user está logeado mostraría esto: -->
           <li class="nav-item">
             <router-link class="nav-link" to="/about" active-class="active">
               Acerca de
@@ -34,9 +36,9 @@
             </a>
             <ul class="dropdown-menu">
               <li>
-                <router-link class="dropdown-item" to="/notes" active-class="active"
-                  >Lista de notas</router-link
-                >
+                <router-link class="dropdown-item" to="/notes" active-class="active">
+                  Lista de notas
+                </router-link>
               </li>
               <li>
                 <router-link class="dropdown-item" to="/asdf" active-class="active">
@@ -46,7 +48,11 @@
             </ul>
           </li>
         </ul>
-        <span v-if="store.state.user.logged"> autenticado como {{ store.state.user.login }} </span>
+
+        <span v-if="store.state.user.logged" class="me-3">
+          autenticado como {{ store.state.user.login }}
+        </span>
+
         <ul class="navbar-nav">
           <li class="nav-item" v-if="store.state.user.logged">
             <a class="nav-link" @click="desautenticarme()"> Logout </a>
@@ -56,17 +62,7 @@
     </div>
   </nav>
 
-  <!-- Enlaces públicos (visibles cuando no hay usuario autenticado)-->
-  <div v-if="!store.state.user.logged" class="container mt-5 text-center">
-    <h1 class="mb-4">¡Bienvenidos a Notebook!</h1>
-    <!--hacer un v-if o algo @click para cuando clique uno u otro -->
-    <div class="d-grid gap-3 col-md-6 mx-auto">
-      <router-link to="/" class="btn btn-primary btn-lg"> Iniciar Sesión </router-link>
-      <router-link to="/register" class="btn btn-outline-primary btn-lg">
-        Crear Cuenta
-      </router-link>
-    </div>
-  </div>
+  <!-- AQUI SE PINTA LA VISTA CONCRETA (landing, login, register, notes)-->
   <router-view />
   <!--se sustiye por la vista que toque -->
 </template>
