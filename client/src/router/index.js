@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import AboutView from "../views/AboutView.vue";
 import ErrorNotFoundView from "../views/ErrorNotFoundView.vue";
+import HomeView from "../views/HomeView.vue";
 import LoginForm from "../components/LoginForm.vue";
 
 import auth from "@/common/auth";
@@ -12,9 +13,15 @@ import RegisterForm from "@/components/RegisterForm.vue";
 const routes = [
   {
     path: "/",
+    name: "HomeView",
+    component: HomeView,
+    meta: { public: true, guestOnly: true } // repercute en las últimas líneas del archivo para saber si el usuario ya está logueado
+  },
+  {
+    path: "/login",
     name: "Login",
     component: LoginForm,
-    meta: { public: true, isLoginPage: true }
+    meta: { public: true, guestOnly: true }
   },
   {
     path: "/about",
@@ -25,7 +32,7 @@ const routes = [
     path: "/register",
     name: "Register",
     component: RegisterForm,
-    meta: { public: true, isLoginPage: false }
+    meta: { public: true, guestOnly: true }
   },
   {
     path: "/:catchAll(.*)*",
@@ -49,6 +56,7 @@ router.beforeEach((to, from, next) => {
     const requiredAuthority = to.meta.authority;
     const userIsLogged = getStore().state.user.logged;
     const loggedUserAuthority = getStore().state.user.authority;
+    const guestOnly = to.meta.guestOnly; // Definido para trabajar con la vista pública
 
     if (requiresAuth) {
       // página privada
@@ -69,7 +77,7 @@ router.beforeEach((to, from, next) => {
       }
     } else {
       // página pública
-      if (userIsLogged && to.meta.isLoginPage) {
+      if (userIsLogged && guestOnly) {
         // si estamos logueados no hace falta volver a mostrar el login
         next({ name: "NoteList", replace: true });
       } else {
