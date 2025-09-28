@@ -42,7 +42,8 @@ export default {
   },
   async mounted() {
     //codigo que queremos que se ejecute
-    this.note = await NoteRepository.findOne(this.$route.params.noteId); //HAY QUE PONER EL ASYNC Y EL AWAIT
+    this.note = await NoteRepository.findOne(this.$route.params.noteId);
+    //HAY QUE PONER EL ASYNC Y EL AWAIT
   }, // lo de $route.params.noteId creo que es porque te recupera un monton de cosas
 
   /* COMPUTED: Crea una propiedad de solo lectura que actualiza automaticamente cuando cambian las dependencias
