@@ -11,15 +11,12 @@
       </h5>
 
       <h6 class="card-subtitle mb-2 text-muted" v-if="formattedDate">
-        {{ formattedDate }}
+        <router-link :to="{ name: 'DetalleNota', params: { noteId: note.id } }">
+          {{ formattedDate }}
+        </router-link>
       </h6>
       <p class="card-text" v-if="note.content && note.content.trim()">
         {{ note.content }}
-      </p>
-      <p class="card-text mb-0">
-        <router-link :to="{ name: 'DetalleNota', params: { noteId: note.id } }">
-          Detalle de la nota
-        </router-link>
       </p>
     </div>
 

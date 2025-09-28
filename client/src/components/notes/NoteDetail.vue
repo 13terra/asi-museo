@@ -4,12 +4,12 @@
     <div class="card">
       <!--Cabecera con propietario y fecha -->
       <div class="card-header d-flex justify-content-between">
-        <h3>
+        <h3 v-if="isAdmin">
           {{ note.owner }}
         </h3>
         <small>
           <!--ACORDARSE QUE LAS LLAMADAS A LAS FUNCIONES ACABAN EN ()-->
-          {{ note.timestamp.toLocaleDateString() }} - {{ note.timestamp.toLocaleTimeString() }}
+          {{ formattedDate }}
         </small>
       </div>
       <!--Cuerpo de la nota -->
@@ -31,6 +31,12 @@
 
 <script>
 import NoteRepository from "@/repositories/NoteRepository.js";
+import auth from "@/common/auth";
+
+//convierte un numero a string y si tiene solo 1 dígito le añade un 0 delante
+function pad(n) {
+  return n.toString().padStart(2, "0");
+}
 
 // cuando intentes cargar este componente devuelve esto: return...
 export default {
@@ -52,6 +58,19 @@ export default {
     categoriesAsString() {
       return this.note.categories.map((t) => t.name).join(", ");
       // map((t) => t.name)  note(listaCategorias(id - name))
+    },
+    isAdmin() {
+      return auth.isAdmin();
+    },
+    formattedDate() {
+      if (!this.note?.timestamp) return "";
+      const date = this.note.timestamp; // ya es date
+      const dd = pad(date.getDate());
+      const mm = pad(date.getMonth() + 1); //getMonth devuelve los meses base (enero:0, febrero:1...)
+      const YYYY = date.getFullYear();
+      const hh = pad(date.getHours());
+      const min = pad(date.getMinutes());
+      return `${dd}/${mm}/${YYYY}, a las ${hh}:${min}`;
     }
   }
 };
