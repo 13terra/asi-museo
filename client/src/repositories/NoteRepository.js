@@ -20,5 +20,11 @@ export default {
     const response = await HTTP.get(`${resource}/${id}`); //esto es una peticion a un servicio REST
 
     return applyDate(response.data); //Aplicamos la transformación de la fecha y devolvemos la nota
+  },
+  // funcion para crear una nota
+  async create(payload) {
+    // payload: {titulo?, contenido?, categorias?}
+    const response = await HTTP.post(`${resource}`, payload);
+    return applyDate(response.data); // aprovecho la función que ya está creada
   }
 };

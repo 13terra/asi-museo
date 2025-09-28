@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <h1>Lista de notas</h1>
-    <!-- Esto será el tema de la lista de las notas -->
+    <router-link to="/notes/new" class="btn btn-success btn-sm"> + Crear Nota </router-link>
+    <!-- A partir de aquí aparece la lista de notas en una caja grande -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4">
       <div class="col mb-3" v-for="note in notes" :key="note.id">
         <NoteCard :note="note"></NoteCard>
