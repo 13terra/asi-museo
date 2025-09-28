@@ -50,12 +50,22 @@
         </ul>
 
         <span v-if="store.state.user.logged" class="me-3">
-          autenticado como {{ store.state.user.login }}
+          Autenticado como: {{ store.state.user.login }}
         </span>
 
         <ul class="navbar-nav">
           <li class="nav-item" v-if="store.state.user.logged">
-            <a class="nav-link" @click="desautenticarme()"> Logout </a>
+            <!-- Botón de logout con icono -->
+            <button
+              class="nav-link btn p-0 border-0 bg-transparent"
+              @click="desautenticarme()"
+              title="Cerrar sesión"
+              style="line-height: 1"
+            >
+              <i class="bi bi-box-arrow-in-left"></i>
+              <!--Texto oculto-->
+              <span>Logout</span>
+            </button>
           </li>
         </ul>
       </div>
