@@ -1,0 +1,28 @@
+services: #Cada servicio es un contenedor Docker
+    server:        
+        build:  # Construye la imagen a partir del Dockerfile en el contexto especificado
+            context: ./server    
+            no_cache: true      # Esto evita que se cacheen capas de la imagen
+        ports:   #Necesario para que el navegador pueda acceder al servicio
+            - "8080:8080"    #   
+    client:
+        build:
+            context: ./client
+            no_cache: true
+        ports:
+            - "1234:80"       
+    database:
+        image: postgres:14.1-alpine #Carga una imagen oficial desde un repositorio
+        #restart: always            #Esta opción permite que el contenedor se reinicie si falla
+        environment:                #Variables de entorno para configurar el contenedor  
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_DB=asi
+        ports:
+            - "5454:5432"           #Desde fuera de Docker sería accesible en el puerto 5454. El servidor puede acceder directamente en el 5432   
+        volumes:                    #Este contenedor almacena sus datos en el volumen "database"
+        - database:/var/lib/postgresql/data
+
+volumes:
+    database:  #Generamos un volumen con el contenido de la base de datos
+        driver: local

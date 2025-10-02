@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    host: database    #Utilizamos el nombre del servicio en lugar de localhost
+    port: 5432
+    database: asi
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+  jpa:
+    database: postgresql
