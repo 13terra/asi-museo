@@ -64,7 +64,7 @@ public class NoteResource {
       throw new RequestBodyNotValidException(errors);
     }
 
-    if (id != note.getId()) {
+    if (!id.equals(note.getId())) {
       throw new IdAndBodyNotMatchingOnUpdateException(Note.class);
     }
 

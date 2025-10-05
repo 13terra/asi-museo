@@ -55,7 +55,7 @@ public class CategoryResource {
       throw new RequestBodyNotValidException(errors);
     }
 
-    if (id != category.getId()) {
+    if (!id.equals(category.getId())) {
       throw new IdAndBodyNotMatchingOnUpdateException(Category.class);
     }
 

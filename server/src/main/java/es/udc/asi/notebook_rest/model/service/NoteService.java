@@ -115,6 +115,8 @@ public class NoteService {
     noteDAO.deleteById(id);
   }
 
+  @PreAuthorize("hasAuthority('ADMIN')")   //
+  @Transactional(readOnly = false)
   public NoteDTO updateNoteOwner(Long id, NoteOwnerDTO newOwner) throws NotFoundException, OperationNotAllowed {
     Note bdNote = noteDAO.findById(id);
     if (bdNote == null) {
