@@ -25,22 +25,43 @@ import NoteRepository from "@/repositories/NoteRepository";
 import NoteCard from "./NoteCard.vue";
 
 export default {
+  props: {
+    categoryId: { type: String, required: false } //llega desde la ruta dinámica porque en el router se puso props:true
+  },
+  components: { NoteCard },
   data() {
     return {
       notes: []
     };
   },
-  components: { NoteCard },
-  async mounted() {
-    const todas = await NoteRepository.findAll(); //recuperamos todas
+  watch: {
+    //watcher sobre categoryId
+    categoryId: {
+      immediate: true,
+      handler() {
+        this.loadNotes();
+      }
+    }
+  },
+  mounted() {
+    if (!this.categoryId) this.loadNotes();
+  },
+  methods: {
+    async loadNotes() {
+      const todas = await NoteRepository.findAll(); //recuperamos todas
+      let lista = todas.filter((n) => !n.archived); //quitamos archivadas
 
-    //filtramos archivadas y ordenamos de manera descendente
-    /* Si b es más reciente (ms mayores) el rtdo es positivo --> a se coloca detrás 
-    Si a es más reciente el rtdo es negativo --> a se coloca antes 
-    así es como se ordenan las notas*/
-    this.notes = todas
-      .filter((n) => !n.archived)
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      if (this.categoryId) {
+        //si tenemos categoria procedemos a filtrar
+        const idNum = Number(this.categoryId);
+        lista = lista.filter(
+          (n) => Array.isArray(n.categories) && n.categories.some((cat) => cat.id === idNum)
+        );
+      }
+
+      lista.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      this.notes = lista;
+    }
   }
 };
 </script>

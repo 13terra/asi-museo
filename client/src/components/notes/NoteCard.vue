@@ -21,8 +21,12 @@
     </div>
 
     <!-- Aquí aparecerian formateadas las categorias -->
-    <div v-if="categoriesAsString" class="card-footer">
-      {{ categoriesAsString }}
+    <div v-if="Array.isArray(note.categories) && note.categories.length" class="card-footer">
+      <span v-for="(cat, i) in note.categories" :key="cat.id">
+        <router-link :to="{ name: 'NotesByCategory', params: { categoryId: cat.id } }">
+          {{ cat.name }} </router-link
+        ><span v-if="i < note.categories.length - 1">, </span>
+      </span>
     </div>
   </div>
 </template>

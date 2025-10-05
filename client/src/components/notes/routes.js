@@ -9,6 +9,12 @@ export default [
     component: NoteList
   },
   {
+    path: "/notes/category/:categoryId",
+    name: "NotesByCategory",
+    component: NoteList,
+    props: true // pasa { categoryId: '...' } como prop
+  },
+  {
     path: "/notes/:noteId",
     name: "DetalleNota",
     component: NoteDetail
@@ -17,5 +23,9 @@ export default [
     path: "/notes/new",
     name: "CrearNota",
     component: CreateNote
-  }
+  } /*, {
+    path: "/notes/:noteId/edit",
+    name: "EditarNota",
+    component: CreateNote //PUEDES HACER UNA IGUAL PERO CUIDADO 
+  }*/
 ];
