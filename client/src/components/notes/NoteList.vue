@@ -3,6 +3,9 @@
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
       <h1 class="m-0">Lista de notas</h1>
       <router-link to="/notes/new" class="btn btn-success btn-sm"> + Crear Nota </router-link>
+      <button class="btn btn-outline-secondary btn-sm" @click="loadArchivadas">
+        {{ showArchived ? "Ocultar Archivadas" : "Mostrar archivadas" }}
+      </button>
     </div>
 
     <!-- CONTADOR [FUNC-5] -->
@@ -31,7 +34,8 @@ export default {
   components: { NoteCard },
   data() {
     return {
-      notes: []
+      notes: [],
+      showArchived: false
     };
   },
   watch: {
@@ -49,7 +53,12 @@ export default {
   methods: {
     async loadNotes() {
       const todas = await NoteRepository.findAll(); //recuperamos todas
-      let lista = todas.filter((n) => !n.archived); //quitamos archivadas
+      let lista = todas;
+      if (this.showArchived) {
+        lista = lista.filter((n) => n.archived); //mostramos archivadas
+      } else {
+        lista = lista.filter((n) => !n.archived); //NO mostramos archivadas
+      }
 
       if (this.categoryId) {
         //si tenemos categoria procedemos a filtrar
@@ -61,6 +70,10 @@ export default {
 
       lista.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       this.notes = lista;
+    },
+    loadArchivadas() {
+      this.showArchived = !this.showArchived;
+      this.loadNotes();
     }
   }
 };
