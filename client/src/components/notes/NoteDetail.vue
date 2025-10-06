@@ -2,6 +2,12 @@
   <div v-if="note != null" class="container mt-4">
     <!-- ERROR DE LOS TÍPICOS MUY IMPORTANTE ENTENDERLO, SI LA NOTA NO ES NULA ENTONCES...-->
     <div class="card">
+      <div>
+        <router-link :to="'notes/' + note.id + '/edit'" custom>
+          <button class="btn btn-primary">EDITAR</button>
+        </router-link>
+      </div>
+
       <!--Cabecera con propietario y fecha -->
       <div class="card-header d-flex justify-content-between">
         <h3 v-if="isAdmin">
@@ -17,6 +23,12 @@
         <h5 class="card-title">{{ note.title }}</h5>
         <p class="card-text">{{ note.content }}</p>
         <!-- El contenido de la nota es un String para tenerlo en cuenta -->
+      </div>
+      <!-- boton ARCHIVAR/DESARCHIVAR -->
+      <div class="card-body">
+        <button class="btn btn-warning" @click="archivarDesarchivar">
+          {{ note.archived ? "Desarchivar" : "Archivar" }}
+        </button>
       </div>
       <!-- Categorías -->
       <div v-if="categoriesAsString" class="card-footer">
@@ -71,6 +83,26 @@ export default {
       const hh = pad(date.getHours());
       const min = pad(date.getMinutes());
       return `${dd}/${mm}/${YYYY}, a las ${hh}:${min}`;
+    }
+  },
+  methods: {
+    async archivarDesarchivar() {
+      const payload = {
+        id: this.note.id,
+        title: this.note.title ?? "",
+        content: this.note.content ?? null,
+        archived: !this.note.archived,
+        categories: Array.isArray(this.note.categories)
+          ? this.note.categories.map((c) => ({ id: c.id }))
+          : []
+      };
+      try {
+        await NoteRepository.update(payload);
+        this.$router.push("/notes"); // ACORDARSE ROUTERRRRRRR CON RRRRRRRR
+      } catch (e) {
+        console.error(e);
+        alert(e.response?.data?.message || "Error al archivar/desarchivar la nota");
+      }
     }
   }
 };

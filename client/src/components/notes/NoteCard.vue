@@ -9,7 +9,7 @@
       <h5 class="card-title" v-if="note.title && note.title.trim()">
         {{ note.title }}
       </h5>
-
+      <!-- link al detalle de la nota -->
       <h6 class="card-subtitle mb-2 text-muted" v-if="formattedDate">
         <router-link :to="{ name: 'DetalleNota', params: { noteId: note.id } }">
           {{ formattedDate }}
@@ -19,7 +19,12 @@
         {{ note.content }}
       </p>
     </div>
-
+    <!-- Boton ARCHIVAR/DESARCHIVAR -->
+    <div class="card-body">
+      <button class="btn btn-warning" @click="archivarDesarchivar">
+        {{ note.archived ? "Desarchivar" : "Archivar" }}
+      </button>
+    </div>
     <!-- Aquí aparecerian formateadas las categorias -->
     <div v-if="Array.isArray(note.categories) && note.categories.length" class="card-footer">
       <span v-for="(cat, i) in note.categories" :key="cat.id">
@@ -33,7 +38,7 @@
 
 <script>
 import auth from "@/common/auth";
-
+import NoteRepository from "@/repositories/NoteRepository";
 //convierte un numero a string y si tiene solo 1 dígito le añade un 0 delante
 function pad(n) {
   return n.toString().padStart(2, "0");
@@ -44,6 +49,28 @@ export default {
     note: {
       type: Object,
       required: true
+    }
+  },
+  emits: ["cambioArchivado"],
+  methods: {
+    async archivarDesarchivar() {
+      const payload = {
+        id: this.note.id,
+        title: this.note.title ?? "",
+        content: this.note.content ?? null,
+        archived: !this.note.archived,
+        categories: Array.isArray(this.note.categories)
+          ? this.note.categories.map((c) => ({ id: c.id }))
+          : []
+      };
+
+      try {
+        const updated = await NoteRepository.update(payload);
+        this.$emit("cambioArchivado", updated);
+      } catch (e) {
+        console.error(e);
+        alert(e.response?.data?.message || "Error al archivar/desarchivar la nota");
+      }
     }
   },
   computed: {

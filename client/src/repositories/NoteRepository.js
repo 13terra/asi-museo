@@ -26,5 +26,11 @@ export default {
     // payload: {titulo?, contenido?, categorias?}
     const response = await HTTP.post(`${resource}`, payload);
     return applyDate(response.data); // aprovecho la función que ya está creada
+  },
+  // payload: { id, title?, content?, categories? (array de {id,name?}), archived? }
+  async update(payload) {
+    //payload : {id, title, content, archived, categories}
+    const response = await HTTP.put(`${resource}/${payload.id}`, payload);
+    return applyDate(response.data);
   }
 };
