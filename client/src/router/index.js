@@ -9,6 +9,7 @@ import { getStore } from "@/common/store";
 
 import notesRoutes from "@/components/notes/routes.js";
 import RegisterForm from "@/components/RegisterForm.vue";
+import UserList from "../components/UserList.vue";
 
 const routes = [
   {
@@ -33,6 +34,11 @@ const routes = [
     name: "Register",
     component: RegisterForm,
     meta: { public: true, guestOnly: true }
+  },
+  {
+    path: "/users",
+    name: "Users",
+    component: UserList
   },
   {
     path: "/:catchAll(.*)*",

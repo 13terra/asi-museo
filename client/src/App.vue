@@ -49,6 +49,11 @@
           </li>
         </ul>
 
+        <span v-if="store.state.user.logged && isAdmin" class="me-3">
+          <router-link to="/users">
+            <strong>Lista de usuarios</strong>
+          </router-link>
+        </span>
         <span v-if="store.state.user.logged" class="me-3">
           Autenticado como: {{ store.state.user.login }}
         </span>
@@ -86,6 +91,11 @@ export default {
     return {
       store: getStore()
     };
+  },
+  computed: {
+    isAdmin() {
+      return auth.isAdmin();
+    }
   },
   methods: {
     desautenticarme() {
