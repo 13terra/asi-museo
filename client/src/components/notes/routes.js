@@ -1,6 +1,6 @@
 import NoteList from "./NoteList.vue";
 import NoteDetail from "./NoteDetail.vue";
-import CreateNote from "./CreateNote.vue";
+import NoteForm from "./NoteForm.vue";
 
 export default [
   {
@@ -22,10 +22,11 @@ export default [
   {
     path: "/notes/new",
     name: "CrearNota",
-    component: CreateNote
-  } /*, {
+    component: NoteForm
+  },
+  {
     path: "/notes/:noteId/edit",
     name: "EditarNota",
-    component: CreateNote //PUEDES HACER UNA IGUAL PERO CUIDADO 
-  }*/
+    component: NoteForm
+  }
 ];

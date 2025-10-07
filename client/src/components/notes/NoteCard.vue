@@ -25,6 +25,14 @@
         {{ note.archived ? "Desarchivar" : "Archivar" }}
       </button>
     </div>
+    <!-- Boton EDITAR -->
+    <div>
+      <router-link :to="{ name: 'EditarNota', params: { noteId: note.id } }">
+        <!-- QUE HACE CUSTOM -->
+        <button class="btn btn-primary btn-sm">Editar Nota</button>
+      </router-link>
+    </div>
+
     <!-- Aquí aparecerian formateadas las categorias -->
     <div v-if="Array.isArray(note.categories) && note.categories.length" class="card-footer">
       <span v-for="(cat, i) in note.categories" :key="cat.id">

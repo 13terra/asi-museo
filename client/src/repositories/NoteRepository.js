@@ -22,15 +22,15 @@ export default {
     return applyDate(response.data); //Aplicamos la transformación de la fecha y devolvemos la nota
   },
   // funcion para crear una nota
-  async create(payload) {
-    // payload: {titulo?, contenido?, categorias?}
-    const response = await HTTP.post(`${resource}`, payload);
+  async create(note) {
+    // note: {titulo?, contenido?, categorias?}
+    const response = await HTTP.post(`${resource}`, note);
     return applyDate(response.data); // aprovecho la función que ya está creada
   },
-  // payload: { id, title?, content?, categories? (array de {id,name?}), archived? }
-  async update(payload) {
+  // note: { id, title?, content?, categories? (array de {id,name?}), archived? }
+  async update(note) {
     //payload : {id, title, content, archived, categories}
-    const response = await HTTP.put(`${resource}/${payload.id}`, payload);
+    const response = await HTTP.put(`${resource}/${note.id}`, note);
     return applyDate(response.data);
   }
 };

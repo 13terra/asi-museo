@@ -2,12 +2,6 @@
   <div v-if="note != null" class="container mt-4">
     <!-- ERROR DE LOS TÍPICOS MUY IMPORTANTE ENTENDERLO, SI LA NOTA NO ES NULA ENTONCES...-->
     <div class="card">
-      <div>
-        <router-link :to="'notes/' + note.id + '/edit'" custom>
-          <button class="btn btn-primary">EDITAR</button>
-        </router-link>
-      </div>
-
       <!--Cabecera con propietario y fecha -->
       <div class="card-header d-flex justify-content-between">
         <h3 v-if="isAdmin">
@@ -36,6 +30,13 @@
       </div>
       <div class="card-footer">
         <router-link to="/notes" class="btn btn-primary"> Volver a la lista </router-link>
+      </div>
+      <!--EDITAR NOTA-->
+      <div>
+        <router-link :to="{ name: 'EditarNota', params: { noteId: note.id } }">
+          <!-- QUE HACE CUSTOM -->
+          <button class="btn btn-primary btn-sm">Editar Nota</button>
+        </router-link>
       </div>
     </div>
   </div>
