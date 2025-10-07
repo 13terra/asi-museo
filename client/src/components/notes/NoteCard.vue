@@ -32,7 +32,11 @@
         <button class="btn btn-primary btn-sm">Editar Nota</button>
       </router-link>
     </div>
-
+    <!-- Boton ELIMINAR -->
+    <div>
+      <!-- QUE HACE CUSTOM -->
+      <button class="btn btn-danger btn-sm" @click="borrarNota">Eliminar Nota</button>
+    </div>
     <!-- Aquí aparecerian formateadas las categorias -->
     <div v-if="Array.isArray(note.categories) && note.categories.length" class="card-footer">
       <span v-for="(cat, i) in note.categories" :key="cat.id">
@@ -59,7 +63,7 @@ export default {
       required: true
     }
   },
-  emits: ["cambioArchivado"],
+  emits: ["cambioArchivado", "notaEliminada"],
   methods: {
     async archivarDesarchivar() {
       const payload = {
@@ -78,6 +82,17 @@ export default {
       } catch (e) {
         console.error(e);
         alert(e.response?.data?.message || "Error al archivar/desarchivar la nota");
+      }
+    },
+    async borrarNota() {
+      const ok = confirm("¿Eliminar la nota?");
+      if (!ok) return;
+      try {
+        await NoteRepository.delete(this.note.id);
+        this.$emit("notaEliminada", this.note.id);
+      } catch (e) {
+        console.log(e);
+        alert(e?.response?.data?.message || "No se pudo eliminar la nota");
       }
     }
   },

@@ -29,7 +29,7 @@
         <strong>Categorías: </strong>{{ categoriesAsString }}
       </div>
       <div class="card-footer">
-        <router-link to="/notes" class="btn btn-primary"> Volver a la lista </router-link>
+        <router-link to="/notes" class="btn-secondary"> Volver a la lista </router-link>
       </div>
       <!--EDITAR NOTA-->
       <div>
@@ -37,6 +37,11 @@
           <!-- QUE HACE CUSTOM -->
           <button class="btn btn-primary btn-sm">Editar Nota</button>
         </router-link>
+      </div>
+
+      <!--ELIMINAR NOTA-->
+      <div>
+        <button class="btn btn-danger btn-sm" @click="borrarNota">Eliminar Nota</button>
       </div>
     </div>
   </div>
@@ -103,6 +108,19 @@ export default {
       } catch (e) {
         console.error(e);
         alert(e.response?.data?.message || "Error al archivar/desarchivar la nota");
+      }
+    },
+    async borrarNota() {
+      if (!this.note) return;
+      const ok = confirm("¿Seguro que quieres eliminar la nota?"); //confirm devuelve true or false
+      if (!ok) return;
+
+      try {
+        await NoteRepository.delete(this.note.id);
+        this.$router.push("/notes");
+      } catch (e) {
+        console.log(e);
+        alert(e.response?.data?.message || "Error al eliminar la nota");
       }
     }
   }

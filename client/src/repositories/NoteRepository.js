@@ -32,5 +32,8 @@ export default {
     //payload : {id, title, content, archived, categories}
     const response = await HTTP.put(`${resource}/${note.id}`, note);
     return applyDate(response.data);
+  },
+  async delete(id) {
+    await HTTP.delete(`${resource}/${id}`);
   }
 };
