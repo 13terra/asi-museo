@@ -2,7 +2,9 @@
   <div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
       <h1 class="m-0">Lista de notas</h1>
-      <router-link to="/notes/new" class="btn btn-success btn-sm"> + Crear Nota </router-link>
+      <router-link v-if="!isAdmin" to="/notes/new" class="btn btn-success btn-sm">
+        + Crear Nota
+      </router-link>
       <button class="btn btn-outline-secondary btn-sm" @click="loadArchivadas">
         {{ showArchived ? "Ocultar Archivadas" : "Mostrar archivadas" }}
       </button>
@@ -26,6 +28,7 @@
 <script>
 import NoteRepository from "@/repositories/NoteRepository";
 import NoteCard from "./NoteCard.vue";
+import auth from "@/common/auth";
 
 export default {
   props: {
@@ -49,6 +52,11 @@ export default {
   },
   mounted() {
     if (!this.categoryId) this.loadNotes();
+  },
+  computed: {
+    isAdmin() {
+      return auth.isAdmin();
+    }
   },
   methods: {
     async loadNotes() {
