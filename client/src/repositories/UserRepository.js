@@ -8,5 +8,8 @@ export default {
   },
   async findOne(id) {
     return (await HTTP.get(`${resource}/${id}`)).data; //user individual para saber numNotas
+  },
+  async delete(id) {
+    return (await HTTP.delete(`${resource}/${id}`)).data; //eliminamos un user
   }
 };
