@@ -8,6 +8,13 @@
       <!-- De donde sale contadorNotas -->
     </div>
     <button class="btn btn-sm btn-danger" @click="eliminarUsuario">Eliminar Usuario</button>
+    <button
+      class="btn btn-sm"
+      @click="toggleActivo"
+      :class="user.active ? 'btn-warning' : 'btn-success'"
+    >
+      {{ user.active ? "Desactivar" : "Activar" }} usuario
+    </button>
   </div>
 </template>
 <script>
@@ -21,7 +28,7 @@ export default {
       required: true
     }
   },
-  emits: ["usuarioEliminado"], //el hijo UserCard muestra y dispara eventos, pero no posee el estado fuente
+  emits: ["usuarioEliminado", "usuarioActualizado"], //el hijo UserCard muestra y dispara eventos, pero no posee el estado fuente
   methods: {
     async eliminarUsuario() {
       const ok = confirm("Seguro que quiere eliminar el usuario?");
@@ -32,6 +39,22 @@ export default {
       } catch (e) {
         console.log(e);
         alert(e?.response?.data?.message || "No se pudo eliminar el usuario.");
+      }
+    },
+    async toggleActivo() {
+      const accion = this.user.active ? "desactivar" : "activar";
+      const ok = confirm(`Seguro que quieres ${accion} el usuario?`);
+      if (!ok) return;
+      try {
+        if (this.user.active) {
+          await UserRepository.deactivate(this.user.id);
+        } else {
+          await UserRepository.activate(this.user.id);
+        }
+        this.$emit("usuarioActualizado");
+      } catch (e) {
+        console.log(e);
+        alert(e?.response?.data?.message || `No se puedo ${accion} el usuario.`);
       }
     }
   }

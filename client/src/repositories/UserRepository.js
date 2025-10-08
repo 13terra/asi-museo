@@ -11,5 +11,11 @@ export default {
   },
   async delete(id) {
     return (await HTTP.delete(`${resource}/${id}`)).data; //eliminamos un user
+  },
+  async deactivate(id) {
+    return (await HTTP.delete(`${resource}/${id}/active`)).data;
+  },
+  async activate(id) {
+    return (await HTTP.put(`${resource}/${id}/active`)).data;
   }
 };

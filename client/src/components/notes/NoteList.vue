@@ -29,6 +29,7 @@
 import NoteRepository from "@/repositories/NoteRepository";
 import NoteCard from "./NoteCard.vue";
 import auth from "@/common/auth";
+import UserRepository from "../../repositories/UserRepository";
 
 export default {
   props: {
@@ -60,8 +61,27 @@ export default {
   },
   methods: {
     async loadNotes() {
-      const todas = await NoteRepository.findAll(); //recuperamos todas
-      let lista = todas;
+      let inactivos = null;
+      if (this.isAdmin) {
+        try {
+          const users = await UserRepository.findAll();
+          inactivos = new Set(users.filter((u) => !u.active).map((u) => u.login));
+        } catch (e) {
+          console.log(e);
+          inactivos = null;
+        }
+      }
+      let todas;
+      try {
+        todas = await NoteRepository.findAll();
+      } catch (e) {
+        console.log(e);
+        this.notes = [];
+        return;
+      }
+
+      let lista = inactivos ? todas.filter((n) => !inactivos.has(n.owner)) : todas;
+
       if (this.showArchived) {
         lista = lista.filter((n) => n.archived); //mostramos archivadas
       } else {
@@ -75,11 +95,12 @@ export default {
           (n) => Array.isArray(n.categories) && n.categories.some((cat) => cat.id === idNum)
         );
       }
-
+      // ORDEN
       lista.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       this.notes = lista;
     },
-    loadArchivadas() {
+    async loadArchivadas() {
+      // CAMBIE PARA QUE SEA ASYNC
       this.showArchived = !this.showArchived;
       this.loadNotes();
     }
