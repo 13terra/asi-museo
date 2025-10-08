@@ -62,6 +62,7 @@ export default {
   methods: {
     async loadNotes() {
       let inactivos = null;
+      //solo si eres admin intentas recuperar TODOS LOS USUARIOS
       if (this.isAdmin) {
         try {
           const users = await UserRepository.findAll();
@@ -71,6 +72,7 @@ export default {
           inactivos = null;
         }
       }
+      //Recuperamos todas las notas
       let todas;
       try {
         todas = await NoteRepository.findAll();
@@ -80,14 +82,16 @@ export default {
         return;
       }
 
+      //si la lista de inactivos no es falsy quitamos las notas de usuarios inactivos
       let lista = inactivos ? todas.filter((n) => !inactivos.has(n.owner)) : todas;
 
+      //archivadas/desarchivadas
       if (this.showArchived) {
         lista = lista.filter((n) => n.archived); //mostramos archivadas
       } else {
         lista = lista.filter((n) => !n.archived); //NO mostramos archivadas
       }
-
+      //filtramos por categoria
       if (this.categoryId) {
         //si tenemos categoria procedemos a filtrar
         const idNum = Number(this.categoryId);
@@ -97,6 +101,7 @@ export default {
       }
       // ORDEN
       lista.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
       this.notes = lista;
     },
     async loadArchivadas() {
