@@ -4,6 +4,11 @@
     <div v-if="isAdmin" class="card-header">
       {{ note.owner }}
     </div>
+    <div v-if="isAdmin" class="card-body">
+      <strong>
+        {{ note.archived ? "Archivada" : "Desarchivada" }}
+      </strong>
+    </div>
     <div class="card-body">
       <!--Se muestra el titulo solo si existe -->
       <h5 class="card-title" v-if="note.title && note.title.trim()">
@@ -21,20 +26,19 @@
     </div>
     <!-- Boton ARCHIVAR/DESARCHIVAR -->
     <div class="card-body">
-      <button class="btn btn-warning" @click="archivarDesarchivar">
+      <button v-if="!isAdmin" class="btn btn-warning" @click="archivarDesarchivar">
         {{ note.archived ? "Desarchivar" : "Archivar" }}
       </button>
     </div>
     <!-- Boton EDITAR -->
-    <div>
+    <div v-if="!isAdmin">
       <router-link :to="{ name: 'EditarNota', params: { noteId: note.id } }">
         <!-- QUE HACE CUSTOM -->
         <button class="btn btn-primary btn-sm">Editar Nota</button>
       </router-link>
     </div>
     <!-- Boton ELIMINAR -->
-    <div>
-      <!-- QUE HACE CUSTOM -->
+    <div v-if="!isAdmin">
       <button class="btn btn-danger btn-sm" @click="borrarNota">Eliminar Nota</button>
     </div>
     <!-- Aquí aparecerian formateadas las categorias -->
@@ -58,27 +62,18 @@ function pad(n) {
 
 export default {
   props: {
+    //las props son de solo lectura en el hijo
     note: {
       type: Object,
       required: true
     }
   },
-  emits: ["cambioArchivado", "notaEliminada"],
+  emits: ["cambioArchivado", "notaEliminada"], //el hijo muestra y dispara eventos, pero NO POSEE el estado fuente
   methods: {
     async archivarDesarchivar() {
-      const payload = {
-        id: this.note.id,
-        title: this.note.title ?? "",
-        content: this.note.content ?? null,
-        archived: !this.note.archived,
-        categories: Array.isArray(this.note.categories)
-          ? this.note.categories.map((c) => ({ id: c.id }))
-          : []
-      };
-
       try {
-        const updated = await NoteRepository.update(payload);
-        this.$emit("cambioArchivado", updated);
+        //no mutar props ni llamar al repo aquí
+        this.$emit("cambioArchivado", this.note);
       } catch (e) {
         console.error(e);
         alert(e.response?.data?.message || "Error al archivar/desarchivar la nota");
@@ -97,6 +92,7 @@ export default {
     }
   },
   computed: {
+    //se calculan cuando cambie user en el padre
     categoriesAsString() {
       return this.note?.categories.map((t) => t.name).join(", ");
     },

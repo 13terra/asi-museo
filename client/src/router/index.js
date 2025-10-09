@@ -38,7 +38,8 @@ const routes = [
   {
     path: "/users",
     name: "Users",
-    component: UserList
+    component: UserList,
+    meta: { authority: "ADMIN" }
   },
   {
     path: "/:catchAll(.*)*",
