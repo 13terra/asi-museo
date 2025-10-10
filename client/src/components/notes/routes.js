@@ -1,6 +1,7 @@
 import NoteList from "./NoteList.vue";
 import NoteDetail from "./NoteDetail.vue";
 import NoteForm from "./NoteForm.vue";
+import ChangeCreator from "./ChangeCreator.vue";
 
 export default [
   {
@@ -18,6 +19,11 @@ export default [
     path: "/notes/:noteId",
     name: "DetalleNota",
     component: NoteDetail
+  },
+  {
+    path: "/notes/:noteId/owner",
+    name: "CambiarCreador",
+    component: ChangeCreator
   },
   {
     path: "/notes/new",

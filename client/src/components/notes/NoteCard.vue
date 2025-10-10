@@ -41,6 +41,13 @@
     <div v-if="!isAdmin">
       <button class="btn btn-danger btn-sm" @click="borrarNota">Eliminar Nota</button>
     </div>
+    <!-- Boton CAMBIAR/CREADOR -->
+    <div class="card-body" v-if="isAdmin">
+      <router-link :to="{ name: 'CambiarCreador', params: { noteId: note.id } }">
+        Cambiar creador de la nota?
+      </router-link>
+    </div>
+
     <!-- Aquí aparecerian formateadas las categorias -->
     <div v-if="Array.isArray(note.categories) && note.categories.length" class="card-footer">
       <span v-for="(cat, i) in note.categories" :key="cat.id">

@@ -35,5 +35,10 @@ export default {
   },
   async delete(id) {
     await HTTP.delete(`${resource}/${id}`);
+  },
+  async owner(id, payload) {
+    // CAMBIO: el backend espera { userId: ... } --> Se lo paso desde methods.
+    const response = await HTTP.put(`${resource}/${id}/owner`, payload);
+    return applyDate(response.data);
   }
 };
