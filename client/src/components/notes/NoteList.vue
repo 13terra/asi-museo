@@ -37,7 +37,9 @@ import UserRepository from "../../repositories/UserRepository";
 
 export default {
   props: {
-    categoryId: { type: String, required: false } //llega desde la ruta dinámica porque en el router se puso props:true
+    //llega desde la ruta dinámica porque en el router se puso props:true
+    categoryId: { type: String, required: false },
+    login: { type: [String, Number], required: false }
   },
   components: { NoteCard },
   data() {
@@ -54,6 +56,12 @@ export default {
       handler() {
         this.loadNotes();
       }
+    },
+    login: {
+      immediate: true,
+      handler() {
+        this.loadNotes();
+      }
     }
   },
   //ACTUALIZA CUANDO CAMBIE ALGUNO DE LOS PROPIEDADES DE NOTELIST
@@ -66,6 +74,10 @@ export default {
     visibleNotes() {
       let lista = [...this.notes];
 
+      if (this.login) {
+        const ownerLogin = String(this.login);
+        lista = lista.filter((n) => n.owner === ownerLogin);
+      }
       //admin ve siempre archivadas y no archivadas
       if (!this.isAdmin) {
         lista = this.showArchived
@@ -81,6 +93,7 @@ export default {
           (n) => Array.isArray(n.categories) && n.categories.some((cat) => cat.id === idNum)
         );
       }
+
       //orden por fecha desc
       lista.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       return lista;

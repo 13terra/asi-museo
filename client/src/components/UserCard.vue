@@ -1,7 +1,9 @@
 <template>
   <div class="card h-100" style="width: 18rem">
     <div class="card-header">
-      {{ user.login }}
+      <router-link :to="{ name: 'ListByUser', params: { login: user.login } }">
+        {{ user.login }}
+      </router-link>
     </div>
     <div class="card-body">
       Notas: {{ user.contadorNotas }}

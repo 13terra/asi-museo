@@ -9,10 +9,11 @@
     <p v-if="users.length === 0" class="fst-italic">Sin usuarios></p>
     <ul class="text-start list-unstyled">
       <li v-for="user in users" :key="user.id">
-        Usuario: {{ user.login }} tiene: {{ user.contadorNotas }} nota<span
-          v-if="user.contadorNotas !== 1"
-          >s</span
-        >
+        Usuario:
+        <router-link :to="{ name: 'ListByUser', params: { login: user.login } }">{{
+          user.login
+        }}</router-link>
+        tiene: {{ user.contadorNotas }} nota<span v-if="user.contadorNotas !== 1">s</span>
       </li>
       <li v-if="users.length === 0" class="fst-italic">Sin usuarios</li>
     </ul>

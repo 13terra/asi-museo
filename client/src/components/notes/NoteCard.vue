@@ -2,7 +2,9 @@
   <div class="card h-100" style="width: 18rem">
     <!-- supongo que esto sólo se mostarará si el usuario es admin-->
     <div v-if="isAdmin" class="card-header">
-      {{ note.owner }}
+      <router-link :to="{ name: 'ListByUser', params: { login: note.owner } }">
+        {{ note.owner }}
+      </router-link>
     </div>
     <div v-if="isAdmin" class="card-body">
       <strong>

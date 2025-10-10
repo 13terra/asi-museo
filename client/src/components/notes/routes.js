@@ -34,5 +34,11 @@ export default [
     path: "/notes/:noteId/edit",
     name: "EditarNota",
     component: NoteForm
+  },
+  {
+    path: "/notes/user/:login",
+    name: "ListByUser",
+    component: NoteList,
+    props: true
   }
 ];
