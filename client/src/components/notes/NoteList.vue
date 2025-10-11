@@ -10,6 +10,12 @@
       </button>
     </div>
 
+    <!-- FILTRADO X FECHA [FUNC-19]-->
+    <div v-if="isAdmin">
+      <p><span>Fecha desde: </span> <input type="date" v-model="fechaDesde" ref="fechaDesde" /></p>
+      <p><span>Fecha hasta: </span> <input type="date" v-model="fechaHasta" ref="fechaHasta" /></p>
+    </div>
+
     <!-- CONTADOR [FUNC-5] -->
     <p class="text-muted mt-2">
       Mostrando {{ visibleNotes.length }} nota<span v-if="visibleNotes.length !== 1">s</span>
@@ -45,7 +51,9 @@ export default {
   data() {
     return {
       notes: [],
-      showArchived: false
+      showArchived: false,
+      fechaDesde: null,
+      fechaHasta: null
     };
   },
   watch: {
@@ -93,6 +101,13 @@ export default {
           (n) => Array.isArray(n.categories) && n.categories.some((cat) => cat.id === idNum)
         );
       }
+
+      //filtrado por rango de fechas
+      const desde = this.fechaDesde ? new Date(`${this.fechaDesde}T00:00:00`) : null;
+      const hasta = this.fechaHasta ? new Date(`${this.fechaHasta}T23:59:59.999`) : null;
+
+      if (desde) lista = lista.filter((n) => n.timestamp >= desde);
+      if (hasta) lista = lista.filter((n) => n.timestamp <= hasta);
 
       //orden por fecha desc
       lista.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
