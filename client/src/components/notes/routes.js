@@ -2,6 +2,7 @@ import NoteList from "./NoteList.vue";
 import NoteDetail from "./NoteDetail.vue";
 import NoteForm from "./NoteForm.vue";
 import ChangeCreator from "./ChangeCreator.vue";
+import CategoryList from "../CategoryList.vue";
 
 export default [
   {
@@ -40,5 +41,10 @@ export default [
     name: "ListByUser",
     component: NoteList,
     props: true
+  },
+  {
+    path: "/categories",
+    name: "CategoryList",
+    component: CategoryList
   }
 ];

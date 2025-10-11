@@ -54,6 +54,11 @@
             <strong>Lista de usuarios</strong>
           </router-link>
         </span>
+        <span v-if="store.state.user.logged && isAdmin" class="me-3">
+          <router-link to="/categories">
+            <strong>Lista de categorías</strong>
+          </router-link>
+        </span>
         <span v-if="store.state.user.logged" class="me-3">
           Autenticado como: {{ store.state.user.login }}
         </span>
