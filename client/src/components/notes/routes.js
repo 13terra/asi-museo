@@ -3,6 +3,7 @@ import NoteDetail from "./NoteDetail.vue";
 import NoteForm from "./NoteForm.vue";
 import ChangeCreator from "./ChangeCreator.vue";
 import CategoryList from "../CategoryList.vue";
+import CategoryForm from "../CategoryForm.vue";
 
 export default [
   {
@@ -46,5 +47,16 @@ export default [
     path: "/categories",
     name: "CategoryList",
     component: CategoryList
+  },
+  {
+    path: "/categories/new",
+    name: "CrearCategoria",
+    component: CategoryForm
+  },
+  {
+    path: "/categories/:catId/edit",
+    name: "EditarCategoria",
+    component: CategoryForm,
+    props: true
   }
 ];
