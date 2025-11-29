@@ -12,7 +12,8 @@ public class Properties {
   private String clientHost;
   private String jwtSecretKey;
   private Long jwtValidity;
-  private String rutaImagenes;
+  private String rutaImagenesObras;
+  private String metApiBaseUrl; //comprobar si se hace de otra manera
 
   public String getClientHost() {
     return clientHost;
@@ -39,12 +40,12 @@ public class Properties {
     this.jwtValidity = jwtValidity;
   }
 
-  public String getRutaImagenes() {
-    return rutaImagenes;
+  public String getRutaImagenesObras() {
+    return rutaImagenesObras;
   }
 
-  public void setRutaImagenes(String rutaImagenes) {
-    this.rutaImagenes = rutaImagenes;
+  public void setRutaImagenesObras(String rutaImagenesObras) {
+    this.rutaImagenesObras = rutaImagenesObras;
   }
 
 }
