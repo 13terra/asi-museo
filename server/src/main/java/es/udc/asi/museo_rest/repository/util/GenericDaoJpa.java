@@ -1,4 +1,4 @@
-package es.udc.asi.museo_rest.model.repository.util;
+package es.udc.asi.museo_rest.repository.util;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

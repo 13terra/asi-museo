@@ -1,4 +1,4 @@
-package es.udc.asi.museo_rest.model.service;
+package es.udc.asi.museo_rest.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,14 +10,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.udc.asi.museo_rest.model.domain.User;
-import es.udc.asi.museo_rest.model.domain.UserAuthority;
-import es.udc.asi.museo_rest.model.exception.NotFoundException;
-import es.udc.asi.museo_rest.model.exception.OperationNotAllowed;
-import es.udc.asi.museo_rest.model.exception.UserLoginExistsException;
-import es.udc.asi.museo_rest.model.repository.UserDao;
-import es.udc.asi.museo_rest.model.service.dto.UserDTOPrivate;
-import es.udc.asi.museo_rest.model.service.dto.UserDTOPublic;
+import es.udc.asi.museo_rest.model.User;
+import es.udc.asi.museo_rest.model.enums.UserAuthority;
+import es.udc.asi.museo_rest.exception.NotFoundException;
+import es.udc.asi.museo_rest.exception.OperationNotAllowed;
+import es.udc.asi.museo_rest.exception.UserLoginExistsException;
+import es.udc.asi.museo_rest.repository.UserDao;
+import es.udc.asi.museo_rest.dto.UserDTOPrivate;
+import es.udc.asi.museo_rest.dto.UserDTOPublic;
 import es.udc.asi.museo_rest.security.SecurityUtils;
 
 @Service

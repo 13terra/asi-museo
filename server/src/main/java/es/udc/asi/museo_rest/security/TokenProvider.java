@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.security;
+package es.udc.asi.museo_rest.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-import es.udc.asi.notebook_rest.config.Properties;
+import es.udc.asi.museo_rest.config.Properties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

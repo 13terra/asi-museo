@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.web.exceptions;
+package es.udc.asi.museo_rest.web.exceptions;
 
 public class CredentialsAreNotValidException extends ResourceException {
 

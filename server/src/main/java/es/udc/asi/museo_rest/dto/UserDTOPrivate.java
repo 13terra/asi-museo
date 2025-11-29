@@ -1,6 +1,6 @@
-package es.udc.asi.museo_rest.model.service.dto;
+package es.udc.asi.museo_rest.dto;
 
-import es.udc.asi.museo_rest.model.domain.User;
+import es.udc.asi.museo_rest.model.User;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 

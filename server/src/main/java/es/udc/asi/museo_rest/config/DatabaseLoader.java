@@ -1,17 +1,17 @@
-package es.udc.asi.notebook_rest.config;
+package es.udc.asi.museo_rest.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.udc.asi.notebook_rest.model.domain.Category;
-import es.udc.asi.notebook_rest.model.domain.Note;
-import es.udc.asi.notebook_rest.model.domain.User;
-import es.udc.asi.notebook_rest.model.exception.UserLoginExistsException;
-import es.udc.asi.notebook_rest.model.repository.CategoryDao;
-import es.udc.asi.notebook_rest.model.repository.NoteDao;
-import es.udc.asi.notebook_rest.model.repository.UserDao;
-import es.udc.asi.notebook_rest.model.service.UserService;
+import es.udc.asi.museo_rest.domain.Category;
+import es.udc.asi.museo_rest.domain.Note;
+import es.udc.asi.museo_rest.model.User;
+import es.udc.asi.museo_rest.exception.UserLoginExistsException;
+import es.udc.asi.museo_rest.repository.CategoryDao;
+import es.udc.asi.museo_rest.repository.NoteDao;
+import es.udc.asi.museo_rest.repository.UserDao;
+import es.udc.asi.museo_rest.service.UserService;
 
 @Configuration
 public class DatabaseLoader {

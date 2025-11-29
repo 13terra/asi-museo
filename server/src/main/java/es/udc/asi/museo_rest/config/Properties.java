@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.config;
+package es.udc.asi.museo_rest.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

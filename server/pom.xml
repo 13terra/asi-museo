@@ -10,7 +10,7 @@
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
   <groupId>es.udc.asi</groupId>
-  <artifactId>notebook-rest</artifactId>
+  <artifactId>museo-asi-2526</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Notebook REST</name>
   <description>Ejemplo práctica ASI</description>

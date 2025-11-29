@@ -1,8 +1,9 @@
-package es.udc.asi.museo_rest.model.domain;
+package es.udc.asi.museo_rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import es.udc.asi.museo_rest.model.enums.UserAuthority;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

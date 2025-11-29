@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.web;
+package es.udc.asi.museo_rest.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.udc.asi.notebook_rest.model.exception.UserLoginExistsException;
-import es.udc.asi.notebook_rest.model.service.UserService;
-import es.udc.asi.notebook_rest.model.service.dto.LoginDTO;
-import es.udc.asi.notebook_rest.model.service.dto.UserDTOPrivate;
-import es.udc.asi.notebook_rest.security.JWTToken;
-import es.udc.asi.notebook_rest.security.TokenProvider;
-import es.udc.asi.notebook_rest.web.exceptions.CredentialsAreNotValidException;
-import es.udc.asi.notebook_rest.web.exceptions.RequestBodyNotValidException;
+import es.udc.asi.museo_rest.exception.UserLoginExistsException;
+import es.udc.asi.museo_rest.service.UserService;
+import es.udc.asi.museo_rest.dto.LoginDTO;
+import es.udc.asi.museo_rest.dto.UserDTOPrivate;
+import es.udc.asi.museo_rest.security.JWTToken;
+import es.udc.asi.museo_rest.security.TokenProvider;
+import es.udc.asi.museo_rest.web.exceptions.CredentialsAreNotValidException;
+import es.udc.asi.museo_rest.web.exceptions.RequestBodyNotValidException;
 import jakarta.validation.Valid;
 
 /**

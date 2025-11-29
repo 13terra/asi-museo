@@ -1,4 +1,4 @@
-package es.udc.asi.museo_rest.model.exception;
+package es.udc.asi.museo_rest.exception;
 
 public class OperationNotAllowed extends ModelException {
 

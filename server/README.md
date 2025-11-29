@@ -1,4 +1,4 @@
-# Notebook REST
+# Museo REST
 
 ## Configuración
 

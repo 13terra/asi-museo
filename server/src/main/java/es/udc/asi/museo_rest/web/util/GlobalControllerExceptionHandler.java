@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.web.util;
+package es.udc.asi.museo_rest.web.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import es.udc.asi.notebook_rest.model.exception.ModelException;
-import es.udc.asi.notebook_rest.model.exception.NotFoundException;
-import es.udc.asi.notebook_rest.web.exceptions.CredentialsAreNotValidException;
-import es.udc.asi.notebook_rest.web.exceptions.ResourceException;
+import es.udc.asi.museo_rest.exception.ModelException;
+import es.udc.asi.museo_rest.exception.NotFoundException;
+import es.udc.asi.museo_rest.web.exceptions.CredentialsAreNotValidException;
+import es.udc.asi.museo_rest.web.exceptions.ResourceException;
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {

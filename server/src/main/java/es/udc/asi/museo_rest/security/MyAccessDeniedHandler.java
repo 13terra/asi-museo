@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.security;
+package es.udc.asi.museo_rest.security;
 
 import java.io.IOException;
 

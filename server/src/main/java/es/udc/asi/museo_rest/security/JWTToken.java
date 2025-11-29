@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.security;
+package es.udc.asi.museo_rest.security;
 
 public class JWTToken {
   private String token;

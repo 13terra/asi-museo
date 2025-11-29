@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.config;
+package es.udc.asi.museo_rest.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

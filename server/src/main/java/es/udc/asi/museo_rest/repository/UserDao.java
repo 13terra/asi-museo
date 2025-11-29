@@ -1,8 +1,8 @@
-package es.udc.asi.museo_rest.model.repository;
+package es.udc.asi.museo_rest.repository;
 
 import java.util.Collection;
 
-import es.udc.asi.museo_rest.model.domain.User;
+import es.udc.asi.museo_rest.model.User;
 
 public interface UserDao {
 

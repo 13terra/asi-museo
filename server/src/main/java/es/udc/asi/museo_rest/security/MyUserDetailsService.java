@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.security;
+package es.udc.asi.museo_rest.security;
 
 import java.util.Collections;
 
@@ -13,8 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.udc.asi.notebook_rest.model.domain.User;
-import es.udc.asi.notebook_rest.model.repository.UserDao;
+import es.udc.asi.museo_rest.model.User;
+import es.udc.asi.museo_rest.repository.UserDao;
 
 @Component
 public class MyUserDetailsService implements UserDetailsService {

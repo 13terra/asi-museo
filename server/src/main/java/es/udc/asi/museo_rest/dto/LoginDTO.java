@@ -1,4 +1,4 @@
-package es.udc.asi.museo_rest.model.service.dto;
+package es.udc.asi.museo_rest.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.web.util;
+package es.udc.asi.museo_rest.web.util;
 
 public class ErrorDTO {
   private String message;

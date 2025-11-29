@@ -1,4 +1,4 @@
-package es.udc.asi.museo_rest.web;
+package es.udc.asi.museo_rest.controller;
 
 import java.util.List;
 
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.udc.asi.museo_rest.model.exception.NotFoundException;
-import es.udc.asi.museo_rest.model.exception.OperationNotAllowed;
-import es.udc.asi.museo_rest.model.service.UserService;
-import es.udc.asi.museo_rest.model.service.dto.UserDTOPublic;
-import es.udc.asi.museo_rest.model.service.dto.UserWithNotesDTO;
+import es.udc.asi.museo_rest.exception.NotFoundException;
+import es.udc.asi.museo_rest.exception.OperationNotAllowed;
+import es.udc.asi.museo_rest.service.UserService;
+import es.udc.asi.museo_rest.dto.UserDTOPublic;
+import es.udc.asi.museo_rest.dto.UserWithNotesDTO;
 
 @RestController
 @RequestMapping("/api/users")

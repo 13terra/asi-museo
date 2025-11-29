@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.security;
+package es.udc.asi.museo_rest.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

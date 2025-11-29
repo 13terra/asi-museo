@@ -1,4 +1,4 @@
-package es.udc.asi.notebook_rest.config;
+package es.udc.asi.museo_rest.config;
 
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import es.udc.asi.notebook_rest.model.domain.UserAuthority;
-import es.udc.asi.notebook_rest.security.JWTConfigurer;
-import es.udc.asi.notebook_rest.security.MyAccessDeniedHandler;
-import es.udc.asi.notebook_rest.security.MyUnauthorizedEntryPoint;
-import es.udc.asi.notebook_rest.security.MyUserDetailsService;
-import es.udc.asi.notebook_rest.security.TokenProvider;
+import es.udc.asi.museo_rest.model.enums.UserAuthority;
+import es.udc.asi.museo_rest.security.JWTConfigurer;
+import es.udc.asi.museo_rest.security.MyAccessDeniedHandler;
+import es.udc.asi.museo_rest.security.MyUnauthorizedEntryPoint;
+import es.udc.asi.museo_rest.security.MyUserDetailsService;
+import es.udc.asi.museo_rest.security.TokenProvider;
 
 @Configuration
 @EnableWebSecurity

@@ -1,6 +1,6 @@
-package es.udc.asi.museo_rest.domain;
+package es.udc.asi.museo_rest.model.enums;
 
 public enum UserAuthority {
   // Definimos dos authorities o roles para los usuarios del sistema
-  USER, ADMIN
+  GESTOR, ADMIN, VISITANTE
 }

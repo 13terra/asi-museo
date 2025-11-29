@@ -1,12 +1,12 @@
-package es.udc.asi.museo_rest.model.repository;
+package es.udc.asi.museo_rest.repository;
 
 import java.util.Collection;
 
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Repository;
 
-import es.udc.asi.museo_rest.model.domain.User;
-import es.udc.asi.museo_rest.model.repository.util.GenericDaoJpa;
+import es.udc.asi.museo_rest.model.User;
+import es.udc.asi.museo_rest.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
 
 @Repository
