@@ -2,9 +2,12 @@ spring:
   datasource:
     host: database    #Utilizamos el nombre del servicio en lugar de localhost
     port: 5432
-    database: asi
-    username: postgres
-    password: postgres
+    database: museo_db
+    username: museo_user
+    password: museo_pass
     url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
   jpa:
     database: postgresql
+
+propeties:
+  metServiceUrl: http://met-microservice:8081

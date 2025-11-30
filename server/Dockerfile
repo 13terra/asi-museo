@@ -23,4 +23,5 @@ WORKDIR /app
 EXPOSE 8080
 
 ENTRYPOINT [ "sh", "-c" ]
+#permite tener configuraciones diferentes según el entorno
 CMD ["exec java -jar -Dspring.profiles.active=docker /app/*.jar"]

@@ -1,4 +1,5 @@
 services: #Cada servicio es un contenedor Docker
+
   # BACKEND SPRING BOOT
   server:
     build:  # Construye la imagen a partir del Dockerfile en el contexto especificado

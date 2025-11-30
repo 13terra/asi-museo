@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Notebook REST
+    name: Museo Backend
 # Descomentar para utilizar postgresql en vez de H2
   datasource:
     host: localhost
@@ -8,12 +8,14 @@ spring:
     database: museo_db
     username: museo_user
     password: museo_pass
-    url: jdbc:postgresql://database:5432/museo_db
+    #así si intentamos ejecutar el back en local no fallará, porque existe el host 'database' en la máquina
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: create  # crea de cero la base de datos cada vez que tiramos el proyecto  (cambiar por validate)
 properties:
-  clientHost: http://localhost:1234
+  clientHost: http://localhost:1234   #define desde que url puede el front comunicarse con el back (CORS)
   jwtSecretKey: h3qlqtvjaq8NEm1AG$2p8qT!^c3AkrE&rno2z8LZWD@qWo40xphNoPQ7j%J197
   jwtValidity: 7200
+  metServiceUrl: http://localhost:8081  #añadido para desarrollo local del microservicio
