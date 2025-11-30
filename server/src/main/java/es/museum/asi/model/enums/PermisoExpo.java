@@ -1,0 +1,5 @@
+package es.museum.asi.model.enums;
+
+public enum PermisoExpo {
+  CREADOR, GESTOR
+}

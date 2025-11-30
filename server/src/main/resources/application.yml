@@ -2,13 +2,13 @@ spring:
   application:
     name: Notebook REST
 # Descomentar para utilizar postgresql en vez de H2
-#  datasource:
-#    host: localhost
-#    port: 5432
-#    database: asi
-#    username: postgres
-#    password: postgres
-#    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+  datasource:
+    host: localhost
+    port: 5432
+    database: museo_db
+    username: museo_user
+    password: museo_pass
+    url: jdbc:postgresql://database:5432/museo_db
   jpa:
     open-in-view: false
     hibernate:

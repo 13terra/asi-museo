@@ -9,11 +9,12 @@
     <version>3.5.5</version>
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
-  <groupId>es.udc.asi</groupId>
-  <artifactId>museo-asi-2526</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>Notebook REST</name>
-  <description>Ejemplo práctica ASI</description>
+
+  <groupId>es.museum</groupId>
+  <artifactId>asi-museo-server</artifactId>
+  <version>1.0.0</version>
+  <name>ASI Museo Backend</name>
+
   <url />
   <licenses>
     <license />
@@ -30,6 +31,7 @@
   <properties>
     <java.version>17</java.version>
   </properties>
+  <!-- Spring boot web: Para crear REST APIs -->
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
