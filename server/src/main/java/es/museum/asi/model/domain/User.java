@@ -1,46 +1,59 @@
 package es.museum.asi.model.domain;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import es.museum.asi.model.enums.EstadoUser;
 import es.museum.asi.model.enums.UserAuthority;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "theUser")
 public class User {
+
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
   @SequenceGenerator(name = "user_generator", sequenceName = "user_seq")
-  private Long id;
+  private Long idUser;
 
-  @Column(unique = true)
+  @Column(unique = true, nullable = false)
   private String login;
 
-  private String password;
+  @Column(nullable = false)
+  private String contrasena;
 
   @Enumerated(EnumType.STRING)
-  private UserAuthority authority;
+  @Column(nullable = false)
+  private UserAuthority autoridad;
 
-  private EstadoUser =
-  private boolean active = true;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private EstadoUser estado = EstadoUser.ACTIVO;
+
+  @OneToMany(mappedBy = "user") //la relacion está mapeada por 'user' en la clase Reserva
+  private List<Reserva> reservas = new ArrayList<>();
+
+  @OneToMany(mappedBy = "user") //la relacion está mapeada por 'user' en la clase Reserva
+  private Set<Gestion> gestiones = new HashSet<>();
 
   public User() {
   }
 
-  public Long getId() {
-    return id;
+  public User(String login, String contrasena, UserAuthority autoridad) {
+    this.login = login;
+    this.contrasena = contrasena;
+    this.autoridad = autoridad;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+
+  public Long getIdUser() {
+    return idUser;
+  }
+
+  public void setIdUser(Long idUser) {
+    this.idUser = idUser;
   }
 
   public String getLogin() {
@@ -51,36 +64,43 @@ public class User {
     this.login = login;
   }
 
-  public String getPassword() {
-    return password;
+  public String getContrasena() {
+    return contrasena;
   }
 
-  public void setPassword(String password) {
-    this.password = password;
+  public void setContrasena(String contrasena) {
+    this.contrasena = contrasena;
   }
 
-  public UserAuthority getAuthority() {
-    return authority;
+  public UserAuthority getAutoridad() {
+    return autoridad;
   }
 
-  public void setAuthority(UserAuthority authority) {
-    this.authority = authority;
+  public void setAutoridad(UserAuthority autoridad) {
+    this.autoridad = autoridad;
   }
 
-  public List<Note> getNotes() {
-    return notes;
+  public EstadoUser getEstado() {
+    return estado;
   }
 
-  public void setNotes(List<Note> notes) {
-    this.notes = notes;
+  public void setEstado(EstadoUser estado) {
+    this.estado = estado;
   }
 
-  public boolean isActive() {
-    return active;
+  public List<Reserva> getReservas() {
+    return reservas;
   }
 
-  public void setActive(boolean active) {
-    this.active = active;
+  public void setReservas(List<Reserva> reservas) {
+    this.reservas = reservas;
   }
 
+  public Set<Gestion> getGestiones() {
+    return gestiones;
+  }
+
+  public void setGestiones(Set<Gestion> gestiones) {
+    this.gestiones = gestiones;
+  }
 }
