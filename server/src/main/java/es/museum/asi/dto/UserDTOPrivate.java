@@ -1,6 +1,6 @@
 package es.museum.asi.dto;
 
-import es.museum.asi.model.User;
+import es.museum.asi.model.domain.User;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 

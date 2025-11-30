@@ -14,6 +14,9 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: create  # crea de cero la base de datos cada vez que tiramos el proyecto  (cambiar por validate)
+    show-sql: true # ver queries que se ejecutan en consola
+    properties:
+      format_sql: true
 properties:
   clientHost: http://localhost:1234   #define desde que url puede el front comunicarse con el back (CORS)
   jwtSecretKey: h3qlqtvjaq8NEm1AG$2p8qT!^c3AkrE&rno2z8LZWD@qWo40xphNoPQ7j%J197

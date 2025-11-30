@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Lazy;
 
 import es.museum.asi.config.DatabaseLoader;
-import es.museum.asi.exception.UserLoginExistsException;
+import es.museum.asi.model.exception.UserLoginExistsException;
 import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication

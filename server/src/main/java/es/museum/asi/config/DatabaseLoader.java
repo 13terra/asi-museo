@@ -6,12 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.asi.museo_rest.domain.Category;
 import es.udc.asi.museo_rest.domain.Note;
-import es.museum.asi.model.User;
-import es.museum.asi.exception.UserLoginExistsException;
+import es.museum.asi.model.domain.User;
+import es.museum.asi.model.exception.UserLoginExistsException;
 import es.udc.asi.museo_rest.repository.CategoryDao;
 import es.udc.asi.museo_rest.repository.NoteDao;
-import es.museum.asi.repository.UserDao;
-import es.museum.asi.service.UserService;
+import es.museum.asi.model.repository.UserDao;
+import es.museum.asi.model.service.UserService;
 
 @Configuration
 public class DatabaseLoader {

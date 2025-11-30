@@ -13,8 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.museum.asi.model.User;
-import es.museum.asi.repository.UserDao;
+import es.museum.asi.model.domain.User;
+import es.museum.asi.model.repository.UserDao;
 
 @Component
 public class MyUserDetailsService implements UserDetailsService {

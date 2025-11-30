@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import es.museum.asi.exception.ModelException;
-import es.museum.asi.exception.NotFoundException;
+import es.museum.asi.model.exception.ModelException;
+import es.museum.asi.model.exception.NotFoundException;
 import es.museum.asi.web.exceptions.CredentialsAreNotValidException;
 import es.museum.asi.web.exceptions.ResourceException;
 

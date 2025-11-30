@@ -1,6 +1,6 @@
 package es.museum.asi.dto;
 
-import es.museum.asi.model.User;
+import es.museum.asi.model.domain.User;
 
 public class UserDTOPublic {
   private Long id;

@@ -9,5 +9,5 @@ spring:
   jpa:
     database: postgresql
 
-propeties:
+properties:
   metServiceUrl: http://met-microservice:8081

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.museum.asi.exception.UserLoginExistsException;
-import es.museum.asi.service.UserService;
+import es.museum.asi.model.exception.UserLoginExistsException;
+import es.museum.asi.model.service.UserService;
 import es.museum.asi.dto.LoginDTO;
 import es.museum.asi.dto.UserDTOPrivate;
 import es.museum.asi.security.JWTToken;
