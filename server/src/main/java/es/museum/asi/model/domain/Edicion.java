@@ -5,20 +5,22 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 @Entity
 @Table(name = "edicion")
 public class Edicion {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "edidicon_generator")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "edicion_generator")
   @SequenceGenerator(name = "edicion_generator", sequenceName = "edicion_seq")
   private Long idEdicion;
 
+  @Column(nullable = false)
   private LocalDate fechaInicio;
+
+  @Column(nullable = false)
   private LocalDate fechaFin;
 
   private EstadoEdicion estado = EstadoEdicion.BORRADOR;
@@ -31,12 +33,11 @@ public class Edicion {
   private List<Sesion> sesiones =  new ArrayList<>(); // List: mantener orden cronológico + existir múltiples ediciones de la misma expo
 
   @OneToMany(mappedBy = "edicion")
-  private Set<PiezaExpuesta> piezaExpuestas = new HashSet<>();
+  private List<PiezaExpuesta> piezasExpuestas = new ArrayList<>();
 
   public Edicion() {
     super();
   }
-
 
   public Long getIdEdicion() {
     return idEdicion;
@@ -86,11 +87,11 @@ public class Edicion {
     this.sesiones = sesiones;
   }
 
-  public Set<PiezaExpuesta> getPiezaExpuestas() {
-    return piezaExpuestas;
+  public List<PiezaExpuesta> getPiezasExpuestas() {
+    return piezasExpuestas;
   }
 
-  public void setPiezaExpuestas(Set<PiezaExpuesta> piezaExpuestas) {
-    this.piezaExpuestas = piezaExpuestas;
+  public void setPiezasExpuestas(List<PiezaExpuesta> piezasExpuestas) {
+    this.piezasExpuestas = piezasExpuestas;
   }
 }
