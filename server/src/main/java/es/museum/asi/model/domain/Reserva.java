@@ -2,6 +2,8 @@ package es.museum.asi.model.domain;
 
 import es.museum.asi.model.enums.EstadoReserva;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "reserva")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)    //hacerlo así o con el constructor sin parámetros --> pero siempre de la misma manera
 public class Reserva {
 
   @Id
@@ -53,6 +56,9 @@ public class Reserva {
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Sesion sesion;
+
+  // DEFINIR CONSTRUCTOR ¿necesito varios?
+
 
   public Long getIdReserva() {
     return idReserva;

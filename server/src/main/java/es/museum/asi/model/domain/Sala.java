@@ -26,6 +26,8 @@ public class Sala {
   @OneToMany(mappedBy = "sala")
   private List<OrdenSalaSesion> ordenes = new ArrayList<>();
 
+  public Sala() {}
+
   public Long getIdSala() {
     return idSala;
   }

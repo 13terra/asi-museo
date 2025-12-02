@@ -1,11 +1,14 @@
 package es.museum.asi.model.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Table(name = "tipoEntrada")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TipoEntrada {
 
   @Id

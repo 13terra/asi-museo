@@ -2,6 +2,8 @@ package es.museum.asi.model.domain;
 
 import es.museum.asi.model.enums.EstadoExpo;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,6 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "exposicion")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)    //hacerlo así o con el constructor sin parámetros --> pero siempre de la misma manera
 public class Exposicion {
 
   @Id
@@ -25,7 +28,7 @@ public class Exposicion {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private EstadoExpo estadoExpo = EstadoExpo.BORRADOR;
+  private EstadoExpo estadoExpo;
 
   @OneToMany(mappedBy = "exposicion")
   private List<Edicion> ediciones =  new ArrayList<>(); // List: mantener orden cronológico + existir múltiples ediciones de la misma expo
@@ -33,13 +36,10 @@ public class Exposicion {
   @OneToMany(mappedBy = "exposicion")
   private Set<Gestion> gestiones = new HashSet<>(); //Set evita duplicados y orden no importa
 
-  public Exposicion() {
-
-  }
-
   public Exposicion(String titulo, String descripcion) {
     this.titulo = titulo;
     this.descripcion = descripcion;
+    this.estadoExpo = EstadoExpo.BORRADOR;
   }
 
   public Long getIdExposicion() {

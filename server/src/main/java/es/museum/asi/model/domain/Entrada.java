@@ -1,9 +1,12 @@
 package es.museum.asi.model.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "entrada")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Entrada {
 
   @Id
@@ -32,6 +35,8 @@ public class Entrada {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sesion sesion;
+
+  // DEFINIR CONSTRUCTOR/ES
 
   public Long getIdEntrada() {
     return idEntrada;

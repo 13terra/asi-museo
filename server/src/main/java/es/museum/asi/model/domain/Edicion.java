@@ -3,6 +3,10 @@ package es.museum.asi.model.domain;
 import es.museum.asi.model.enums.EstadoEdicion;
 import jakarta.persistence.*;
 
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "edicion")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Edicion {
 
   @Id
@@ -23,7 +28,7 @@ public class Edicion {
   @Column(nullable = false)
   private LocalDate fechaFin;
 
-  private EstadoEdicion estado = EstadoEdicion.BORRADOR;
+  private EstadoEdicion estado;
 
   // optional? supongo que false
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -35,8 +40,11 @@ public class Edicion {
   @OneToMany(mappedBy = "edicion")
   private List<PiezaExpuesta> piezasExpuestas = new ArrayList<>();
 
-  public Edicion() {
-    super();
+  // no estoy seguro
+  public Edicion(LocalDate fechaInicio, LocalDate fechaFin) {
+    this.fechaInicio = fechaInicio;
+    this.fechaFin = fechaFin;
+    this.estado = EstadoEdicion.BORRADOR;
   }
 
   public Long getIdEdicion() {
