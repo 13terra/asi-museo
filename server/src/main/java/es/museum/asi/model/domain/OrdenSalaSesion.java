@@ -14,12 +14,6 @@ public class OrdenSalaSesion {
   @SequenceGenerator(name = "orden_sala_sesion_generator", sequenceName = "orden_sala_sesion_seq")
   private Long id;
 
-  @Column(name = "id_sala")
-  private Long idSala;
-
-  @Column(name = "id_sesion")
-  private Long idSesion;
-
   @Column(name = "orden")
   private int orden;
 
@@ -35,22 +29,6 @@ public class OrdenSalaSesion {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public Long getIdSala() {
-    return idSala;
-  }
-
-  public void setIdSala(Long idSala) {
-    this.idSala = idSala;
-  }
-
-  public Long getIdSesion() {
-    return idSesion;
-  }
-
-  public void setIdSesion(Long idSesion) {
-    this.idSesion = idSesion;
   }
 
   public int getOrden() {

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,7 +27,7 @@ public class TipoEntrada {
   private String descripcion;
 
   @OneToMany(mappedBy = "tipoEntrada")
-  private List<Entrada> entradas;
+  private List<Entrada> entradas = new ArrayList<>();
 
 
   public Long getIdTipoEntrada() {

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class Reserva {
   private String apellido2;
 
   @Column(nullable = false)
-  private LocalDate fechaReserva;
+  private LocalDateTime fechaReserva;
 
   @Column(nullable = false)
   private String telefono;
@@ -42,19 +42,20 @@ public class Reserva {
   private String pais;
 
   @Column(nullable = false)
-  private EstadoReserva estadoReserva;
+  @Enumerated(EnumType.STRING)
+  private EstadoReserva estadoReserva = EstadoReserva.CONFIRMADA; // ? no estoy seguro
 
-  @Column
+  @Column(nullable = false)
   private String email;
 
   @OneToMany(mappedBy = "reserva")
   private List<Entrada> entradas = new ArrayList<>();
 
   // que significa optional=false?
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sesion sesion;
 
   // DEFINIR CONSTRUCTOR ¿necesito varios?
@@ -100,11 +101,11 @@ public class Reserva {
     this.apellido2 = apellido2;
   }
 
-  public LocalDate getFechaReserva() {
+  public LocalDateTime getFechaReserva() {
     return fechaReserva;
   }
 
-  public void setFechaReserva(LocalDate fechaReserva) {
+  public void setFechaReserva(LocalDateTime fechaReserva) {
     this.fechaReserva = fechaReserva;
   }
 

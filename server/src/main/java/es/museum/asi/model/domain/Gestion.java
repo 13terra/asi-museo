@@ -17,12 +17,7 @@ public class Gestion {
   private Long idGestion;
 
   @Column(nullable = false)
-  private Long idUser;
-
-  @Column(nullable = false)
-  private Long idExposicion;
-
-  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
   private TipoPermiso permiso;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -37,22 +32,6 @@ public class Gestion {
 
   public void setIdGestion(Long idGestion) {
     this.idGestion = idGestion;
-  }
-
-  public Long getIdUser() {
-    return idUser;
-  }
-
-  public void setIdUser(Long idUser) {
-    this.idUser = idUser;
-  }
-
-  public Long getIdExposicion() {
-    return idExposicion;
-  }
-
-  public void setIdExposicion(Long idExposicion) {
-    this.idExposicion = idExposicion;
   }
 
   public TipoPermiso getPermiso() {

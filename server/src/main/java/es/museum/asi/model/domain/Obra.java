@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,7 +26,8 @@ public class Obra {
   private String titulo;
 
   @Column(nullable = false)
-  private EstadoObra estado;
+  @Enumerated(EnumType.STRING)
+  private EstadoObra estado = EstadoObra.EN_ALMACEN;
 
   @Column(nullable = false)
   private String dimensiones;
@@ -34,16 +36,17 @@ public class Obra {
   private String autor;
 
   @Column(nullable = false)
-  private LocalDate anoCreacion;
+  private Integer anoCreacion; // capacidad de ser null
 
-  @Column(nullable = false)
-  private Long idExterno;
+  @Column
+  private Long idExterno; //no todas las obras vienen de The MET
 
   @Column(nullable = false)
   private String tecnica;
 
   @OneToMany(mappedBy = "obra")
-  private List<PiezaExpuesta> piezasExpuestas;
+  private List<PiezaExpuesta> piezasExpuestas = new ArrayList<>();
+
 
   public Long getIdObra() {
     return idObra;
@@ -93,11 +96,11 @@ public class Obra {
     this.autor = autor;
   }
 
-  public LocalDate getAnoCreacion() {
+  public Integer getAnoCreacion() {
     return anoCreacion;
   }
 
-  public void setAnoCreacion(LocalDate anoCreacion) {
+  public void setAnoCreacion(Integer anoCreacion) {
     this.anoCreacion = anoCreacion;
   }
 

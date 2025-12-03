@@ -14,26 +14,27 @@ public class PiezaExpuesta {
   @SequenceGenerator(name = "pieza_expuesta_generator", sequenceName = "pieza_expuesta_seq")
   private Long idPiezaExpuesta;
 
-  @Column(nullable = false)
-  private String textoCuratorial;
+  @Column(length = 2000)
+  private String textoCuratorial; //puede no tener, o al menos no en un primer momento
 
   @Column(nullable = false)
-  private String orden;
+  private Integer orden;  //corregido
 
   @Column(nullable = false)
-  private Boolean portada;
+  private Boolean portada = false;  //se le da este valor por defecto, y luego se escoge una
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Obra obra;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sala sala;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Edicion edicion;
 
 
   public Long getIdPiezaExpuesta() {
+
     return idPiezaExpuesta;
   }
 
@@ -49,11 +50,11 @@ public class PiezaExpuesta {
     this.textoCuratorial = textoCuratorial;
   }
 
-  public String getOrden() {
+  public Integer getOrden() {
     return orden;
   }
 
-  public void setOrden(String orden) {
+  public void setOrden(Integer orden) {
     this.orden = orden;
   }
 
