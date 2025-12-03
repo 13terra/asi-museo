@@ -28,7 +28,9 @@ public class Edicion {
   @Column(nullable = false)
   private LocalDate fechaFin;
 
-  private EstadoEdicion estado;
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private EstadoEdicion estado = EstadoEdicion.BORRADOR;
 
   // optional? supongo que false
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -40,11 +42,11 @@ public class Edicion {
   @OneToMany(mappedBy = "edicion")
   private List<PiezaExpuesta> piezasExpuestas = new ArrayList<>();
 
-  // no estoy seguro
-  public Edicion(LocalDate fechaInicio, LocalDate fechaFin) {
+  // no estoy seguro --> ¿hace falta el estado?
+  public Edicion(Exposicion exposicion, LocalDate fechaInicio, LocalDate fechaFin) {
+    this.exposicion = exposicion;
     this.fechaInicio = fechaInicio;
     this.fechaFin = fechaFin;
-    this.estado = EstadoEdicion.BORRADOR;
   }
 
   public Long getIdEdicion() {

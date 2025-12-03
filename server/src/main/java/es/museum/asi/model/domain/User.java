@@ -10,7 +10,7 @@ import es.museum.asi.model.enums.UserAuthority;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "theUser")
+@Table(name = "theUser")  //evitamos palabra reservada
 public class User {
 
   @Id
@@ -35,7 +35,7 @@ public class User {
   @OneToMany(mappedBy = "user") //la relacion está mapeada por 'user' en la clase Reserva
   private List<Reserva> reservas = new ArrayList<>();
 
-  @OneToMany(mappedBy = "user") //la relacion está mapeada por 'user' en la clase Reserva
+  @OneToMany(mappedBy = "user") //la relacion está mapeada por 'user' en la clase gestion
   private Set<Gestion> gestiones = new HashSet<>();
 
   public User() {

@@ -28,7 +28,7 @@ public class Exposicion {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private EstadoExpo estadoExpo;
+  private EstadoExpo estadoExpo = EstadoExpo.BORRADOR;  //si se usa el constructor de lombok si no inicializamos sería nulo
 
   @OneToMany(mappedBy = "exposicion")
   private List<Edicion> ediciones =  new ArrayList<>(); // List: mantener orden cronológico + existir múltiples ediciones de la misma expo
@@ -39,7 +39,6 @@ public class Exposicion {
   public Exposicion(String titulo, String descripcion) {
     this.titulo = titulo;
     this.descripcion = descripcion;
-    this.estadoExpo = EstadoExpo.BORRADOR;
   }
 
   public Long getIdExposicion() {

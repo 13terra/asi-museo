@@ -1,12 +1,15 @@
 package es.museum.asi.model.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "sala")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Sala {
 
   @Id
@@ -26,7 +29,10 @@ public class Sala {
   @OneToMany(mappedBy = "sala")
   private List<OrdenSalaSesion> ordenes = new ArrayList<>();
 
-  public Sala() {}
+  public Sala(String nombre, int planta) {
+    this.nombre = nombre;
+    this.planta = planta;
+  }
 
   public Long getIdSala() {
     return idSala;
