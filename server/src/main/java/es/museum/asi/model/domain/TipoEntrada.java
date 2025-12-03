@@ -21,7 +21,7 @@ public class TipoEntrada {
   private String nombre;
 
   @Column(nullable = false)
-  private float precio;
+  private Float precio;
 
   @Column
   private String descripcion;
@@ -46,11 +46,11 @@ public class TipoEntrada {
     this.nombre = nombre;
   }
 
-  public float getPrecio() {
+  public Float getPrecio() {
     return precio;
   }
 
-  public void setPrecio(float precio) {
+  public void setPrecio(Float precio) {
     this.precio = precio;
   }
 

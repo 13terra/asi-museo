@@ -17,10 +17,10 @@ public class OrdenSalaSesion {
   @Column(name = "orden")
   private int orden;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sesion sesion;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sala sala;
 
   public Long getId() {

@@ -26,6 +26,9 @@ public class Entrada {
   @Column(nullable = false)
   private String dni;
 
+  @Column(nullable = false)
+  private Float precio;
+
   //tiene que haber tipoEntrada sí o sí --> por eso optional = false
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private TipoEntrada tipoEntrada;
@@ -36,8 +39,15 @@ public class Entrada {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sesion sesion;
 
-  // DEFINIR CONSTRUCTOR/ES
 
+
+  public Float getPrecio() {
+    return precio;
+  }
+
+  public void setPrecio(Float precio) {
+    this.precio = precio;
+  }
   public Long getIdEntrada() {
     return idEntrada;
   }
