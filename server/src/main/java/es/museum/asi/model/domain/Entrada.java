@@ -36,11 +36,6 @@ public class Entrada {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Reserva reserva;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  private Sesion sesion;
-
-
-
   public Float getPrecio() {
     return precio;
   }
@@ -104,11 +99,4 @@ public class Entrada {
     this.reserva = reserva;
   }
 
-  public Sesion getSesion() {
-    return sesion;
-  }
-
-  public void setSesion(Sesion sesion) {
-    this.sesion = sesion;
-  }
 }

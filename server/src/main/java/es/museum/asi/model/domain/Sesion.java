@@ -41,9 +41,6 @@ public class Sesion {
   @OneToMany(mappedBy = "sesion")
   private List<Reserva> reservas = new ArrayList<>();
 
-  @OneToMany(mappedBy = "sesion")
-  private List<Entrada> entradas = new ArrayList<>();
-
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Edicion edicion;
 
@@ -101,14 +98,6 @@ public class Sesion {
 
   public void setReservas(List<Reserva> reservas) {
     this.reservas = reservas;
-  }
-
-  public List<Entrada> getEntradas() {
-    return entradas;
-  }
-
-  public void setEntradas(List<Entrada> entradas) {
-    this.entradas = entradas;
   }
 
   public Edicion getEdicion() {
