@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "tipoEntrada")
+@Table(name = "tipo_entrada")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TipoEntrada {
 

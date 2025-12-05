@@ -1,6 +1,7 @@
 package es.museum.asi.repository;
 
 import es.museum.asi.model.domain.Exposicion;
+import es.museum.asi.model.enums.EstadoExpo;
 import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
 
@@ -19,9 +20,9 @@ public class ExposicionDaoJpa extends GenericDaoJpa implements ExposicionDao {
   }
 
   @Override
-  public Collection<Exposicion> findByEstado(String estado) {
+  public Collection<Exposicion> findByEstado(EstadoExpo estado) {
     TypedQuery<Exposicion> query = entityManager
-      .createQuery("SELECT e FROM Exposicion e WHERE e.estado = :estado", Exposicion.class)
+      .createQuery("SELECT e FROM Exposicion e WHERE e.estadoExpo = :estado", Exposicion.class)
       .setParameter("estado", estado);
     return query.getResultList();
   }
