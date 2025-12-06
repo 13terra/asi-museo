@@ -1,6 +1,5 @@
 package es.museum.asi.repository;
 
-import es.museum.asi.model.domain.Entrada;
 import es.museum.asi.model.domain.TipoEntrada;
 import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
@@ -27,7 +26,7 @@ public class TipoEntradaDaoJpa extends GenericDaoJpa implements TipoEntradaDao {
 
   @Override
   public Collection<TipoEntrada> findAll() {
-      return entityManager.createQuery("from TipoEntada", TipoEntrada.class).getResultList();
+      return entityManager.createQuery("from TipoEntrada", TipoEntrada.class).getResultList();
   }
 
   @Override
