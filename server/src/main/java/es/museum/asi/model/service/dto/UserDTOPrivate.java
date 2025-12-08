@@ -1,6 +1,7 @@
-package es.museum.asi.dto;
+package es.museum.asi.model.service.dto;
 
 import es.museum.asi.model.domain.User;
+import es.museum.asi.model.enums.UserAuthority;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
@@ -14,16 +15,17 @@ public class UserDTOPrivate {
   @NotEmpty
   @Size(min = 4)
   private String password;
-  private String authority;
+
+  private UserAuthority authority;
 
   public UserDTOPrivate() {
   }
 
   public UserDTOPrivate(User user) {
-    this.id = user.getId();
+    this.id = user.getIdUser();
     this.login = user.getLogin();
     // la contraseña no se rellena, nunca se envía al cliente
-    this.authority = user.getAuthority().name();
+    this.authority = user.getAutoridad();
   }
 
   public Long getId() {
@@ -50,11 +52,11 @@ public class UserDTOPrivate {
     this.password = password;
   }
 
-  public String getAuthority() {
+  public UserAuthority getAuthority() {
     return authority;
   }
 
-  public void setAuthority(String authority) {
+  public void setAuthority(UserAuthority authority) {
     this.authority = authority;
   }
 }
