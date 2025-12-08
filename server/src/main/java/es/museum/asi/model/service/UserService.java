@@ -10,6 +10,7 @@ import es.museum.asi.model.exception.UserLoginExistsException;
 import es.museum.asi.model.service.dto.UserDTOCompleto;
 import es.museum.asi.model.service.dto.UserDTOPrivate;
 import es.museum.asi.model.service.dto.UserDTOPublic;
+import es.museum.asi.repository.EntradaDao;
 import es.museum.asi.repository.GestionDao;
 import es.museum.asi.repository.ReservaDao;
 import es.museum.asi.repository.UserDao;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class UserService {
@@ -36,6 +38,9 @@ public class UserService {
 
   @Autowired
   private GestionDao gestionDao;
+
+  @Autowired
+  private EntradaDao entradaDao;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
@@ -238,8 +243,13 @@ public class UserService {
     //Eliminar gestiones asociadas
     gestionDao.findByUser(idUser).forEach(gestion -> gestionDao.delete(gestion));
 
-    //Eliminar reservas y entradas asociadas (en cascada)
-    reservaDao.findByUser(idUser).forEach(reserva -> reservaDao.delete(reserva));
+    //Eliminar reservas y entradas asociadas
+    reservaDao.findByUser(idUser).forEach(reserva -> {
+      entradaDao.findByReserva(reserva.getIdReserva()).forEach(entrada -> {
+        entradaDao.delete(entrada);
+      });
+      reservaDao.delete(reserva);
+    });
 
     userDao.delete(theUser);
   }
