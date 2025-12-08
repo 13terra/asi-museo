@@ -52,4 +52,12 @@ public class SesionDaoJpa extends GenericDaoJpa implements SesionDao {
     return query.getResultList();
   }
 
+  @Override
+  public Collection<Sesion> findBySala(Long idSala) {
+    TypedQuery<Sesion> query = entityManager
+      .createQuery("Select s From Sesion s WHERE s.idSala = :idSala", Sesion.class)
+      .setParameter("idSala", idSala);
+    return query.getResultList();
+  }
+
 }

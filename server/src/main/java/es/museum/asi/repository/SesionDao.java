@@ -20,4 +20,6 @@ public interface SesionDao {
   Collection<Sesion> findByEdicion(Long idEdicion);
 
   Collection<Sesion> findByEstado(EstadoSesion estado);
+
+  Collection<Sesion> findBySala(Long idSala);
 }
