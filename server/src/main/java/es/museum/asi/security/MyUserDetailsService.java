@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import es.museum.asi.model.enums.EstadoUser;
 import es.museum.asi.repository.UserDao;
+import es.museum.asi.web.exceptions.UserNotActiveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +28,27 @@ public class MyUserDetailsService implements UserDetailsService {
   @Override
   @Transactional(readOnly = true)
   public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-    // HAY QUE IMPLEMENTARLO
+
     User user = userDAO.findByLogin(login);
+    // usuario no existe
     if (user == null) {
-      throw new UsernameNotFoundException("User " + login + " not found");
+      logger.warn("Intento de login fallido: usuario '{}' no encontrado", login);
+      throw new UsernameNotFoundException("Usuario o contraseña incorrectos");
     }
+    // usuario inactivo
     if (user.getEstado() != EstadoUser.ACTIVO) {
-      throw new UsernameNotFoundException("User " + login + " not active");
+      logger.warn("Intento de login con usuario inactivo: '{}'", login);
+      throw new UserNotActiveException( "El usuario está inactivo.  Contacte con el administrador.");
     }
 
-    logger.info("Loaded user {} with authority {}", login, user.getAutoridad().name());
+    logger.info("Usuario '{}' autenticado correctamente con autoridad {}", login, user.getAutoridad(). name());
 
+    // Crear GrantedAuthority con el enum convertido a String
     GrantedAuthority authority = new SimpleGrantedAuthority(user.getAutoridad().name());
-    return new org.springframework.security.core.userdetails.User(login, user.getContrasena(),
-        Collections.singleton(authority));
+
+    return new org.springframework.security.core.userdetails.User(
+      login,
+      user.getContrasena(),
+      Collections.singleton(authority));
   }
 }
