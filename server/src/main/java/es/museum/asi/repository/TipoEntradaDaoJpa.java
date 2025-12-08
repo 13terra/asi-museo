@@ -26,7 +26,7 @@ public class TipoEntradaDaoJpa extends GenericDaoJpa implements TipoEntradaDao {
 
   @Override
   public Collection<TipoEntrada> findAll() {
-      return entityManager.createQuery("from TipoEntrada", TipoEntrada.class).getResultList();
+      return entityManager.createQuery("Select te From TipoEntrada te Order By te.precio", TipoEntrada.class).getResultList();
   }
 
   @Override

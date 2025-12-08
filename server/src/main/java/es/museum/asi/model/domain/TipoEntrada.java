@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "tipo_entrada")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class TipoEntrada {
 
   @Id
