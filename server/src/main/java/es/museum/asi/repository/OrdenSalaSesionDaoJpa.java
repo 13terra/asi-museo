@@ -54,7 +54,7 @@ public class OrdenSalaSesionDaoJpa extends GenericDaoJpa implements OrdenSalaSes
   @Override
   public Collection<OrdenSalaSesion> findBySesion(Long idSesion) {
     TypedQuery<OrdenSalaSesion> query = entityManager
-      .createQuery("Select o From OrdenSalaSesion o Where o.sala.idSesion = :idSesion Order By o.orden", OrdenSalaSesion.class)
+      .createQuery("Select o From OrdenSalaSesion o Where o.sesion.idSesion = :idSesion Order By o.orden", OrdenSalaSesion.class)
       .setParameter("idSesion", idSesion);
     return query.getResultList();
   }
