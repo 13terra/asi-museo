@@ -1,7 +1,6 @@
 package es.museum.asi.repository;
 
 import es.museum.asi.model.domain.Edicion;
-import es.museum.asi.model.domain.Exposicion;
 
 import java.util.Collection;
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
-@Repository // DE QUE SIRVE LA NOTACIÓN REPOSITORY?
+@Repository
 public class ObraDaoJpa extends GenericDaoJpa implements ObraDao {
 
   @Override

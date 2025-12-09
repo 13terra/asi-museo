@@ -4,9 +4,11 @@ import es.museum.asi.model.domain.Exposicion;
 import es.museum.asi.model.enums.EstadoExpo;
 import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
+@Repository
 public class ExposicionDaoJpa extends GenericDaoJpa implements ExposicionDao {
 
   @Override

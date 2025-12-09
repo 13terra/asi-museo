@@ -4,9 +4,11 @@ import es.museum.asi.model.domain.OrdenSalaSesion;
 import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
+@Repository
 public class OrdenSalaSesionDaoJpa extends GenericDaoJpa implements OrdenSalaSesionDao {
 
   @Override

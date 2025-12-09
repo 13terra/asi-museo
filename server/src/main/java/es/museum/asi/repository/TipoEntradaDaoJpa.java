@@ -3,10 +3,11 @@ package es.museum.asi.repository;
 import es.museum.asi.model.domain.TipoEntrada;
 import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
-
+@Repository
 public class TipoEntradaDaoJpa extends GenericDaoJpa implements TipoEntradaDao {
 
   @Override

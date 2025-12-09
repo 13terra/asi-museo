@@ -5,7 +5,6 @@ import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
-import java.text.CollationElementIterator;
 import java.util.Collection;
 
 @Repository

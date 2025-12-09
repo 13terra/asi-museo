@@ -5,9 +5,11 @@ import es.museum.asi.model.enums.TipoPermiso;
 import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
+@Repository
 public class GestionDaoJpa extends GenericDaoJpa implements GestionDao {
 
   @Override

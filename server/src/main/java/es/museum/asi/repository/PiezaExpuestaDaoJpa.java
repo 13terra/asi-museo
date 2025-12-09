@@ -3,12 +3,9 @@ package es.museum.asi.repository;
 import es.museum.asi.model.domain.PiezaExpuesta;
 import es.museum.asi.repository.util.GenericDaoJpa;
 import jakarta.persistence.TypedQuery;
-import org.hibernate.boot.model.TypeDefinition;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 
 @Repository
