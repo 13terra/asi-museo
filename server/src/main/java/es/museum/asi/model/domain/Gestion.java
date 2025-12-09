@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "gestion")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Gestion {
 
   @Id
@@ -25,6 +25,12 @@ public class Gestion {
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Exposicion exposicion;
+
+  public Gestion(User user, Exposicion exposicion, TipoPermiso permiso) {
+    this.user = user;
+    this.exposicion = exposicion;
+    this.permiso = permiso;
+  }
 
   public Long getIdGestion() {
     return idGestion;
