@@ -11,6 +11,7 @@ import es.museum.asi.model.exception.NotFoundException;
 import es.museum.asi.model.exception.OperationNotAllowed;
 import es.museum.asi.model.service.dto.ExposicionDTO;
 import es.museum.asi.model.service.dto.ExposicionDetalleDTO;
+import es.museum.asi.model.service.dto.GestorPermisoDTO;
 import es.museum.asi.repository.*;
 import es.museum.asi.security.SecurityUtils;
 import es.museum.asi.web.exceptions.InvalidPermissionException;
@@ -47,6 +48,21 @@ public class ExpoService {
 
   @Autowired
   private UserDao userDao;
+
+  @Autowired
+  private PiezaExpuestaDao piezaExpuestaDao;
+
+  @Autowired
+  private SesionDao sesionDao;
+
+  @Autowired
+  private OrdenSalaSesionDao ordenSalaSesionDao;
+
+  @Autowired
+  private ReservaDao reservaDao;
+
+  @Autowired
+  private EntradaDao entradaDao;
 
   /**
    * HU9 - Listado de exposiciones (Vista ADMIN)
@@ -309,18 +325,156 @@ public class ExpoService {
       throw new OperationNotAllowed("No se puede eliminar la exposición porque tiene ediciones con reservas/entradas asociadas.");
     }
 
-    //Eliminación manual
-    //Eliminar gestiones
-    gestionDao.findByExpo(idExposicion).forEach(gestion -> gestionDao.delete(gestion));
-    //Eliminar ediciones (y dependencias)
-    edicionDao.findByExposicion(idExposicion).forEach(edicion -> edicionDao.delete(edicion));
 
-    //Eliminar exposicion
-    String tituloExpo = exposicion.getTitulo();
+    String tituloExposicion = exposicion.getTitulo();
+
+    // 1. Eliminar gestiones
+    gestionDao.findByExpo(idExposicion).forEach(gestion -> gestionDao.delete(gestion));
+
+    // 2. Para cada edición, eliminar sus dependencias
+    edicionDao. findByExposicion(idExposicion).forEach(edicion -> {
+      Long idEdicion = edicion.getIdEdicion();
+
+      // 2.1 Eliminar piezas expuestas de la edición
+      piezaExpuestaDao.findByEdicion(idEdicion).forEach(pieza -> {
+        piezaExpuestaDao.delete(pieza);
+      });
+
+      // 2.2 Para cada sesión de la edición
+      sesionDao.findByEdicion(idEdicion).forEach(sesion -> {
+        Long idSesion = sesion.getIdSesion();
+
+        // 2.2.1 Eliminar OrdenSalaSesion (relación N:N Sesion-Sala)
+        ordenSalaSesionDao.findBySesion(idSesion).forEach(orden -> {
+          ordenSalaSesionDao.delete(orden);
+        });
+
+        // 2.2.2 Eliminar reservas y sus entradas
+        reservaDao. findBySesion(idSesion).forEach(reserva -> {
+          // Primero eliminar entradas de la reserva
+          entradaDao.findByReserva(reserva. getIdReserva()).forEach(entrada -> {
+            entradaDao.delete(entrada);
+          });
+          // Después eliminar la reserva
+          reservaDao.delete(reserva);
+        });
+
+        // 2.2.3 Eliminar la sesión
+        sesionDao. delete(sesion);
+      });
+
+      // 2.3 Eliminar la edición
+      edicionDao.delete(edicion);
+    });
+
+    // 3. Finalmente eliminar la exposición
     exposicionDao.delete(exposicion);
 
-    logger.info("Exposición '{}' eliminada por {}",
-      tituloExpo, getCurrentUser().getLogin());
+    logger.info("Exposición '{}' eliminada correctamente con todas sus dependencias", tituloExposicion);
+  }
+
+
+  // ==================== HU17-HU19: GESTIÓN DE PERMISOS ====================
+
+  /**
+   * HU17 - Listar permisos de una exposición (Solo CREADOR o ADMIN)
+   */
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  public Collection<GestorPermisoDTO> listarPermisos(Long idExposicion)
+    throws NotFoundException, InvalidPermissionException {
+    Exposicion exposicion = exposicionDao.findById(idExposicion);
+    if (exposicion == null) {
+      throw new NotFoundException(idExposicion.toString(), Exposicion.class);
+    }
+
+    verificarPermisoCreador(idExposicion, "listar permisos de la exposición");
+
+    return gestionDao.findByExpo(idExposicion).stream()
+      .map(GestorPermisoDTO::new)
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * HU18 - Asignar o modificar permiso (Solo CREADOR o ADMIN)
+   */
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  @Transactional(readOnly = false)
+  public GestorPermisoDTO asignarPermisoDTO(Long idExposicion,
+                                            Long idUserGestor,
+                                            TipoPermiso permiso)
+    throws NotFoundException, InvalidPermissionException,
+    OperationNotAllowed {
+    Exposicion exposicion = exposicionDao.findById(idExposicion);
+    if (exposicion == null) {
+      throw new NotFoundException(idExposicion.toString(), Exposicion.class);
+    }
+
+    User gestor = userDao.findById(idUserGestor);
+    if(gestor == null) {
+      throw new NotFoundException(idUserGestor.toString(), User.class);
+    }
+
+    //Solo se pueden asignar permisos a usuarios GESTOR
+    // Solo se pueden asignar permisos a usuarios GESTOR
+    if (gestor. getAutoridad() != UserAuthority.GESTOR) {
+      throw new OperationNotAllowed("Solo se pueden asignar permisos a usuarios con rol GESTOR");
+    }
+
+    verificarPermisoCreador(idExposicion, "asignar permisos");
+
+    //Verificar si ya existe una gestión
+    Gestion gestionExistente = gestionDao.findByUserAndExpo(idUserGestor, idExposicion);
+
+    if (gestionExistente != null) {
+      //Modificar permiso existente
+      gestionExistente.setPermiso(permiso);
+      gestionDao.update(gestionExistente);
+      logger.info("Permiso de {} sobre exposición {} modificado a {}",
+        gestor.getLogin(), exposicion.getTitulo(), permiso);
+      return new GestorPermisoDTO(gestionExistente);
+    } else {
+      //Crear nueva gestión
+      Gestion nuevaGestion = new Gestion(gestor, exposicion, permiso);
+      gestionDao.create(nuevaGestion);
+      logger.info("Permiso {} asignado a {} sobre exposición {}",
+        permiso, gestor.getLogin(), exposicion.getTitulo());
+      return new GestorPermisoDTO(nuevaGestion);
+    }
+  }
+
+  /**
+   * HU19 - Revocar permiso (Solo CREADOR o ADMIN)
+   */
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  @Transactional(readOnly = false)
+  public void revocarPermiso(Long idExposicion, Long idUserGestor)
+    throws NotFoundException, InvalidPermissionException,
+    OperationNotAllowed {
+    Exposicion exposicion = exposicionDao.findById(idExposicion);
+    if (exposicion == null) {
+      throw new NotFoundException(idExposicion.toString(), Exposicion.class);
+    }
+
+    verificarPermisoCreador(idExposicion, "revocar permisos");
+
+    Gestion gestion = gestionDao.findByUserAndExpo(idUserGestor, idExposicion);
+    if (gestion == null) {
+      throw new NotFoundException("No existe permiso para este gestor en esta exposición", Gestion.class);
+    }
+
+    // No se puede revocar al CREADOR principal sin transferir el rol primero
+    long numCreadores = gestionDao.findByExpoAndPermiso(idExposicion, TipoPermiso. CREADOR).size();
+    if (gestion.getPermiso() == TipoPermiso.CREADOR && numCreadores <= 1) {
+      throw new OperationNotAllowed(
+        "No se puede revocar al único CREADOR de la exposición. " +
+          "Debe transferir el rol a otro gestor primero."
+      );
+    }
+
+    User gestor = userDao.findById(idUserGestor);
+    gestionDao.delete(gestion);
+    logger.info("Permiso de {} sobre exposición {} revocado",
+      gestor.getLogin(), exposicion.getTitulo());
   }
 
 
