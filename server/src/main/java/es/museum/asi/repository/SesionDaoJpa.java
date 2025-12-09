@@ -47,15 +47,17 @@ public class SesionDaoJpa extends GenericDaoJpa implements SesionDao {
   @Override
   public Collection<Sesion> findByEstado(EstadoSesion estado) {
     TypedQuery<Sesion> query = entityManager
-      .createQuery("SELECT s FROM Sesion WHERE s.estadoSesion = :estado", Sesion.class)
+      .createQuery("SELECT s FROM Sesion s WHERE s.estadoSesion = :estado", Sesion.class)
       .setParameter("estado", estado);
     return query.getResultList();
   }
 
+  // + compleja
   @Override
   public Collection<Sesion> findBySala(Long idSala) {
     TypedQuery<Sesion> query = entityManager
-      .createQuery("Select s From Sesion s WHERE s.idSala = :idSala", Sesion.class)
+      .createQuery("Select Distinct s From Sesion s Join s.ordenes o " +
+        " WHERE o.sala.idSala = :idSala", Sesion.class)
       .setParameter("idSala", idSala);
     return query.getResultList();
   }

@@ -48,7 +48,7 @@ public class Reserva {
   @Column(nullable = false)
   private String email;
 
-  @OneToMany(mappedBy = "reserva")
+  @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL,  orphanRemoval = true)
   private List<Entrada> entradas = new ArrayList<>();
 
   // que significa optional=false?

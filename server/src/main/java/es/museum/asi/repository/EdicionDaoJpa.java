@@ -32,7 +32,7 @@ public class EdicionDaoJpa extends GenericDaoJpa implements EdicionDao {
 
   @Override
   public Collection<Edicion> findAll() {
-    return entityManager.createNamedQuery("SELECT e FROM Edicion e", Edicion.class)
+    return entityManager.createQuery("SELECT e FROM Edicion e", Edicion.class)
       .getResultList();
   }
 
