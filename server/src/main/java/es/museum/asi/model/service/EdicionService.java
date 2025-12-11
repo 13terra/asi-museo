@@ -358,10 +358,52 @@ public class EdicionService {
         idEdicion, sesiones.size(), totalReservasCanceladas);
 
       return new EdicionDTO(edicion);
+  }
+
+
+  /**
+   * HU26 - Eliminar Edición, sólo CREADOR o ADMIN
+   * Solo se puede eliminar si está en BORRADOR
+   */
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  @Transactional(readOnly = false)
+  public void delete(Long idEdicion)
+    throws NotFoundException, OperationNotAllowed,
+    InvalidPermissionException {
+
+    Edicion edicion = edicionDao.findById(idEdicion);
+    if (edicion == null) {
+      throw new NotFoundException(idEdicion.toString(), Edicion.class);
     }
 
+    if (edicion.getEstado() != EstadoEdicion.BORRADOR) {
+      throw new OperationNotAllowed("Sólo se pueden eliminar ediciones que estén estado BORRADOR.");
+    }
 
+    verificarPermisoCreador(edicion.getExposicion().getIdExposicion(), "Eliminar ediciones");
 
+    //Eliminamos piezas expuestas
+    piezaExpuestaDao.findByEdicion(idEdicion).
+      forEach(pieza -> piezaExpuestaDao.delete(pieza));
+
+    //Para cada sesión (eliminamos orden + propia sesion)
+
+    sesionDao.findByEdicion(idEdicion).forEach(sesion -> {
+      //Eliminar ordenSalaSesion
+      ordenSalaSesionDao.findBySesion(sesion.getIdSesion()).forEach(orden -> {
+        ordenSalaSesionDao.delete(orden);
+      });
+
+      //Eliminas sesión
+      sesionDao.delete(sesion);
+    });
+
+    edicionDao.delete(edicion);
+
+    String tituloExposicion = edicion.getExposicion().getTitulo();
+
+    logger.info("Edición {} de exposición '{}' eliminada correctamente", idEdicion, tituloExposicion);
+  }
 
 
   // ==================== MÉTODOS AUXILIARES ====================
