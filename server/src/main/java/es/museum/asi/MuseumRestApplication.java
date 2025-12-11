@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Lazy;
 import es.museum.asi.config.DatabaseLoader;
 import es.museum.asi.model.exception.UserLoginExistsException;
 import jakarta.annotation.PostConstruct;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication
 public class MuseumRestApplication {
   private final Logger logger = LoggerFactory.getLogger(MuseumRestApplication.class);
