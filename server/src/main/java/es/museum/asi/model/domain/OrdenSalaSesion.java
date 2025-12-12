@@ -15,7 +15,7 @@ public class OrdenSalaSesion {
   private Long id;
 
   @Column(name = "orden")
-  private int orden;
+  private Integer orden;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sesion sesion;
@@ -31,11 +31,11 @@ public class OrdenSalaSesion {
     this.id = id;
   }
 
-  public int getOrden() {
+  public Integer getOrden() {
     return orden;
   }
 
-  public void setOrden(int orden) {
+  public void setOrden(Integer orden) {
     this.orden = orden;
   }
 
