@@ -27,6 +27,13 @@ public class OrdenSalaSesionDaoJpa extends GenericDaoJpa implements OrdenSalaSes
   }
 
   @Override
+  public void deleteBySesion(Long idSesion) {
+    entityManager.createQuery("DELETE FROM OrdenSalaSesion o WHERE o.sesion.idSesion = :idSesion")
+      .setParameter("idSesion", idSesion)
+      .executeUpdate();
+  }
+
+  @Override
   public Collection<OrdenSalaSesion> findAll() {
     return entityManager.createQuery("from OrdenSalaSesion", OrdenSalaSesion.class).getResultList();
   }

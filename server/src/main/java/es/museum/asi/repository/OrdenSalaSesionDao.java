@@ -12,6 +12,8 @@ public interface OrdenSalaSesionDao {
 
   void delete(OrdenSalaSesion ordenSalaSesion);
 
+  void deleteBySesion(Long idSesion);
+
   Collection<OrdenSalaSesion> findAll();
 
   OrdenSalaSesion findById(Long id);
