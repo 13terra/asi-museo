@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "orden_sala_sesion")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class OrdenSalaSesion {
 
   @Id

@@ -5,22 +5,19 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "sesion")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Sesion {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sesion_generator")
   @SequenceGenerator(name = "sesion_generator", sequenceName = "sesion_seq")
   private Long idSesion;
-
-  //AÑADIR CAMBIOS TIPO LISTA DE CAMBIOS + NOTIFICARSELO (TEMA HORAS)
 
   @Column(nullable = false)
   private LocalDateTime horaInicio;   // 2025-06-01 10:00:00
