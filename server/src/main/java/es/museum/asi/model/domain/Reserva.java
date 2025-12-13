@@ -11,16 +11,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "reserva")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)    //hacerlo así o con el constructor sin parámetros --> pero siempre de la misma manera
+@NoArgsConstructor(access = AccessLevel.PUBLIC)    //hacerlo así o con el constructor sin parámetros --> pero siempre de la misma manera
 public class Reserva {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reserva_generator")
   @SequenceGenerator(name = "reserva_generator", sequenceName = "reserva_seq")
   private Long idReserva;
-
-  @Column(nullable = false)
-  private String dni;
 
   @Column(nullable = false)
   private String nombrePila;
@@ -43,7 +40,7 @@ public class Reserva {
 
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private EstadoReserva estadoReserva = EstadoReserva.CONFIRMADA; // ? no estoy seguro
+  private EstadoReserva estadoReserva = EstadoReserva.CONFIRMADA;
 
   @Column(nullable = false)
   private String email;
@@ -58,8 +55,6 @@ public class Reserva {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Sesion sesion;
 
-  // DEFINIR CONSTRUCTOR ¿necesito varios?
-
 
   public Long getIdReserva() {
     return idReserva;
@@ -67,14 +62,6 @@ public class Reserva {
 
   public void setIdReserva(Long idReserva) {
     this.idReserva = idReserva;
-  }
-
-  public String getDni() {
-    return dni;
-  }
-
-  public void setDni(String dni) {
-    this.dni = dni;
   }
 
   public String getNombrePila() {
