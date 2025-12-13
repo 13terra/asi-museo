@@ -206,6 +206,9 @@ public class SesionService {
   }
 
 
+  /**
+   * HU34 - Editar sesion
+   */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
   public SesionDTO update(Long idSesion, SesionUpdateDTO dto)

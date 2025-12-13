@@ -59,7 +59,6 @@ public class EntradaService {
   /**
    * HU56 - Ver detalle de entrada
    * Solo el propietario puede ver su entrada
-   * Útil para mostrar QR/código en el museo
    */
   @PreAuthorize("hasAuthority('VISITANTE')")
   public EntradaDetalleDTO findMiEntradaDetalle(Long idEntrada)
@@ -72,7 +71,7 @@ public class EntradaService {
 
     // Verificar que la entrada pertenece al usuario actual
     User currentUser = getCurrentUser();
-    if (! entrada.getReserva().getUser().getIdUser().equals(currentUser. getIdUser())) {
+    if (! entrada.getReserva().getUser().getIdUser().equals(currentUser.getIdUser())) {
       throw new OperationNotAllowed("No tiene permisos para ver esta entrada");
     }
 

@@ -1,5 +1,6 @@
 package es.museum.asi.model.service.dto;
 
+import es.museum.asi.model.domain.Entrada;
 import es.museum.asi.model.enums.EstadoReserva;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,31 @@ public class EntradaDTO {
   private EstadoReserva estadoReserva;
 
   public EntradaDTO() {}
+
+  public EntradaDTO(Entrada entrada) {
+    this.idEntrada = entrada. getIdEntrada();
+    this.idReserva = entrada. getReserva().getIdReserva();
+
+    // Nombre completo del asistente
+    this.nombreCompletoAsistente = entrada.getNombrePila() + " " + entrada.getApellido1();
+    if (entrada.getApellido2() != null && !entrada.getApellido2().isEmpty()) {
+      this.nombreCompletoAsistente += " " + entrada.getApellido2();
+    }
+    this.dni = entrada.getDni();
+
+    // Tipo de entrada
+    this.tipoEntrada = entrada.getTipoEntrada().getNombre();
+    this.precio = entrada.getPrecio();
+
+    // Datos de la sesión
+    this. idSesion = entrada.getReserva().getSesion().getIdSesion();
+    this.fechaHoraSesion = entrada.getReserva().getSesion().getHoraInicio();
+    this.nombreExposicion = entrada.getReserva().getSesion().getEdicion().getExposicion().getTitulo();
+    this.idEdicion = entrada.getReserva().getSesion().getEdicion().getIdEdicion();
+
+    // Estado de la reserva
+    this.estadoReserva = entrada.getReserva().getEstadoReserva();
+  }
 
 
   public Long getIdEntrada() {
