@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/met-microservice/met-microservice.iml" filepath="$PROJECT_DIR$/met-microservice/met-microservice.iml" />
       <module fileurl="file://$PROJECT_DIR$/server/museo-asi-2526.iml" filepath="$PROJECT_DIR$/server/museo-asi-2526.iml" />
     </modules>
   </component>
