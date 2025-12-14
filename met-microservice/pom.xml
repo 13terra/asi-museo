@@ -12,9 +12,9 @@
         <relativePath/>
     </parent>
 
-    <groupId>es. museum</groupId>
+    <groupId>es.museo</groupId>
     <artifactId>met-microservice</artifactId>
-    <version>1.0. 0</version>
+    <version>1.0.0</version>
     <name>MET Microservice</name>
 
     <properties>

@@ -26,6 +26,8 @@ services: #Cada servicio es un contenedor Docker
     container_name: museo-met-service
     ports:
       - "8081:8081"
+    environment:
+          MET_API_BASE_URL: https://collectionapi.metmuseum.org/public/collection/v1
 
   # BD POSTGRESQL
   database:
