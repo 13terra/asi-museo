@@ -436,9 +436,10 @@ public class SesionService {
 
 
   /**
-   * HU42 - Desasignar sala a sesión
-   * ADMIN/GESTOR podré desasignar salas a una sesion.
-   * Sólo si no hay sesiones ni piezas expuestas en esa sala
+   * HU42 - Desasignar sala de sesión
+   * Validaciones:
+   * - No puede ser la única sala asignada
+   * - La edición no puede tener piezas expuestas en esa sala
    */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
@@ -449,14 +450,18 @@ public class SesionService {
     if (sesion == null) {
       throw new NotFoundException(idSesion.toString(), Sesion.class);
     }
+
     Sala sala = salaDao.findById(idSala);
     if (sala == null) {
       throw new NotFoundException(idSala.toString(), Sala.class);
     }
 
-    verificarPermisoSobreExposicion(sesion.getEdicion().getExposicion().getIdExposicion(), "Desasignar sala a sesion");
+    verificarPermisoSobreExposicion(
+      sesion.getEdicion().getExposicion().getIdExposicion(),
+      "desasignar salas de sesiones"
+    );
 
-    //Validar que está asignada
+    // Validar que esté asignada
     OrdenSalaSesion ordenSalaSesion = ordenSalaSesionDao.findBySesionAndSala(idSesion, idSala);
     if (ordenSalaSesion == null) {
       throw new OperationNotAllowed(
@@ -464,20 +469,20 @@ public class SesionService {
       );
     }
 
-    // Validación 1: No puede ser la última sala
+    // Validación 1: No puede ser la única sala
     Collection<OrdenSalaSesion> salasAsignadas = ordenSalaSesionDao.findBySesion(idSesion);
     if (salasAsignadas.size() <= 1) {
       throw new OperationNotAllowed("Una sesión debe tener al menos una sala asignada");
     }
 
-    // Validación 2: No debe tener piezas expuestas en esa sala
+    // Validación 2: La EDICIÓN no debe tener piezas expuestas en esa sala
     long numPiezas = sesion.getEdicion().getPiezasExpuestas().stream()
       .filter(p -> p.getSala().getIdSala().equals(idSala))
       .count();
 
     if (numPiezas > 0) {
       throw new OperationNotAllowed(
-        String.format("No se puede desasignar la sala '%s' porque tiene %d piezas expuestas en esta edición",
+        String.format("No se puede desasignar la sala '%s' porque la edición tiene %d piezas expuestas en ella",
           sala.getNombre(), numPiezas)
       );
     }
