@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "pieza_expuesta")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class PiezaExpuesta {
 
   @Id
@@ -15,10 +15,10 @@ public class PiezaExpuesta {
   private Long idPiezaExpuesta;
 
   @Column(length = 2000)
-  private String textoCuratorial; //puede no tener, o al menos no en un primer momento
+  private String textoCuratorial;
 
   @Column(nullable = false)
-  private Integer orden;  //corregido
+  private Integer orden;
 
   @Column(nullable = false)
   private Boolean portada = false;  //se le da este valor por defecto, y luego se escoge una
