@@ -74,10 +74,10 @@ public class EdicionDetalleDTO {
       .map(ResumenPiezaExpuestaDTO::new)
       .collect(Collectors.toList());
     }
-  }
-
-
-
-
-
 }
+
+
+
+
+
+

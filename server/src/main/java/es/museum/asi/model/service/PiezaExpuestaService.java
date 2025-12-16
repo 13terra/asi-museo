@@ -200,6 +200,160 @@ public class PiezaExpuestaService {
   // FALTAN EDITAR PE (HU29) + ELIMINAR PE(HU30)
 
 
+  // ==================== HU29: EDITAR PIEZA EXPUESTA ====================
+
+  /**
+   * HU29 - Editar pieza expuesta
+   * Permite modificar:  sala, orden, texto curatorial, portada
+   */
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  @Transactional(readOnly = false)
+  public PiezaExpuestaDTO update(Long idPiezaExpuesta, Long nuevaIdSala, Integer nuevoOrden,
+                                 String nuevoTextoCuratorial, Boolean esPortada)
+    throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
+
+    PiezaExpuesta piezaExpuesta = piezaExpuestaDao.findById(idPiezaExpuesta);
+    if (piezaExpuesta == null) {
+      throw new NotFoundException(idPiezaExpuesta.toString(), PiezaExpuesta.class);
+    }
+
+    verificarPermisoSobreExposicion(
+      piezaExpuesta.getEdicion().getExposicion().getIdExposicion(),
+      "editar piezas expuestas"
+    );
+
+    // Actualizar sala
+    if (nuevaIdSala != null && !nuevaIdSala.equals(piezaExpuesta.getSala().getIdSala())) {
+      Sala nuevaSala = salaDao.findById(nuevaIdSala);
+      if (nuevaSala == null) {
+        throw new NotFoundException(nuevaIdSala. toString(), Sala.class);
+      }
+      piezaExpuesta.setSala(nuevaSala);
+
+      // Si cambia de sala, auto-asignar orden al final de la nueva sala
+      if (nuevoOrden == null) {
+        nuevoOrden = piezaExpuestaDao.findByEdicion(piezaExpuesta.getEdicion().getIdEdicion()).stream()
+          .filter(pe -> pe.getSala().getIdSala().equals(nuevaIdSala))
+          .filter(pe -> ! pe.getIdPiezaExpuesta().equals(idPiezaExpuesta))
+          .mapToInt(PiezaExpuesta::getOrden)
+          .max()
+          .orElse(0) + 1;
+      }
+    }
+
+    // Actualizar orden (validar unicidad en sala)
+    if (nuevoOrden != null && !nuevoOrden.equals(piezaExpuesta.getOrden())) {
+      Long idSalaFinal = nuevaIdSala != null ? nuevaIdSala : piezaExpuesta.getSala().getIdSala();
+
+      // Se utiliza para validar si hay alguna pieza con el orden que se le pasa, sino protestaba
+      final Integer ordenParaValidar = nuevoOrden;
+
+      boolean ordenDuplicado = piezaExpuestaDao.findByEdicion(piezaExpuesta.getEdicion().getIdEdicion()).stream()
+        .filter(pe -> pe.getSala().getIdSala().equals(idSalaFinal))
+        .filter(pe -> !pe.getIdPiezaExpuesta().equals(idPiezaExpuesta))
+        .anyMatch(pe -> pe.getOrden().equals(ordenParaValidar));
+
+      if (ordenDuplicado) {
+        throw new OperationNotAllowed(
+          String.format("Ya existe una pieza con orden %d en esta sala", nuevoOrden)
+        );
+      }
+      piezaExpuesta.setOrden(nuevoOrden);
+    }
+
+    // Actualizar texto curatorial
+    if (nuevoTextoCuratorial != null) {
+      piezaExpuesta.setTextoCuratorial(nuevoTextoCuratorial);
+    }
+
+    // Actualizar portada
+    if (Boolean.TRUE.equals(esPortada) && ! piezaExpuesta.getPortada()) {
+      // Desmarcar portada anterior
+      PiezaExpuesta portadaAnterior = piezaExpuestaDao. findPortadaByEdicion(
+        piezaExpuesta.getEdicion().getIdEdicion()
+      );
+      if (portadaAnterior != null && ! portadaAnterior.getIdPiezaExpuesta().equals(idPiezaExpuesta)) {
+        portadaAnterior.setPortada(false);
+        piezaExpuestaDao.update(portadaAnterior);
+      }
+      piezaExpuesta.setPortada(true);
+    } else if (Boolean.FALSE.equals(esPortada)) {
+      piezaExpuesta.setPortada(false);
+    }
+
+    piezaExpuestaDao. update(piezaExpuesta);
+    logger.info("Pieza expuesta {} actualizada", idPiezaExpuesta);
+
+    return new PiezaExpuestaDTO(piezaExpuesta);
+  }
+
+  // ==================== HU30: ELIMINAR PIEZA EXPUESTA ====================
+
+  /**
+   * HU30 - Eliminar pieza expuesta
+   * La obra permanece en el catálogo general
+   */
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  @Transactional(readOnly = false)
+  public void delete(Long idPiezaExpuesta)
+    throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
+
+    PiezaExpuesta piezaExpuesta = piezaExpuestaDao.findById(idPiezaExpuesta);
+    if (piezaExpuesta == null) {
+      throw new NotFoundException(idPiezaExpuesta.toString(), PiezaExpuesta.class);
+    }
+
+    verificarPermisoSobreExposicion(
+      piezaExpuesta.getEdicion().getExposicion().getIdExposicion(),
+      "eliminar piezas expuestas"
+    );
+
+    // Advertencia si es la portada
+    if (piezaExpuesta.getPortada()) {
+      logger.warn("Se está eliminando la pieza portada de la edición {}",
+        piezaExpuesta. getEdicion().getIdEdicion());
+    }
+
+    String tituloObra = piezaExpuesta. getObra().getTitulo();
+    piezaExpuestaDao.delete(piezaExpuesta);
+
+    logger.info("Pieza expuesta {} ('{}') eliminada. La obra permanece en el catálogo",
+      idPiezaExpuesta, tituloObra);
+  }
+
+  /**
+   * Marcar/desmarcar pieza como portada
+   */
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  @Transactional(readOnly = false)
+  public void setPortada(Long idPiezaExpuesta) throws NotFoundException, InvalidPermissionException {
+
+    PiezaExpuesta piezaExpuesta = piezaExpuestaDao.findById(idPiezaExpuesta);
+    if (piezaExpuesta == null) {
+      throw new NotFoundException(idPiezaExpuesta.toString(), PiezaExpuesta.class);
+    }
+
+    verificarPermisoSobreExposicion(
+      piezaExpuesta.getEdicion().getExposicion().getIdExposicion(),
+      "gestionar portadas"
+    );
+
+    // Desmarcar portada anterior
+    PiezaExpuesta portadaAnterior = piezaExpuestaDao.findPortadaByEdicion(
+      piezaExpuesta.getEdicion().getIdEdicion()
+    );
+    if (portadaAnterior != null) {
+      portadaAnterior.setPortada(false);
+      piezaExpuestaDao.update(portadaAnterior);
+    }
+
+    // Marcar nueva portada
+    piezaExpuesta.setPortada(true);
+    piezaExpuestaDao.update(piezaExpuesta);
+
+    logger.info("Pieza expuesta {} marcada como portada de la edición {}",
+      idPiezaExpuesta, piezaExpuesta.getEdicion().getIdEdicion());
+  }
 
 
 
