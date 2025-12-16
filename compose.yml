@@ -4,16 +4,21 @@ services: #Cada servicio es un contenedor Docker
   server:
     build:  # Construye la imagen a partir del Dockerfile en el contexto especificado
       context: ./server
-      no_cache: true      # Esto evita que se cacheen capas de la imagen
+      # no_cache: true      # Esto evita que se cacheen capas de la imagen
     container_name: museo-backend
     ports:   #Necesario para que el navegador pueda acceder al servicio
       - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - database
+      - met-microservice
 
   # FRONTEND VUE
   client:
     build:
       context: ./client
-      no_cache: true
+      #no_cache: true
     container_name: museo-frontend
     ports:
       - "1234:80"
@@ -22,7 +27,7 @@ services: #Cada servicio es un contenedor Docker
   met-microservice:
     build:
       context: ./met-microservice
-      no_cache: true
+      #no_cache: true
     container_name: museo-met-service
     ports:
       - "8081:8081"

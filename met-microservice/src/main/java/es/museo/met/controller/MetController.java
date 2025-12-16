@@ -45,9 +45,8 @@ public class MetController {
      * GET /api/met/obras/{met_id}
      */
     @GetMapping("/obras/{met_id}")
-    public ResponseEntity<ObraDetalleDTO> obtenerDetalle(
-            @PathVariable("met_id") Long metId
-    ) {
+    public ResponseEntity<ObraDetalleDTO> obtenerDetalle(@PathVariable("met_id") Long metId) {
+
         logger.info("GET /api/met/obras/{}", metId);
 
         ObraDetalleDTO obra = metService.obtenerDetalle(metId);

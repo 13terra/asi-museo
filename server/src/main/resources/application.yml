@@ -4,7 +4,7 @@ spring:
 # Descomentar para utilizar postgresql en vez de H2
   datasource:
     host: localhost
-    port: 5432
+    port: 5454
     database: museo_db
     username: museo_user
     password: museo_pass
@@ -17,8 +17,23 @@ spring:
     show-sql: true # ver queries que se ejecutan en consola
     properties:
       format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+
 properties:
   clientHost: http://localhost:1234   #define desde que url puede el front comunicarse con el back (CORS)
   jwtSecretKey: h3qlqtvjaq8NEm1AG$2p8qT!^c3AkrE&rno2z8LZWD@qWo40xphNoPQ7j%J197
   jwtValidity: 7200
-  metServiceUrl: http://localhost:8081  #añadido para desarrollo local del microservicio
+
+met:
+  service:
+    url: http://localhost:8081
+
+# Almacenamiento de imágenes (si no lo tienes ya)
+app:
+  upload:
+    dir: ${user.home}/asi-museo-imagenes
+

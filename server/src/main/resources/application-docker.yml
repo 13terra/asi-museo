@@ -9,5 +9,7 @@ spring:
   jpa:
     database: postgresql
 
-properties:
-  metServiceUrl: http://met-microservice:8081
+# Microservicio TheMET (nombre del servicio en docker-compose)
+met:
+  service:
+    url: http://met-service:8081
