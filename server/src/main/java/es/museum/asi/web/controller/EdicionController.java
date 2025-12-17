@@ -1,4 +1,4 @@
-package es.museum.asi.controller;
+package es.museum.asi.web.controller;
 
 import es.museum.asi.model.enums.EstadoEdicion;
 import es.museum.asi.model.exception.NotFoundException;

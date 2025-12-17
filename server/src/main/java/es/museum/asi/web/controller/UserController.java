@@ -1,4 +1,4 @@
-package es.museum.asi.controller;
+package es.museum.asi.web.controller;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class UserController {
   public List<UserDTOPublic> findAll(
       @RequestParam(required = false) UserAuthority autoridad,
       @RequestParam(required = false) EstadoUser estado) {
-    
+
     if (autoridad != null) {
       return userService.findByAutoridad(autoridad);
     } else if (estado != null) {
@@ -59,15 +59,15 @@ public class UserController {
    * HU5 - POST /api/users - Crear usuario (ADMIN)
    */
   @PostMapping
-  public UserDTOPrivate create(@RequestBody @Valid UserDTOPrivate userDTO, Errors errors) 
+  public UserDTOPrivate create(@RequestBody @Valid UserDTOPrivate userDTO, Errors errors)
       throws RequestBodyNotValidException, UserLoginExistsException {
     if (errors.hasErrors()) {
       throw new RequestBodyNotValidException(errors);
     }
-    
+
     return userService.createUser(
-        userDTO.getLogin(), 
-        userDTO.getPassword(), 
+        userDTO.getLogin(),
+        userDTO.getPassword(),
         userDTO.getAuthority()
     );
   }
@@ -78,14 +78,14 @@ public class UserController {
   @PutMapping("/{id}")
   public UserDTOPublic update(
       @PathVariable Long id,
-      @RequestBody @Valid UserDTOPublic userDTO, 
-      Errors errors) 
+      @RequestBody @Valid UserDTOPublic userDTO,
+      Errors errors)
       throws RequestBodyNotValidException, NotFoundException, OperationNotAllowed {
-    
+
     if (errors.hasErrors()) {
       throw new RequestBodyNotValidException(errors);
     }
-    
+
     return userService.updateUser(
         id,
         userDTO.getLogin(),
@@ -99,7 +99,7 @@ public class UserController {
    * HU8 - PUT /api/users/{id}/activate - Activar usuario (ADMIN)
    */
   @PutMapping("/{id}/activate")
-  public UserDTOPublic activate(@PathVariable Long id) 
+  public UserDTOPublic activate(@PathVariable Long id)
       throws NotFoundException, OperationNotAllowed {
     return userService.activateUser(id);
   }
@@ -108,7 +108,7 @@ public class UserController {
    * HU8 - PUT /api/users/{id}/deactivate - Desactivar usuario (ADMIN)
    */
   @PutMapping("/{id}/deactivate")
-  public UserDTOPublic deactivate(@PathVariable Long id) 
+  public UserDTOPublic deactivate(@PathVariable Long id)
       throws NotFoundException, OperationNotAllowed {
     return userService.deactivateUser(id);
   }
@@ -117,7 +117,7 @@ public class UserController {
    * HU7 - DELETE /api/users/{id} - Eliminar usuario (ADMIN)
    */
   @DeleteMapping("/{id}")
-  public void delete(@PathVariable Long id) 
+  public void delete(@PathVariable Long id)
       throws NotFoundException, OperationNotAllowed {
     userService.deleteById(id);
   }

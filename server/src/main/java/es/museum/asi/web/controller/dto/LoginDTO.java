@@ -1,4 +1,4 @@
-package es.museum.asi.dto;
+package es.museum.asi.web.controller.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

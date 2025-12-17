@@ -1,4 +1,4 @@
-package es.museum.asi.controller;
+package es.museum.asi.web.controller;
 
 import java.util.Collection;
 
@@ -48,12 +48,12 @@ public class SalaController {
    * HU37 - POST /api/salas - Crear sala (ADMIN)
    */
   @PostMapping
-  public SalaDTO create(@RequestBody @Valid SalaDTO salaDTO, Errors errors) 
+  public SalaDTO create(@RequestBody @Valid SalaDTO salaDTO, Errors errors)
       throws RequestBodyNotValidException, OperationNotAllowed {
     if (errors.hasErrors()) {
       throw new RequestBodyNotValidException(errors);
     }
-    
+
     return salaService.create(salaDTO.getNombre(), salaDTO.getPlanta());
   }
 
@@ -63,14 +63,14 @@ public class SalaController {
   @PutMapping("/{id}")
   public SalaDTO update(
       @PathVariable Long id,
-      @RequestBody @Valid SalaDTO salaDTO, 
-      Errors errors) 
+      @RequestBody @Valid SalaDTO salaDTO,
+      Errors errors)
       throws RequestBodyNotValidException, NotFoundException, OperationNotAllowed {
-    
+
     if (errors.hasErrors()) {
       throw new RequestBodyNotValidException(errors);
     }
-    
+
     return salaService.update(id, salaDTO.getNombre(), salaDTO.getPlanta());
   }
 
@@ -78,7 +78,7 @@ public class SalaController {
    * HU40 - DELETE /api/salas/{id} - Eliminar sala (ADMIN)
    */
   @DeleteMapping("/{id}")
-  public void delete(@PathVariable Long id) 
+  public void delete(@PathVariable Long id)
       throws NotFoundException, OperationNotAllowed {
     salaService.deleteById(id);
   }
@@ -87,7 +87,7 @@ public class SalaController {
    * GET /api/salas/{id}/disponible - Verificar si sala puede eliminarse (ADMIN)
    */
   @GetMapping("/{id}/disponible")
-  public boolean isDisponibleParaEliminar(@PathVariable Long id) 
+  public boolean isDisponibleParaEliminar(@PathVariable Long id)
       throws NotFoundException {
     return salaService.isDisponibleParaEliminar(id);
   }

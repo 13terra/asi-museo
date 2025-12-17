@@ -1,4 +1,4 @@
-package es.museum.asi.controller;
+package es.museum.asi.web.controller;
 
 public class PiezaExpuestaController {
 }
