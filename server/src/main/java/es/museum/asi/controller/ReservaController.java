@@ -4,7 +4,6 @@ import es.museum.asi.model.enums.EstadoReserva;
 import es.museum.asi.model.exception.NotFoundException;
 import es.museum.asi.model.exception.OperationNotAllowed;
 import es.museum.asi.model.service.ReservaService;
-import es.museum.asi.model.service.TipoEntradaService;
 import es.museum.asi.model.service.dto.*;
 import es.museum.asi.web.exceptions.InvalidPermissionException;
 import es.museum.asi.web.exceptions.RequestBodyNotValidException;
@@ -27,29 +26,6 @@ public class ReservaController {
   @Autowired
   private ReservaService reservaService;
 
-  @Autowired
-  private TipoEntradaService tipoEntradaService;
-
-  // ==================== TIPO ENTRADA (HU50) ====================
-
-  /**
-   * HU50 - Listar tipos de entrada
-   * Público: visitantes necesitan ver precios al reservar
-   */
-  @GetMapping("/tipos-entrada")
-  public Collection<TipoEntradaDTO> findAllTiposEntrada() {
-    return tipoEntradaService.findAll();
-  }
-
-  /**
-   * HU50 - Obtener tipo de entrada por ID
-   */
-  @GetMapping("/tipos-entrada/{id}")
-  public TipoEntradaDTO findTipoEntradaById(@PathVariable Long id) throws NotFoundException {
-    return tipoEntradaService.findById(id);
-  }
-
-  // ==================== RESERVAS (HU51-HU54) ====================
 
   /**
    * HU51 - Reservar entradas
