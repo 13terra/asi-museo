@@ -50,14 +50,6 @@ public class UserController {
   }
 
   /**
-   * HU4 - GET /api/users/{id} - Obtener detalle de usuario (ADMIN)
-   */
-  @GetMapping("/{id}")
-  public UserDTOCompleto findOne(@PathVariable Long id) throws NotFoundException {
-    return userService.findOne(id);
-  }
-
-  /**
    * HU5 - POST /api/users - Crear usuario (ADMIN)
    */
   @PostMapping
