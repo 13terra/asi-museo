@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,7 @@ public class ExpoService {
     return exposicionDao.findByEstado(EstadoExpo.ACTIVA).stream()
       .filter(this::tieneEdicionPublicadaVigente)
       .map(expo -> new ExposicionDTO(expo, false)) //false = sin info de permisos
-      .sorted((e1,e2) -> comparePorProximidad(e1,e2))
+      .sorted((e1,e2) -> comparePorProximidad(e1, e2))
       .collect(Collectors.toList());
   }
 
@@ -529,13 +530,58 @@ public class ExpoService {
   }
 
   /**
+   * Calcular la próxima fecha de inicio de edición publicada vigente
+   * Devuelve la fecha de inicio de la edición publicada más próxima (futura o en curso)
+   */
+  private LocalDate calcularProximaFechaInicio(Exposicion expo) {
+    LocalDate hoy = LocalDate.now();
+
+    return expo.getEdiciones().stream()
+      .filter(ed -> ed.getEstado() == EstadoEdicion.PUBLICADA)
+      .filter(ed -> !ed.getFechaFin().isBefore(hoy)) // Ediciones vigentes (no finalizadas)
+      .map(ed -> ed.getFechaInicio())
+      .min(LocalDate::compareTo) // La fecha de inicio más temprana
+      .orElse(null); // Si no hay ediciones vigentes, devuelve null
+  }
+
+  /**
    * Comparar exposiciones por proximidad de fecha de inicio
    * (para ordenar en vista pública)
    */
   private int comparePorProximidad(ExposicionDTO e1, ExposicionDTO e2) {
-    // Implementar lógica de ordenación por proximidad
-    // TODO: Necesitaréis añadir la próxima fecha de inicio en el DTO
-    return 0; // Placeholder
+
+    Exposicion expo1 = exposicionDao.findById(e1.getIdExposicion());
+    Exposicion expo2 = exposicionDao.findById(e2.getIdExposicion());
+
+    if (expo1 == null || expo2 == null) return 0;
+
+    // Calcular la próxima fecha de inicio para cada exposición
+    LocalDate fecha1 = calcularProximaFechaInicio(expo1);
+    LocalDate fecha2 = calcularProximaFechaInicio(expo2);
+
+    // Si ninguna tiene fecha, son iguales
+    if (fecha1 == null && fecha2 == null) return 0;
+
+    // Las que no tienen fecha van al final
+    if (fecha1 == null) return 1;
+    if (fecha2 == null) return -1;
+
+    LocalDate hoy = LocalDate.now();
+
+    // Caso 1: Ambas son FUTURAS → la más cercana primero
+    if (fecha1.isAfter(hoy) && fecha2.isAfter(hoy)) {
+      return fecha1.compareTo(fecha2);
+    }
+
+    // Caso 2: Ambas están EN CURSO (inicio <= hoy, fin >= hoy) → las más recientes primero
+    if (! fecha1.isAfter(hoy) && !fecha2.isAfter(hoy)) {
+      return fecha2.compareTo(fecha1); // Orden inverso:  más reciente primero
+    }
+
+    // Caso 3: Una futura, otra en curso → FUTURA primero
+    if (fecha1.isAfter(hoy)) return -1;
+    return 1;
+
   }
 
 }
