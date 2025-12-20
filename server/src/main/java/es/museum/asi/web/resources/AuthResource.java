@@ -70,7 +70,7 @@ public class AuthResource {
       response.setId(created.getId());
       response.setLogin(created.getLogin());
       response.setAutoridad(created.getAuthority());
-      // Estado es ACTIVO por defecto en el servicio
+      response.setEstado(created.getEstadoUser());
       return ResponseEntity.status(HttpStatus.CREATED).body(response);
     } catch (UserLoginExistsException e) {
       logger.warn("Login ya existe: {}", request.getLogin());
@@ -135,6 +135,7 @@ public class AuthResource {
     response.setId(current.getId());
     response.setLogin(current.getLogin());
     response.setAutoridad(current.getAuthority());
+    response.setEstado(current.getEstadoUser());
     return ResponseEntity.ok(response);
   }
 }

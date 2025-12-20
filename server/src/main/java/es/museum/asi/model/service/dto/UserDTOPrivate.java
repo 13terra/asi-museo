@@ -2,6 +2,7 @@ package es.museum.asi.model.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import es.museum.asi.model.domain.User;
+import es.museum.asi.model.enums.EstadoUser;
 import es.museum.asi.model.enums.UserAuthority;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -20,6 +21,16 @@ public class UserDTOPrivate {
 
   private UserAuthority authority;
 
+  public EstadoUser getEstadoUser() {
+    return estadoUser;
+  }
+
+  public void setEstadoUser(EstadoUser estadoUser) {
+    this.estadoUser = estadoUser;
+  }
+
+  private EstadoUser estadoUser;
+
   public UserDTOPrivate() {
   }
 
@@ -28,6 +39,7 @@ public class UserDTOPrivate {
     this.login = user.getLogin();
     // la contraseña no se rellena, nunca se envía al cliente
     this.authority = user.getAutoridad();
+    this.estadoUser = user.getEstado();
   }
 
   public Long getId() {

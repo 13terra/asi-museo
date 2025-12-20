@@ -161,6 +161,7 @@ public class UserResource {
     pu.setId(dto.getId());
     pu.setLogin(dto.getLogin());
     pu.setAutoridad(dto.getAuthority());
+    pu.setEstado(dto.getEstadoUser());
     return pu;
   }
 }
