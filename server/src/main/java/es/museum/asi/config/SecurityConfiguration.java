@@ -60,13 +60,56 @@ public class SecurityConfiguration {
       .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.disable()))
       .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .authorizeHttpRequests((authorize) -> authorize
+        // OPCIONES Y PÚBLICO
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
-        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-        .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/notes/**").authenticated() // Ahora sólo podrán acceder a la lista de notas los usuarios autenticados
-        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(UserAuthority.ADMIN.toString())
-        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll() // Debería ser authenticated, pero para poder tener un GET abierto para las pruebas lo dejamos en permitAllﬁ
+
+        // AUTENTICACÓN (HU1-HU3)
+        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
+
+        // USUARIOS (HU4-HU8) - SOLO ADMIN
+        .requestMatchers("/api/users/**").hasAuthority(UserAuthority.ADMIN.toString())
+
+        // SALAS (HU37-HU40) - SOLO ADMIN
+        .requestMatchers("api/salas/**").hasAuthority(UserAuthority.ADMIN.toString())
+
+        // EXPOS (HU9 - HU19)
+        .requestMatchers(HttpMethod.GET, "api/exposiciones/publico/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "api/exposiciones/admin").hasAuthority(UserAuthority.ADMIN.toString())
+        .requestMatchers(HttpMethod.GET, "api/exposiciones/gestor").hasAuthority(UserAuthority.GESTOR.toString())
+        .requestMatchers("api/exposiciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+
+        // EDICIONES (HU20 - HU26)
+        .requestMatchers(HttpMethod.GET, "api/ediciones/*/publico").permitAll()
+        .requestMatchers("/api/ediciones/**").hasAnyAuthority(UserAuthority. ADMIN.toString(), UserAuthority.GESTOR.toString())
+
+        // SESIONES HU31-HU36
+        .requestMatchers(HttpMethod.GET, "/api/sesiones/*/publico").permitAll()
+        .requestMatchers("/api/sesiones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+
+        // PIEZAS EXPUESTAS HU27-HU30
+        .requestMatchers("/api/piezas-expuestas/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+
+        // OBRAS HU43-HU47
+        .requestMatchers(HttpMethod.GET, "/api/obras/**").permitAll() // Público puede ver catálogo
+        .requestMatchers("/api/obras/**").hasAnyAuthority(UserAuthority. ADMIN.toString(), UserAuthority.GESTOR.toString())
+
+        // THE MET HU48-HU49
+        .requestMatchers("/api/met/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+
+        // TIPOS DE ENTRADA HU50
+        .requestMatchers(HttpMethod.GET, "api/tipos-entrada/**").permitAll()
+
+        // RESERVAS HU51-HU54, HU57-HU58
+        .requestMatchers("/api/mis-reservas/**").hasAuthority(UserAuthority.VISITANTE.toString())
+        .requestMatchers(HttpMethod.POST, "/api/reservas").hasAuthority(UserAuthority.VISITANTE.toString())
+        .requestMatchers("/api/reservas/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+
+        // ENTRADAS HU55,56
+        .requestMatchers("/api/mis-entradas/**").hasAuthority(UserAuthority.VISITANTE.toString())
+
+        // por defecto...
         .requestMatchers("/**").authenticated())
       .with(securityConfigurerAdapter(), Customizer.withDefaults());
     // @formatter:on
