@@ -81,7 +81,7 @@ public class ExpoService {
    * HU10 - Listado de exposiciones (Vista GESTOR)
    * Muestran sólo las expos en las que tenga permisos de CREADOR o EDITOR
    */
-  @PreAuthorize("hasAuthority('GESTOR')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   public Collection<ExposicionDTO> findAllForGestor(boolean incluirArchivadas) {
     User currentUser = getCurrentUser();
 
@@ -126,7 +126,7 @@ public class ExpoService {
    * HU12 - CREAR EXPOSICION (ADMIN o GESTOR)
    * Si es GESTOR, se le asigna automáticamente permiso CREADOR
    */
-  @PreAuthorize("hasAuthority('ADMIN', 'GESTOR')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
   public ExposicionDTO create(String titulo, String descripcion) {
     Exposicion exposicion = new Exposicion(titulo, descripcion);

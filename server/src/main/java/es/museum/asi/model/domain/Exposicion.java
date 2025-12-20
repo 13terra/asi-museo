@@ -2,8 +2,6 @@ package es.museum.asi.model.domain;
 
 import es.museum.asi.model.enums.EstadoExpo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +10,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "exposicion")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)    //hacerlo así o con el constructor sin parámetros --> pero siempre de la misma manera
 public class Exposicion {
 
   @Id
@@ -35,6 +32,10 @@ public class Exposicion {
 
   @OneToMany(mappedBy = "exposicion")
   private Set<Gestion> gestiones = new HashSet<>(); //Set evita duplicados y orden no importa
+
+  // Constructor requerido por JPA
+  protected Exposicion() {
+  }
 
   public Exposicion(String titulo, String descripcion) {
     this.titulo = titulo;

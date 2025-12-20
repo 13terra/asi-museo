@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,6 +14,7 @@ import es.museum.asi.model.exception.ModelException;
 import es.museum.asi.model.exception.NotFoundException;
 import es.museum.asi.web.exceptions.CredentialsAreNotValidException;
 import es.museum.asi.web.exceptions.ResourceException;
+import es.museum.asi.web.exceptions.UserNotActiveException;
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
@@ -32,6 +34,14 @@ public class GlobalControllerExceptionHandler {
   public ErrorDTO badCredentialsExceptionHandler(Exception e) {
     logger.info(e.getMessage(), e);
     return new ErrorDTO("Bad Credentials");
+  }
+
+  @ExceptionHandler({ UserNotActiveException.class })
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  @ResponseBody
+  public ErrorDTO userNotActiveExceptionHandler(AuthenticationException e) {
+    logger.info(e.getMessage(), e);
+    return new ErrorDTO("Usuario desactivado");
   }
 
   @ExceptionHandler({ ModelException.class, ResourceException.class })

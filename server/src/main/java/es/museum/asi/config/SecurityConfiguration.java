@@ -64,6 +64,7 @@ public class SecurityConfiguration {
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
         // AUTENTICACÓN (HU1-HU3)
+        .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
@@ -72,17 +73,17 @@ public class SecurityConfiguration {
         .requestMatchers("/api/users/**").hasAuthority(UserAuthority.ADMIN.toString())
 
         // SALAS (HU37-HU40) - SOLO ADMIN
-        .requestMatchers("api/salas/**").hasAuthority(UserAuthority.ADMIN.toString())
+        .requestMatchers("/api/salas/**").hasAuthority(UserAuthority.ADMIN.toString())
 
         // EXPOS (HU9 - HU19)
-        .requestMatchers(HttpMethod.GET, "api/exposiciones/publico/**").permitAll()
-        .requestMatchers(HttpMethod.GET, "api/exposiciones/admin").hasAuthority(UserAuthority.ADMIN.toString())
-        .requestMatchers(HttpMethod.GET, "api/exposiciones/gestor").hasAuthority(UserAuthority.GESTOR.toString())
-        .requestMatchers("api/exposiciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+        .requestMatchers(HttpMethod.GET, "/api/exposiciones/publico/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/exposiciones/admin").hasAuthority(UserAuthority.ADMIN.toString())
+        .requestMatchers(HttpMethod.GET, "/api/exposiciones/gestor").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+        .requestMatchers("/api/exposiciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // EDICIONES (HU20 - HU26)
-        .requestMatchers(HttpMethod.GET, "api/ediciones/*/publico").permitAll()
-        .requestMatchers("/api/ediciones/**").hasAnyAuthority(UserAuthority. ADMIN.toString(), UserAuthority.GESTOR.toString())
+        .requestMatchers(HttpMethod.GET, "/api/ediciones/*/publico").permitAll()
+        .requestMatchers("/api/ediciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // SESIONES HU31-HU36
         .requestMatchers(HttpMethod.GET, "/api/sesiones/*/publico").permitAll()
@@ -93,13 +94,13 @@ public class SecurityConfiguration {
 
         // OBRAS HU43-HU47
         .requestMatchers(HttpMethod.GET, "/api/obras/**").permitAll() // Público puede ver catálogo
-        .requestMatchers("/api/obras/**").hasAnyAuthority(UserAuthority. ADMIN.toString(), UserAuthority.GESTOR.toString())
+        .requestMatchers("/api/obras/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // THE MET HU48-HU49
         .requestMatchers("/api/met/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // TIPOS DE ENTRADA HU50
-        .requestMatchers(HttpMethod.GET, "api/tipos-entrada/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/tipos-entrada/**").permitAll()
 
         // RESERVAS HU51-HU54, HU57-HU58
         .requestMatchers("/api/mis-reservas/**").hasAuthority(UserAuthority.VISITANTE.toString())
