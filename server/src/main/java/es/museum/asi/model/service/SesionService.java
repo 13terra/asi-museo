@@ -62,7 +62,7 @@ public class SesionService {
    * GESTOR/ADMIN -> no se puede crear sin asignarle al menos una sala
    */
   //HAY QUE PASAR COMO PARÁMETRO LA FECHA TAMBIÉN
-  @PreAuthorize("hasAuthority('ADMIN', 'GESTOR')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
   public SesionDTO create(Long idEdicion, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin,
                           int aforo, List<Long> idSalas)

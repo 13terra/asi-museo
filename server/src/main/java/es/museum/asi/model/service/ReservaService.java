@@ -1,10 +1,7 @@
 package es.museum.asi.model.service;
 
 import es.museum.asi.model.domain.*;
-import es.museum.asi.model.enums.EstadoReserva;
-import es.museum.asi.model.enums.EstadoSesion;
-import es.museum.asi.model.enums.TipoPermiso;
-import es.museum.asi.model.enums.UserAuthority;
+import es.museum.asi.model.enums.*;
 import es.museum.asi.model.exception.NotFoundException;
 import es.museum.asi.model.exception.OperationNotAllowed;
 import es.museum.asi.model.service.dto.ReservaDTO;
@@ -77,7 +74,9 @@ public class ReservaService {
       throw new NotFoundException(request.getIdSesion().toString(), Sesion.class);
     }
 
-    //Validamos SESION DISPONIBLE?
+    if (sesion.getEstadoSesion() != EstadoSesion.DISPONIBLE) {
+      throw new OperationNotAllowed("No se pueden reservar entradas para una sesión que no está disponible");
+    }
 
     int totalEntradasSolicitadas = request.getEntradasPorTipo().values().stream()
       .mapToInt(Integer::intValue).sum();

@@ -62,7 +62,7 @@ public class EdicionService {
    * Sólo admin o gestor con permisos
    * Nace en estado BORRADOR
    */
-  @PreAuthorize("hasAuthority('ADMIN', 'GESTOR')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
   public EdicionDTO create(Long idExposicion, LocalDate fechaInicio, LocalDate fechaFin)
     throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
@@ -141,7 +141,7 @@ public class EdicionService {
   /**
    * Listado de ediciones de una expo (para ADMIN/GESTOR) --> FUTURA HU?
    */
-  @PreAuthorize("hasAuthority('ADMIN', 'GESTOR')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   public Collection<EdicionDTO> findByExpo(Long idExposicion)
     throws NotFoundException,  InvalidPermissionException {
 
@@ -163,7 +163,7 @@ public class EdicionService {
    * EDITOR puede editar fechas
    * Sólo CREADOR/ADMIN pueden cambiar el estado
    */
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
+  @PreAuthorize("hasAnyAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
   public EdicionDTO update(Long idEdicion, LocalDate nuevaFechaInicio, LocalDate nuevaFechaFin, EstadoEdicion nuevoEstado)
     throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
