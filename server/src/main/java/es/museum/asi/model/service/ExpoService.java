@@ -229,6 +229,17 @@ public class ExpoService {
       if (permiso != TipoPermiso.CREADOR && currentUser.getAutoridad() != UserAuthority.ADMIN) {
         throw new InvalidPermissionException("cambiar el estado de la exposición", "Solo el CREADOR o ADMIN pueden modificar el estado");
       }
+
+      // NUEVA VALIDACIÓN: Evitar bypass de lógica de negocio
+      if (nuevoEstado == EstadoExpo.ARCHIVADA) {
+        throw new OperationNotAllowed("No se puede cambiar a ARCHIVADA desde la edición. Use el botón 'Archivar' específico.");
+      }
+
+      // Paso inverso para forzar el uso de desarchivar
+      if (exposicion.getEstadoExpo() == EstadoExpo.ARCHIVADA && nuevoEstado == EstadoExpo.ACTIVA) {
+        throw new OperationNotAllowed("Para reactivar una exposición archivada, use el botón 'Desarchivar'.");
+      }
+
       exposicion.setEstadoExpo(nuevoEstado);
     }
 
