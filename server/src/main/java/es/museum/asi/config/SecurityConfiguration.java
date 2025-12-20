@@ -62,6 +62,7 @@ public class SecurityConfiguration {
       .authorizeHttpRequests((authorize) -> authorize
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
+        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/notes/**").authenticated() // Ahora sólo podrán acceder a la lista de notas los usuarios autenticados
         .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(UserAuthority.ADMIN.toString())

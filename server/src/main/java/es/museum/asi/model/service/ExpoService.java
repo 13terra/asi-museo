@@ -134,10 +134,7 @@ public class ExpoService {
     //Si es GESTOR, asignar permiso CREADOR automáticamente
     User currentUser = getCurrentUser();
     if (currentUser.getAutoridad() == UserAuthority.GESTOR) {
-      Gestion gestion = new Gestion();
-      gestion.setUser(currentUser);
-      gestion.setExposicion(exposicion);
-      gestion.setPermiso(TipoPermiso.CREADOR);
+      Gestion gestion = new Gestion(currentUser, exposicion, TipoPermiso.CREADOR);
       gestionDao.create(gestion);
 
       logger.info("Exposición '{}' creada por gestor {} con permiso CREADOR",

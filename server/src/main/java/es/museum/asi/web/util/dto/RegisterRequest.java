@@ -1,10 +1,19 @@
-package es.museum.asi.web.controller.dto;
+package es.museum.asi.web.util.dto;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import jakarta.validation.constraints.NotBlank;
 
 public class RegisterRequest {
+  @NotBlank(message = "El login es obligatorio")
   private String login;
-  private String password;
-  private String passwordConfirm;
 
+  @NotBlank(message = "La contraseña es obligatoria")
+  @JsonAlias({"contrasena", "password"})
+  private String password;
+
+  @NotBlank(message = "La confirmación de contraseña es obligatoria")
+  @JsonAlias({"contrasenaConfirm", "passwordConfirm"})
+  private String passwordConfirm;
 
   public RegisterRequest() {}
 

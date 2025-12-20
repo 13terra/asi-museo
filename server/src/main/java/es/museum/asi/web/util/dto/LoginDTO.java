@@ -1,5 +1,6 @@
-package es.museum.asi.web.controller.dto;
+package es.museum.asi.web.util.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
@@ -8,6 +9,7 @@ public class LoginDTO {
   private String login;
 
   @NotEmpty
+  @JsonAlias({"contrasena", "password"})
   @Size(min = 4)
   private String password;
 

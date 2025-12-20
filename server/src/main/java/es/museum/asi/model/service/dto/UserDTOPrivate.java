@@ -1,5 +1,6 @@
 package es.museum.asi.model.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import es.museum.asi.model.domain.User;
 import es.museum.asi.model.enums.UserAuthority;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,6 +14,7 @@ public class UserDTOPrivate {
   private String login;
 
   @NotEmpty
+  @JsonAlias({"contrasena", "password"})
   @Size(min = 4)
   private String password;
 
