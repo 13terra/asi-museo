@@ -12,4 +12,4 @@ spring:
 # Microservicio TheMET (nombre del servicio en docker-compose)
 met:
   service:
-    url: http://met-service:8081
+    url: http://met-microservice:8081
