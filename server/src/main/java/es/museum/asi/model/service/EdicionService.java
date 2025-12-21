@@ -9,8 +9,7 @@ import es.museum.asi.model.service.dto.EdicionDetalleDTO;
 import es.museum.asi.repository.*;
 import es.museum.asi.security.SecurityUtils;
 import es.museum.asi.web.exceptions.InvalidPermissionException;
-import jdk.jfr.Percentage;
-import org.aspectj.weaver.ast.Not;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,7 +162,7 @@ public class EdicionService {
    * EDITOR puede editar fechas
    * Sólo CREADOR/ADMIN pueden cambiar el estado
    */
-  @PreAuthorize("hasAnyAnyAuthority('ADMIN', 'GESTOR')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
   public EdicionDTO update(Long idEdicion, LocalDate nuevaFechaInicio, LocalDate nuevaFechaFin, EstadoEdicion nuevoEstado)
     throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
@@ -205,6 +204,10 @@ public class EdicionService {
 
       if (permiso != TipoPermiso.CREADOR && currentUser.getAutoridad() != UserAuthority.ADMIN) {
         throw new InvalidPermissionException("cambiar estado edición", "Solo el CREADOR o un ADMIN puede modificar el estado");
+      }
+
+      if (nuevoEstado == EstadoEdicion.PUBLICADA || nuevoEstado == EstadoEdicion.CANCELADA) {
+        throw new OperationNotAllowed("Para Publicar o Cancelar, use los botones específicos.");
       }
       edicion.setEstado(nuevoEstado);
     }
