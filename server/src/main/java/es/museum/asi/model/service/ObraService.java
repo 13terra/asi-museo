@@ -87,7 +87,7 @@ public class ObraService {
    * Flujo alternativo: Usuario crea obra manualmente
    */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
-  @Transactional(readOnly = true, rollbackFor = Exception.class)
+  @Transactional(readOnly = false, rollbackFor = Exception.class)
   public ObraDTO create(String titulo, String autor, Integer anoCreacion, String tecnica,
                         String dimensiones, String imagenUrlMET, MultipartFile imagenFile,
                         Long idExterno, EstadoObra estado) throws OperationNotAllowed {
