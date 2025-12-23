@@ -19,10 +19,11 @@ const onResponseSuccess = (response) => response;
 // estamos intentando acceder a un recurso sin
 // los permisos correctos
 const onResponseFailure = (err) => {
-  const status = err.response.status;
-  // excepto cuando estemos haciendo login
-  if (!err.config.url.includes("authenticate")) {
-    if (status == 401 || status == 403) {
+  const status = err?.response?.status;
+  const url = err?.config?.url ?? "";
+  // excepto cuando estemos haciendo login/register
+  if (!url.includes("auth/login") && !url.includes("auth/register")) {
+    if (status === 401 || status === 403) {
       onUnauthorized();
     }
   }

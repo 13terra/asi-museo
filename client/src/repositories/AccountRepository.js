@@ -2,16 +2,18 @@ import HTTP from "../common/http";
 
 export default {
   async authenticate(credentials) {
-    return (await HTTP.post(`authenticate`, credentials)).data;
+    return (await HTTP.post(`auth/login`, credentials)).data;
   },
 
   async getAccount() {
-    /* Lo del .data era como cuando en ISD haciamos el .json 
-    lo que pasa es que la petición devuelve muchas más cosas de las que necesitamos  CREOOOO */
-    return (await HTTP.get(`account`)).data;
+    return (await HTTP.get(`auth/me`)).data;
   },
 
   async registerAccount(user) {
-    return (await HTTP.post(`register`, user)).data;
+    return (await HTTP.post(`auth/register`, user)).data;
+  },
+
+  async logout() {
+    return (await HTTP.post(`auth/logout`)).data;
   }
 };

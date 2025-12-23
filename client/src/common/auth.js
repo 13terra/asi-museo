@@ -7,6 +7,7 @@ export default {
   register, // nuevo método para registrar nuevos usuarios
   getToken,
   isAdmin,
+  isGestor,
   isAuthenticationChecked: isAuthenticationChecked()
 };
 
@@ -21,18 +22,26 @@ async function login(credentials) {
   return _authenticate();
 }
 
-function logout() {
+async function logout() {
+  try {
+    await AccountRepository.logout();
+  } catch (e) {
+    // ignore network/logout errors; client state still reset
+  }
   _removeToken();
-  getStore().state.user.login = "";
-  getStore().state.user.authority = "";
-  getStore().state.user.logged = false;
+  const state = getStore().state.user;
+  state.login = "";
+  state.authority = "";
+  state.estado = "";
+  state.logged = false;
 }
 
 async function register(userData) {
   // call to the AccountRepository to throw a POST
   await AccountRepository.registerAccount({
     login: userData.login,
-    password: userData.password
+    password: userData.password,
+    passwordConfirm: userData.passwordConfirm ?? userData.password
   });
 
   // authenticate and obtain the token
@@ -46,6 +55,10 @@ async function register(userData) {
    FUNCIONES QUE SOLO PUEDAN SER EJECUTADAS POR UN ADMIN. O TB PARA COMPROBAR QUE SEA UN USUARIO SIN PROPIEDAD DE ADMIN */
 function isAdmin() {
   return getStore().state.user.authority == "ADMIN";
+}
+
+function isGestor() {
+  return getStore().state.user.authority == "GESTOR";
 }
 
 function getToken() {
@@ -69,8 +82,10 @@ function _removeToken() {
 async function _authenticate() {
   const response = await AccountRepository.getAccount();
   const store = getStore();
+  store.state.user.id = response.id;
   store.state.user.login = response.login;
   store.state.user.authority = response.authority;
+  store.state.user.estado = response.estado;
   store.state.user.logged = true;
   return store.state.user;
 }

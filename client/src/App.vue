@@ -1,90 +1,32 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <router-link class="navbar-brand" :to="store.state.user.logged ? '/notes' : '/'">
-        Notebook 2025/2026
-      </router-link>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <!-- MENU SOLO SI LOGUEADO -->
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-if="store.state.user.logged">
-          <li class="nav-item">
-            <router-link class="nav-link" to="/about" active-class="active">
-              Acerca de
-            </router-link>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              ref="dropdownElement"
-            >
-              Notas
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <router-link class="dropdown-item" to="/notes" active-class="active">
-                  Lista de notas
-                </router-link>
-              </li>
-              <li>
-                <router-link class="dropdown-item" to="/asdf" active-class="active">
-                  URL incorrecta
-                </router-link>
-              </li>
-            </ul>
-          </li>
-        </ul>
-
-        <span v-if="store.state.user.logged && isAdmin" class="me-3">
-          <router-link to="/users">
-            <strong>Lista de usuarios</strong>
-          </router-link>
-        </span>
-        <span v-if="store.state.user.logged && isAdmin" class="me-3">
-          <router-link to="/categories">
-            <strong>Lista de categorías</strong>
-          </router-link>
-        </span>
-        <span v-if="store.state.user.logged" class="me-3">
-          Autenticado como: {{ store.state.user.login }}
-        </span>
-
-        <ul class="navbar-nav">
-          <li class="nav-item" v-if="store.state.user.logged">
-            <!-- Botón de logout con icono -->
-            <button
-              class="nav-link btn p-0 border-0 bg-transparent"
-              @click="desautenticarme()"
-              title="Cerrar sesión"
-              style="line-height: 1"
-            >
-              <i class="bi bi-box-arrow-in-left"></i>
-              <!--Texto oculto-->
-              <span>Logout</span>
-            </button>
-          </li>
-        </ul>
+  <div class="layout">
+    <header class="topbar">
+      <div class="brand">
+        <router-link to="/catalogo">Museo · Exposiciones</router-link>
       </div>
-    </div>
-  </nav>
+      <nav class="links">
+        <router-link to="/catalogo" active-class="active">Catálogo</router-link>
+        <router-link v-if="store.state.user.logged && (isAdmin || isGestor)" to="/expos/gestor" active-class="active">
+          Mis exposiciones
+        </router-link>
+        <router-link v-if="store.state.user.logged && isAdmin" to="/expos/admin" active-class="active">
+          Panel admin
+        </router-link>
+      </nav>
+      <div class="actions" v-if="store.state.user.logged">
+        <div class="user-pill">{{ store.state.user.login }} · {{ store.state.user.authority }}</div>
+        <button class="btn-ghost" @click="desautenticarme">Salir</button>
+      </div>
+      <div class="actions" v-else>
+        <router-link to="/login" class="btn-ghost">Iniciar sesión</router-link>
+        <router-link to="/register" class="btn-primary">Registrarse</router-link>
+      </div>
+    </header>
 
-  <!-- AQUI SE PINTA LA VISTA CONCRETA (landing, login, register, notes)-->
-  <router-view />
-  <!--se sustiye por la vista que toque -->
+    <main class="page">
+      <router-view />
+    </main>
+  </div>
 </template>
 
 <script>
@@ -100,6 +42,9 @@ export default {
   computed: {
     isAdmin() {
       return auth.isAdmin();
+    },
+    isGestor() {
+      return auth.isGestor();
     }
   },
   methods: {
@@ -108,36 +53,105 @@ export default {
       this.$router.push("/");
     }
   },
-  watch: {
-    $route(newValue) {
-      if (this.store.state.user.logged) {
-        if (newValue.name === "NoteList") {
-          this.$refs.dropdownElement.classList.add("active");
-        } else {
-          this.$refs.dropdownElement.classList.remove("active");
-        }
-      }
-    }
-  }
+  watch: {}
 };
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<style scoped>
+#app,
+.layout {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #1f2733;
 }
 
-nav {
-  padding: 30px;
+.topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e9f2;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-  cursor: pointer;
+.brand a {
+  font-weight: 800;
+  color: #1f4b99;
+  text-decoration: none;
+}
+
+.links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.links a {
+  color: #4a5460;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.links a.active {
+  background: #eef2ff;
+  color: #1f4b99;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-pill {
+  background: #eef1f6;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #2a2f36;
+}
+
+.btn-primary {
+  background: #1f4b99;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.btn-ghost {
+  border: 1px solid #d9deea;
+  color: #1f4b99;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.page {
+  min-height: calc(100vh - 64px);
+  background: #f5f7fb;
+}
+
+@media (max-width: 800px) {
+  .topbar {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+  .links {
+    width: 100%;
+  }
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 </style>

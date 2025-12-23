@@ -3,20 +3,27 @@ import AboutView from "../views/AboutView.vue";
 import ErrorNotFoundView from "../views/ErrorNotFoundView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginForm from "../components/LoginForm.vue";
+import RegisterForm from "../components/RegisterForm.vue";
+import AdminExposView from "../views/AdminExposView.vue";
+import GestorExposView from "../views/GestorExposView.vue";
+import ExpoDetailView from "../views/ExpoDetailView.vue";
+import PublicCatalogView from "../views/PublicCatalogView.vue";
 
 import auth from "@/common/auth";
 import { getStore } from "@/common/store";
-
-import notesRoutes from "@/components/notes/routes.js";
-import RegisterForm from "@/components/RegisterForm.vue";
-import UserList from "../components/UserList.vue";
 
 const routes = [
   {
     path: "/",
     name: "HomeView",
     component: HomeView,
-    meta: { public: true, guestOnly: true } // repercute en las últimas líneas del archivo para saber si el usuario ya está logueado
+    meta: { public: true, guestOnly: true }
+  },
+  {
+    path: "/catalogo",
+    name: "PublicCatalog",
+    component: PublicCatalogView,
+    meta: { public: true }
   },
   {
     path: "/login",
@@ -36,17 +43,29 @@ const routes = [
     meta: { public: true, guestOnly: true }
   },
   {
-    path: "/users",
-    name: "Users",
-    component: UserList,
-    meta: { authority: "ADMIN" }
+    path: "/expos/admin",
+    name: "AdminExpos",
+    component: AdminExposView,
+    meta: { authority: ["ADMIN"] }
+  },
+  {
+    path: "/expos/gestor",
+    name: "GestorExpos",
+    component: GestorExposView,
+    meta: { authority: ["ADMIN", "GESTOR"] }
+  },
+  {
+    path: "/expos/:id",
+    name: "ExpoDetail",
+    component: ExpoDetailView,
+    meta: { authority: ["ADMIN", "GESTOR"] }
   },
   {
     path: "/:catchAll(.*)*",
     component: ErrorNotFoundView,
     meta: { public: true }
   }
-].concat(notesRoutes); // concatena con las rutas de las notas
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,7 +87,11 @@ router.beforeEach((to, from, next) => {
     if (requiresAuth) {
       // página privada
       if (userIsLogged) {
-        if (requiredAuthority && requiredAuthority != loggedUserAuthority) {
+        const hasAuthority = Array.isArray(requiredAuthority)
+          ? requiredAuthority.includes(loggedUserAuthority)
+          : !requiredAuthority || requiredAuthority === loggedUserAuthority;
+
+        if (requiredAuthority && !hasAuthority) {
           // usuario logueado pero sin permisos suficientes, le redirigimos a la página de login
           alert("Acceso prohibido para el usuario actual; intenta autenticarte de nuevo");
           auth.logout();
@@ -86,7 +109,7 @@ router.beforeEach((to, from, next) => {
       // página pública
       if (userIsLogged && guestOnly) {
         // si estamos logueados no hace falta volver a mostrar el login
-        next({ name: "NoteList", replace: true });
+        next({ name: "PublicCatalog", replace: true });
       } else {
         next();
       }
