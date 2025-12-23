@@ -1,5 +1,6 @@
 import { getStore } from "./store";
 import AccountRepository from "../repositories/AccountRepository";
+import { ROLES } from "@/constants";
 
 export default {
   login,
@@ -7,6 +8,9 @@ export default {
   register, // nuevo método para registrar nuevos usuarios
   getToken,
   isAdmin,
+  isGestor,
+  isVisitante,
+  canManageUsers,
   isAuthenticationChecked: isAuthenticationChecked()
 };
 
@@ -28,6 +32,7 @@ function logout() {
   getStore().state.user.logged = false;
 }
 
+// HU1 (Sólo crea visitantes)
 async function register(userData) {
   // call to the AccountRepository to throw a POST
   await AccountRepository.registerAccount({
@@ -45,7 +50,22 @@ async function register(userData) {
 /* AQUÍ ES DONDE SE COMPRUEBA SI ES ADMIN SUPONGO QUE HAY QUE USARLA PARA CUANDO HAYA 
    FUNCIONES QUE SOLO PUEDAN SER EJECUTADAS POR UN ADMIN. O TB PARA COMPROBAR QUE SEA UN USUARIO SIN PROPIEDAD DE ADMIN */
 function isAdmin() {
-  return getStore().state.user.authority == "ADMIN";
+  return getStore().state.user.authority == ROLES.ADMIN;
+}
+
+function isGestor() {
+  return getStore().state.user.authority == ROLES.GESTOR;
+}
+
+function isVisitante() {
+  return getStore().state.user.authority == ROLES.VISITANTE;
+}
+
+/**
+ * Verifica si puede gestionar usuarios (solo ADMIN)
+ */
+function canManageUsers() {
+  return isAdmin();
 }
 
 function getToken() {
