@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import HTTP from "../common/http";
-
-const resource = "users"; // endpoint base
-
-export default {
-  async findAll({ autoridad, estado } = {}) {
-    const params = {};
-    if (autoridad) params.autoridad = autoridad;
-    if (estado) params.estado = estado;
-    return (await HTTP.get(`${resource}`, { params })).data; //lista básica
-=======
 import HTTP from '../common/http';
 
 export default {
@@ -23,7 +11,6 @@ export default {
     if (filters.estado) params.append('estado', filters.estado);
 
     return (await HTTP.get(`users?${params.toString()}`)).data;
->>>>>>> 8044a9b ([Repositories] Completos + comprobados)
   },
 
   /**
@@ -41,13 +28,6 @@ export default {
   async create(user) {
     return (await HTTP.post('users', user)).data;
   },
-<<<<<<< HEAD
-  async deactivate(id) {
-    return (await HTTP.put(`${resource}/${id}/deactivate`)).data;
-  },
-  async activate(id) {
-    return (await HTTP.put(`${resource}/${id}/activate`)).data;
-=======
 
   /**
    * HU6 - Editar usuario (ADMIN)
@@ -79,6 +59,5 @@ export default {
    */
   async activar(idUser) {
     return (await HTTP.put(`users/${idUser}/activar`)).data;
->>>>>>> 8044a9b ([Repositories] Completos + comprobados)
   }
 };
