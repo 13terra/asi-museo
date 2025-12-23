@@ -122,14 +122,19 @@ public class SesionService {
     sesion.setEstadoSesion(EstadoSesion.DISPONIBLE);
     sesionDao.create(sesion);
 
+    List<OrdenSalaSesion> listaOrdenes = new ArrayList<>();
+
     for(int i = 0; i < salas.size(); i++) {
       OrdenSalaSesion orden = new OrdenSalaSesion();
       orden.setSesion(sesion);
       orden.setSala(salas.get(i));
       orden.setOrden(i+1);
       ordenSalaSesionDao.create(orden);
-
+      //Necesario para setear los órdenes
+      listaOrdenes.add(orden);
     }
+    sesion.setOrdenes(listaOrdenes);
+
     logger.info("Sesión creada para edición {} en fecha {} ({} - {}) con {} salas",
       idEdicion, fecha, horaInicio, horaFin, salas.size());
 

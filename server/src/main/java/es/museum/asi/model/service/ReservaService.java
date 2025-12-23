@@ -74,6 +74,11 @@ public class ReservaService {
       throw new NotFoundException(request.getIdSesion().toString(), Sesion.class);
     }
 
+    // Validación necesaria (había un bug)
+    if (sesion.getHoraInicio().isBefore(LocalDateTime.now())) {
+      throw new OperationNotAllowed("No se pueden reservar entradas para una sesión que ya ha comenzado o finalizado.");
+    }
+
     if (sesion.getEstadoSesion() != EstadoSesion.DISPONIBLE) {
       throw new OperationNotAllowed("No se pueden reservar entradas para una sesión que no está disponible");
     }
@@ -172,6 +177,8 @@ public class ReservaService {
     float importeTotal = entradas.stream()
       .map(Entrada::getPrecio)
       .reduce(0f, Float::sum);
+
+    reserva.setEntradas(entradas);
 
     logger.info("Reserva {} creada:  {} entradas para sesión {} (Total: {}€)",
       reserva.getIdReserva(), totalEntradasSolicitadas, sesion.getIdSesion(), importeTotal);

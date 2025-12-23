@@ -9,7 +9,7 @@ public class ObraMetDetalleDTO {
   private Long idExterno;
   private String titulo;
   private String autor;
-  private Integer anioCreacion;
+  private Integer anoCreacion;
   private String dimensiones;
   private String imagen;
   private String tecnica;
@@ -18,12 +18,12 @@ public class ObraMetDetalleDTO {
   public ObraMetDetalleDTO() {
   }
 
-  public ObraMetDetalleDTO(Long idExterno, String titulo, String autor, Integer anioCreacion,
+  public ObraMetDetalleDTO(Long idExterno, String titulo, String autor, Integer anoCreacion,
                            String dimensiones, String imagen, String tecnica) {
     this.idExterno = idExterno;
     this.titulo = titulo;
     this.autor = autor;
-    this.anioCreacion = anioCreacion;
+    this.anoCreacion = anoCreacion;
     this.dimensiones = dimensiones;
     this.imagen = imagen;
     this.tecnica = tecnica;
@@ -54,12 +54,12 @@ public class ObraMetDetalleDTO {
     this.autor = autor;
   }
 
-  public Integer getAnioCreacion() {
-    return anioCreacion;
+  public Integer getAnoCreacion() {
+    return anoCreacion;
   }
 
-  public void setAnioCreacion(Integer anioCreacion) {
-    this.anioCreacion = anioCreacion;
+  public void setAnoCreacion(Integer anoCreacion) {
+    this.anoCreacion = anoCreacion;
   }
 
   public String getDimensiones() {
