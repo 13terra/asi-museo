@@ -166,39 +166,61 @@ router.beforeEach((to, from, next) => {
   auth.isAuthenticationChecked.finally(() => {
     // por defecto, el usuario debe estar autenticado para acceder a las rutas
     const requiresAuth = !to.meta.public;
-
     const requiredAuthority = to.meta.authority;
     const userIsLogged = getStore().state.user.logged;
     const loggedUserAuthority = getStore().state.user.authority;
     const guestOnly = to.meta.guestOnly; // Definido para trabajar con la vista pública
 
     if (requiresAuth) {
-      // página privada
+      // Página privada (requiere autenticación)
       if (userIsLogged) {
-        if (requiredAuthority && requiredAuthority != loggedUserAuthority) {
-          // usuario logueado pero sin permisos suficientes, le redirigimos a la página de login
-          alert("Acceso prohibido para el usuario actual; intenta autenticarte de nuevo");
-          auth.logout();
-          next("/");
+        //Usuario autenticado
+        if (requiredAuthority) {
+          //La ruta requiere un rol específico
+          if (loggedUserAuthority === ROLES.ADMIN) {
+            // Admin tiene acceso total (puede acceder a rutas de gestor también)
+            next();
+          } else if (requiredAuthority === loggedUserAuthority) {
+            // El rol coincide: suficiente
+            next();
+          } else {
+            // Rol insuficiente
+            alert('No tienes permisos para acceder a esta sección');
+            // Redirigir según rol
+            if (loggedUserAuthority === ROLES.VISITANTE) {
+              next('/');
+            } else if (loggedUserAuthority === ROLES.GESTOR) {
+              next('/gestor');
+            } else {
+              next('/');
+            }
+          }
         } else {
-          // usuario logueado y con permisos adecuados
+          // Ruta privada sin rol específico
           next();
         }
       } else {
-        // usuario no está logueado, no puede acceder a la página
-        alert("Esta página requiere autenticación");
-        next("/");
+        // Usuario NO autenticado
+        alert('Esta página requiere autenticación');
+        next({ name: 'Login', query: { redirect: to.fullPath } });
       }
     } else {
-      // página pública
+      // Página pública
       if (userIsLogged && guestOnly) {
-        // si estamos logueados no hace falta volver a mostrar el login
-        next({ name: "NoteList", replace: true });
+        // Si está loggeado, redirigir al panel correspondiente
+        if (loggedUserAuthority === ROLES.ADMIN) {
+          next({ name: 'PanelAdmin', replace: true });
+        } else if (loggedUserAuthority === ROLES.GESTOR) {
+          next({ name: 'PanelGestor', replace: true });
+        } else {
+          next({ name: 'CatalogoPublico', replace: true });
+        }
       } else {
         next();
       }
     }
   });
 });
+
 
 export default router;
