@@ -1,37 +1,143 @@
 <template>
-  <div class="layout">
-    <header class="topbar">
-      <div class="brand">
-        <router-link to="/catalogo">Museo · Exposiciones</router-link>
-      </div>
-      <nav class="links">
-        <router-link to="/catalogo" active-class="active">Catálogo</router-link>
-        <router-link v-if="store.state.user.logged && (isAdmin || isGestor)" to="/expos/gestor" active-class="active">
-          Mis exposiciones
+  <div id="app">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <router-link class="navbar-brand" :to="getHomeRoute()">
+          <i class="bi bi-building"></i> Sistema de Museos
         </router-link>
-        <router-link v-if="store.state.user.logged && isAdmin" to="/expos/admin" active-class="active">
-          Panel admin
-        </router-link>
-      </nav>
-      <div class="actions" v-if="store.state.user.logged">
-        <div class="user-pill">{{ store.state.user.login }} · {{ store.state.user.authority }}</div>
-        <button class="btn-ghost" @click="desautenticarme">Salir</button>
-      </div>
-      <div class="actions" v-else>
-        <router-link to="/login" class="btn-ghost">Iniciar sesión</router-link>
-        <router-link to="/register" class="btn-primary">Registrarse</router-link>
-      </div>
-    </header>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <main class="page">
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <!-- Menú público -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-if="!store.state.user.logged">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/" active-class="active">
+                <i class="bi bi-house-door"></i> Catálogo
+              </router-link>
+            </li>
+          </ul>
+
+          <!-- Menú visitante -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-else-if="isVisitante">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/" active-class="active">
+                <i class="bi bi-house-door"></i> Catálogo
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/mis-reservas" active-class="active">
+                <i class="bi bi-ticket-perforated"></i> Mis Reservas
+              </router-link>
+            </li>
+          </ul>
+
+          <!-- Menú gestor -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-else-if="isGestor">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/gestor" active-class="active">
+                <i class="bi bi-kanban"></i> Panel Gestor
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/gestor/obras" active-class="active">
+                <i class="bi bi-palette"></i> Catálogo Obras
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/" active-class="active">
+                <i class="bi bi-eye"></i> Vista Pública
+              </router-link>
+            </li>
+          </ul>
+
+          <!-- Menú admin -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-else-if="isAdmin">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/admin" active-class="active">
+                <i class="bi bi-shield-check"></i> Panel Admin
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/admin/usuarios" active-class="active">
+                <i class="bi bi-people"></i> Usuarios
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/admin/salas" active-class="active">
+                <i class="bi bi-grid-3x3"></i> Salas
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/gestor/obras" active-class="active">
+                <i class="bi bi-palette"></i> Obras
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/" active-class="active">
+                <i class="bi bi-eye"></i> Vista Pública
+              </router-link>
+            </li>
+          </ul>
+
+          <!-- Autenticación / usuario -->
+          <div class="d-flex align-items-center ms-auto">
+            <template v-if="!store.state.user.logged">
+              <router-link to="/login" class="btn btn-outline-light btn-sm me-2">
+                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+              </router-link>
+              <router-link to="/register" class="btn btn-primary btn-sm">
+                <i class="bi bi-person-plus"></i> Registrarse
+              </router-link>
+            </template>
+            <template v-else>
+              <span class="navbar-text text-light me-3">
+                <i class="bi bi-person-circle"></i>
+                <strong>{{ store.state.user.login }}</strong>
+                <span class="badge bg-secondary ms-2">{{ store.state.user.authority }}</span>
+              </span>
+              <button class="btn btn-outline-light btn-sm" @click="handleLogout" title="Cerrar sesión">
+                <i class="bi bi-box-arrow-right"></i> Salir
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div
+      v-if="store.state.notification.show"
+      class="alert alert-dismissible fade show m-3"
+      :class="`alert-${store.state.notification.type}`"
+      role="alert"
+    >
+      {{ store.state.notification.message }}
+      <button type="button" class="btn-close" @click="clearNotification"></button>
+    </div>
+
+    <main class="container-fluid mt-4">
       <router-view />
     </main>
+
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+      <p class="mb-0">&copy; 2025 Sistema de Gestión de Museos - ASI Trabajo Tutelado</p>
+    </footer>
   </div>
 </template>
 
 <script>
-import { getStore } from "./common/store";
+import { getStore, clearNotification } from "./common/store";
 import auth from "./common/auth";
+import { ROLES } from "./constants";
 
 export default {
   data() {
@@ -45,113 +151,51 @@ export default {
     },
     isGestor() {
       return auth.isGestor();
+    },
+    isVisitante() {
+      return auth.isVisitante();
     }
   },
   methods: {
-    desautenticarme() {
-      auth.logout();
-      this.$router.push("/");
+    handleLogout() {
+      if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+        auth.logout();
+        this.$router.push("/");
+      }
+    },
+    getHomeRoute() {
+      if (!this.store.state.user.logged) return "/";
+      if (this.store.state.user.authority === ROLES.ADMIN) return "/admin";
+      if (this.store.state.user.authority === ROLES.GESTOR) return "/gestor";
+      return "/";
+    },
+    clearNotification() {
+      clearNotification();
     }
-  },
-  watch: {}
+  }
 };
 </script>
 
-<style scoped>
-#app,
-.layout {
-  font-family: "Segoe UI", Arial, sans-serif;
-  color: #1f2733;
-}
-
-.topbar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  border-bottom: 1px solid #e5e9f2;
-  background: #ffffff;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.brand a {
-  font-weight: 800;
-  color: #1f4b99;
-  text-decoration: none;
-}
-
-.links {
+<style lang="scss">
+#app {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
 }
 
-.links a {
-  color: #4a5460;
-  text-decoration: none;
-  font-weight: 700;
-  padding: 6px 10px;
-  border-radius: 10px;
+main {
+  flex: 1;
 }
 
-.links a.active {
-  background: #eef2ff;
-  color: #1f4b99;
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user-pill {
-  background: #eef1f6;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-  color: #2a2f36;
-}
-
-.btn-primary {
-  background: #1f4b99;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.btn-ghost {
-  border: 1px solid #d9deea;
-  color: #1f4b99;
-  background: #fff;
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.page {
-  min-height: calc(100vh - 64px);
-  background: #f5f7fb;
-}
-
-@media (max-width: 800px) {
-  .topbar {
-    grid-template-columns: 1fr;
-    align-items: flex-start;
-  }
-  .links {
-    width: 100%;
-  }
-  .actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
+.badge {
+  font-size: 0.75rem;
 }
 </style>
