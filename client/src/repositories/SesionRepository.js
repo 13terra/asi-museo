@@ -3,37 +3,53 @@ import HTTP from '../common/http';
 export default {
   /**
    * HU32 - Listar sesiones de una edición
-   * GET /ediciones/{idEdicion}/sesiones? fecha=...&sala=...&estado=...
+   * GET /api/ediciones/{idEdicion}/sesiones? fecha=...&idSala=...&estado=...
    */
   async getByEdicion(idEdicion, filters = {}) {
     const params = new URLSearchParams();
     if (filters.fecha) params.append('fecha', filters.fecha);
-    if (filters.sala) params.append('sala', filters. sala);
-    if (filters.estado) params.append('estado', filters.estado);
+    if (filters.idSala) params.append('idSala', filters.idSala);
+    if (filters.estado) params.append('estado', filters. estado);
 
     return (await HTTP.get(`ediciones/${idEdicion}/sesiones?${params.toString()}`)).data;
   },
 
   /**
-   * HU33 - Detalle de sesión
-   * GET /sesiones/{id}
+   * HU33 - Detalle de sesión (ADMIN/GESTOR)
+   * GET /api/sesiones/{id}/admin
    */
-  async getById(idSesion) {
-    return (await HTTP.get(`sesiones/${idSesion}`)).data;
+  async getDetalleForAdmin(idSesion) {
+    return (await HTTP.get(`sesiones/${idSesion}/admin`)).data;
+  },
+
+  /**
+   * HU33 - Detalle de sesión (PÚBLICO)
+   * GET /api/sesiones/{id}/publico
+   */
+  async getDetallePublic(idSesion) {
+    return (await HTTP.get(`sesiones/${idSesion}/publico`)).data;
   },
 
   /**
    * HU31 - Crear sesión
-   * POST /ediciones/{idEdicion}/sesiones
-   * Body: { fecha, horaInicio, horaFin, aforo, salas:  [{ idSala, orden }] }
+   * POST /api/ediciones/{idEdicion}/sesiones?fecha=...&horaInicio=...&horaFin=...&aforo=...&idSalas=... 
    */
   async create(idEdicion, sesion) {
-    return (await HTTP.post(`ediciones/${idEdicion}/sesiones`, sesion)).data;
+    const params = new URLSearchParams();
+    params.append('fecha', sesion.fecha);
+    params.append('horaInicio', sesion.horaInicio);
+    params.append('horaFin', sesion.horaFin);
+    params.append('aforo', sesion. aforo);
+    // idSalas es un array, se añade múltiples veces
+    sesion.idSalas.forEach(id => params.append('idSalas', id));
+    
+    return (await HTTP.post(`ediciones/${idEdicion}/sesiones?${params.toString()}`)).data;
   },
 
   /**
    * HU34 - Editar sesión
-   * PUT /sesiones/{id}
+   * PUT /api/sesiones/{id}
+   * Body: SesionUpdateDTO (JSON)
    */
   async update(idSesion, sesion) {
     return (await HTTP.put(`sesiones/${idSesion}`, sesion)).data;
@@ -41,31 +57,42 @@ export default {
 
   /**
    * HU35 - Cancelar sesión
-   * PUT /sesiones/{id}/cancelar
+   * PUT /api/sesiones/{id}/cancelar
    */
   async cancelar(idSesion) {
     return (await HTTP.put(`sesiones/${idSesion}/cancelar`)).data;
   },
 
   /**
-   * HU36 - Eliminar sesión (sin reservas)
-   * DELETE /sesiones/{id}
+   * HU36 - Eliminar sesión
+   * DELETE /api/sesiones/{id}
    */
   async delete(idSesion) {
     return (await HTTP.delete(`sesiones/${idSesion}`)).data;
   },
 
   /**
-   * HU41 - Asignar sala a sesión
-   * POST /sesiones/{idSesion}/salas
+   * Listar salas asignadas a sesión
+   * GET /api/sesiones/{idSesion}/salas
    */
-  async asignarSala(idSesion, sala) {
-    return (await HTTP.post(`sesiones/${idSesion}/salas`, sala)).data;
+  async getSalasAsignadas(idSesion) {
+    return (await HTTP.get(`sesiones/${idSesion}/salas`)).data;
+  },
+
+  /**
+   * HU41 - Asignar salas a sesión
+   * POST /api/sesiones/{idSesion}/salas?idSalas=...&idSalas=...
+   */
+  async asignarSalas(idSesion, idSalas) {
+    const params = new URLSearchParams();
+    idSalas.forEach(id => params.append('idSalas', id));
+    
+    return (await HTTP.post(`sesiones/${idSesion}/salas?${params.toString()}`)).data;
   },
 
   /**
    * HU42 - Desasignar sala de sesión
-   * DELETE /sesiones/{idSesion}/salas/{idSala}
+   * DELETE /api/sesiones/{idSesion}/salas/{idSala}
    */
   async desasignarSala(idSesion, idSala) {
     return (await HTTP.delete(`sesiones/${idSesion}/salas/${idSala}`)).data;

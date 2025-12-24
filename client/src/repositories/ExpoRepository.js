@@ -2,39 +2,56 @@ import HTTP from '../common/http';
 
 export default {
   /**
-   * HU9/10/11 - Listar exposiciones
-   * Admin: GET /exposiciones/admin? incluirArchivadas=true
-   * Gestor: GET /exposiciones/gestor?incluirArchivadas=true
-   * Público: GET /exposiciones/publico
+   * HU9 - Listar exposiciones para ADMIN
+   * GET /api/exposiciones/admin? incluirArchivadas=true|false
    */
   async getAllForAdmin(incluirArchivadas = false) {
     return (await HTTP.get(`exposiciones/admin?incluirArchivadas=${incluirArchivadas}`)).data;
   },
 
+  /**
+   * HU10 - Listar exposiciones para GESTOR
+   * GET /api/exposiciones/gestor? incluirArchivadas=true|false
+   */
   async getAllForGestor(incluirArchivadas = false) {
     return (await HTTP.get(`exposiciones/gestor?incluirArchivadas=${incluirArchivadas}`)).data;
   },
 
+  /**
+   * HU11 - Listar exposiciones públicas
+   * GET /api/exposiciones/publico
+   */
   async getAllPublic() {
     return (await HTTP.get('exposiciones/publico')).data;
   },
 
   /**
-   * HU13 - Detalle de exposición
-   * Admin/Gestor: GET /exposiciones/{id}/admin
-   * Público: GET /exposiciones/{id}/publico
+   * HU59 - Buscar exposiciones en catálogo público
+   * GET /api/exposiciones/publico/buscar? termino=... 
+   */
+  async searchPublic(termino) {
+    return (await HTTP.get(`exposiciones/publico/buscar?termino=${encodeURIComponent(termino)}`)).data;
+  },
+
+  /**
+   * HU13 - Detalle de exposición (ADMIN/GESTOR)
+   * GET /api/exposiciones/{id}/admin
    */
   async getDetalleForAdmin(idExposicion) {
     return (await HTTP.get(`exposiciones/${idExposicion}/admin`)).data;
   },
 
+  /**
+   * HU13 - Detalle de exposición (PÚBLICO)
+   * GET /api/exposiciones/{id}/publico
+   */
   async getDetallePublic(idExposicion) {
     return (await HTTP.get(`exposiciones/${idExposicion}/publico`)).data;
   },
 
   /**
    * HU12 - Crear exposición
-   * POST /exposiciones? titulo=... &descripcion=... 
+   * POST /api/exposiciones? titulo=...&descripcion=... 
    */
   async create(exposicion) {
     const params = new URLSearchParams();
@@ -46,7 +63,7 @@ export default {
 
   /**
    * HU14 - Editar exposición
-   * PUT /exposiciones/{id}? titulo=...&descripcion=... &estado=...
+   * PUT /api/exposiciones/{id}? titulo=...&descripcion=... &estado=...
    */
   async update(idExposicion, exposicion) {
     const params = new URLSearchParams();
@@ -59,7 +76,7 @@ export default {
 
   /**
    * HU15 - Archivar exposición
-   * PUT /exposiciones/{id}/archivar
+   * PUT /api/exposiciones/{id}/archivar
    */
   async archivar(idExposicion) {
     return (await HTTP.put(`exposiciones/${idExposicion}/archivar`)).data;
@@ -67,7 +84,7 @@ export default {
 
   /**
    * HU15 - Desarchivar exposición
-   * PUT /exposiciones/{id}/desarchivar
+   * PUT /api/exposiciones/{id}/desarchivar
    */
   async desarchivar(idExposicion) {
     return (await HTTP.put(`exposiciones/${idExposicion}/desarchivar`)).data;
@@ -75,17 +92,9 @@ export default {
 
   /**
    * HU16 - Eliminar exposición
-   * DELETE /exposiciones/{id}
+   * DELETE /api/exposiciones/{id}
    */
   async delete(idExposicion) {
     return (await HTTP.delete(`exposiciones/${idExposicion}`)).data;
-  },
-
-  /**
-   * HU59 - Buscar en catálogo público
-   * GET /exposiciones/publico/buscar? termino=... 
-   */
-  async searchPublic(termino) {
-    return (await HTTP.get(`exposiciones/publico/buscar?termino=${encodeURIComponent(termino)}`)).data;
   }
 };

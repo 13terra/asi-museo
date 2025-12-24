@@ -78,13 +78,13 @@ const routes = [
     meta: { authority: ROLES.VISITANTE }
   },
   {
-    path: '/reservas/: idReserva',
+    path: '/reservas/:idReserva',
     name: 'ReservaDetalle',
     component: ReservaDetalle,
     meta: { authority: ROLES.VISITANTE }
   },
   {
-    path: '/sesiones/: idSesion/reservar',
+    path: '/sesiones/:idSesion/reservar',
     name: 'ReservarEntradas',
     component: ReservarEntradas,
     meta: { authority: ROLES.VISITANTE }
