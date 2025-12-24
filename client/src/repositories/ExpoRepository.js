@@ -17,12 +17,23 @@ export default {
     return (await HTTP.get(`exposiciones/gestor?incluirArchivadas=${incluirArchivadas}`)).data;
   },
 
+  // Alias usado en vistas
+  async listGestor(opts = {}) {
+    const incluirArchivadas = typeof opts === 'object' ? !!opts.incluirArchivadas : !!opts;
+    return this.getAllForGestor(incluirArchivadas);
+  },
+
   /**
    * HU11 - Listar exposiciones públicas
    * GET /api/exposiciones/publico
    */
   async getAllPublic() {
     return (await HTTP.get('exposiciones/publico')).data;
+  },
+
+  // Alias usado en vistas
+  async listPublic() {
+    return this.getAllPublic();
   },
 
   /**
@@ -39,6 +50,11 @@ export default {
    */
   async getDetalleForAdmin(idExposicion) {
     return (await HTTP.get(`exposiciones/${idExposicion}/admin`)).data;
+  },
+
+  // Alias usado en vistas
+  async detailAdmin(idExposicion) {
+    return this.getDetalleForAdmin(idExposicion);
   },
 
   /**
@@ -71,7 +87,9 @@ export default {
     if (exposicion. descripcion) params.append('descripcion', exposicion.descripcion);
     if (exposicion.estado) params.append('estado', exposicion.estado);
     
-    return (await HTTP.put(`exposiciones/${idExposicion}? ${params.toString()}`)).data;
+    const query = params.toString();
+    const url = query ? `exposiciones/${idExposicion}?${query}` : `exposiciones/${idExposicion}`;
+    return (await HTTP.put(url)).data;
   },
 
   /**

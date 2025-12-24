@@ -34,7 +34,7 @@
           </div>
           <h3>{{ expo.titulo }}</h3>
           <p class="description">{{ expo.descripcion || "Sin descripción" }}</p>
-          <router-link :to="`/expos/${expo.idExposicion}`" class="link-btn">Ver detalle</router-link>
+          <router-link :to="`/catalogo/${expo.idExposicion}`" class="link-btn">Ver detalle</router-link>
         </div>
       </article>
     </div>

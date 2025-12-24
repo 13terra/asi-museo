@@ -2,7 +2,7 @@
   <div class="detail-shell" v-if="!loading && expo">
     <div class="detail-header">
       <div class="breadcrumbs">
-        <router-link to="/expos/admin">Exposiciones</router-link>
+        <router-link :to="listRoute">Exposiciones</router-link>
         <span>/</span>
         <span>{{ expo.titulo }}</span>
       </div>
@@ -129,6 +129,7 @@
 <script>
 import ExpoRepository from "@/repositories/ExpoRepository";
 import EdicionRepository from "@/repositories/EdicionRepository";
+import auth from "@/common/auth";
 
 export default {
   name: "ExpoDetailView",
@@ -157,6 +158,11 @@ export default {
   },
   created() {
     this.load();
+  },
+  computed: {
+    listRoute() {
+      return auth.isAdmin() ? "/expos/admin" : "/expos/gestor";
+    }
   },
   methods: {
     badgeClass(estado) {

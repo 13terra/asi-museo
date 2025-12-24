@@ -7,7 +7,7 @@ export default {
    */
   async getAll(filters = {}) {
     const params = new URLSearchParams();
-    if (filters.autoridad) params.append('autoridad', filters. autoridad);
+    if (filters.autoridad) params.append('autoridad', filters.autoridad);
     if (filters.estado) params.append('estado', filters.estado);
 
     return (await HTTP.get(`users?${params.toString()}`)).data;

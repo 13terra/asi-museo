@@ -20,6 +20,7 @@
 
 <script>
 import auth from "../common/auth.js";
+import { clearNotification } from "../common/store.js";
 
 export default {
   data() {
@@ -39,7 +40,8 @@ export default {
           login: this.auxLogin,
           password: this.auxPass
         });
-        this.$router.push({ name: "PublicCatalog" });
+        clearNotification();
+        this.$router.push({ name: "HomeLanding" });
       } catch (e) {
         this.error = e.response?.data?.message || "No se pudo iniciar sesión";
       } finally {

@@ -9,11 +9,8 @@ export default {
   getToken,
   isAdmin,
   isGestor,
-<<<<<<< HEAD
-=======
   isVisitante,
   canManageUsers,
->>>>>>> 3d1b8ac34f0fdb1b93176741a83be22c2b447231
   isAuthenticationChecked: isAuthenticationChecked()
 };
 
@@ -64,12 +61,12 @@ function isAdmin() {
   return getStore().state.user.authority == ROLES.ADMIN;
 }
 
-function isGestor() {
-  return getStore().state.user.authority == ROLES.GESTOR;
-}
-
 function isVisitante() {
   return getStore().state.user.authority == ROLES.VISITANTE;
+}
+
+function isGestor() {
+  return getStore().state.user.authority == ROLES.GESTOR;
 }
 
 /**
@@ -77,10 +74,6 @@ function isVisitante() {
  */
 function canManageUsers() {
   return isAdmin();
-}
-
-function isGestor() {
-  return getStore().state.user.authority == "GESTOR";
 }
 
 function getToken() {
@@ -106,7 +99,8 @@ async function _authenticate() {
   const store = getStore();
   store.state.user.id = response.id;
   store.state.user.login = response.login;
-  store.state.user.authority = response.authority;
+  // El backend devuelve "autoridad"
+  store.state.user.authority = response.authority || response.autoridad;
   store.state.user.estado = response.estado;
   store.state.user.logged = true;
   return store.state.user;

@@ -4,7 +4,8 @@ import { getStore } from '@/common/store';
 import { ROLES } from '@/constants';
 
 // ========== VISTAS PÚBLICAS ==========
-import CatalogoPublico from '@/views/public/CatalogoPublico. vue';
+import HomeLanding from '@/views/HomeLanding.vue';
+import CatalogoPublico from '@/views/public/CatalogoPublico.vue';
 import ExposicionPublicaDetalle from '@/views/public/ExposicionPublicaDetalle.vue';
 import EdicionPublicaDetalle from '@/views/public/EdicionPublicaDetalle.vue';
 
@@ -13,24 +14,25 @@ import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 
 // ========== VISITANTE ==========
-import MisReservas from '@/views/visitante/MisReservas. vue';
+import MisReservas from '@/views/visitante/MisReservas.vue';
 import ReservaDetalle from '@/views/visitante/ReservaDetalle.vue';
-import ReservarEntradas from '@/views/visitante/ReservarEntradas. vue';
+import ReservarEntradas from '@/views/visitante/ReservarEntradas.vue';
 
 // ========== GESTOR ==========
-import PanelGestor from '@/views/gestor/PanelGestor. vue';
+import PanelGestor from '@/views/gestor/PanelGestor.vue';
 import ExposicionDetalle from '@/views/gestor/ExposicionDetalle.vue';
 import EdicionDetalle from '@/views/gestor/EdicionDetalle.vue';
 import GestionPiezas from '@/views/gestor/GestionPiezas.vue';
-import GestionSesiones from '@/views/gestor/GestionSesiones. vue';
+import GestionSesiones from '@/views/gestor/GestionSesiones.vue';
 import GestionSalas from '@/views/gestor/GestionSalas.vue';
-import GestionPermisos from '@/views/gestor/GestionPermisos. vue';
+import GestionPermisos from '@/views/gestor/GestionPermisos.vue';
 import CatalogoObras from '@/views/gestor/CatalogoObras.vue';
 
 // ========== ADMIN ==========
 import PanelAdmin from '@/views/admin/PanelAdmin.vue';
 import GestionUsuarios from '@/views/admin/GestionUsuarios.vue';
 import GestionSalasAdmin from '@/views/admin/GestionSalasAdmin.vue';
+import AdminExposList from '@/views/admin/AdminExposList.vue';
 
 // ========== ERROR ==========
 import ErrorNotFound from '@/views/ErrorNotFound.vue';
@@ -39,18 +41,24 @@ const routes = [
   // ========== RUTAS PÚBLICAS ==========
   {
     path: '/',
+    name: 'HomeLanding',
+    component: HomeLanding,
+    meta: { public: true }
+  },
+  {
+    path: '/catalogo',
     name: 'CatalogoPublico',
     component: CatalogoPublico,
     meta: { public: true }
   },
   {
-    path: '/exposiciones/: idExposicion',
-    name:  'ExposicionPublicaDetalle',
+    path: '/exposiciones/:idExposicion',
+    name: 'ExposicionPublicaDetalle',
     component: ExposicionPublicaDetalle,
     meta: { public: true }
   },
   {
-    path: '/exposiciones/: idExposicion/ediciones/:idEdicion',
+    path: '/exposiciones/:idExposicion/ediciones/:idEdicion',
     name: 'EdicionPublicaDetalle',
     component: EdicionPublicaDetalle,
     meta: { public: true }
@@ -98,7 +106,7 @@ const routes = [
     meta: { authority:  ROLES.GESTOR }
   },
   {
-    path:  '/gestor/exposiciones/: idExposicion',
+    path: '/gestor/exposiciones/:idExposicion',
     name: 'ExposicionDetalle',
     component: ExposicionDetalle,
     meta: { authority: ROLES.GESTOR }
@@ -116,7 +124,7 @@ const routes = [
     meta: { authority:  ROLES.GESTOR }
   },
   {
-    path: '/gestor/ediciones/: idEdicion/sesiones',
+    path: '/gestor/ediciones/:idEdicion/sesiones',
     name: 'GestionSesiones',
     component:  GestionSesiones,
     meta: { authority: ROLES. GESTOR }
@@ -146,6 +154,20 @@ const routes = [
     name: 'PanelAdmin',
     component: PanelAdmin,
     meta:  { authority: ROLES.ADMIN }
+  },
+  {
+    path: '/admin/exposiciones',
+    name: 'AdminExposList',
+    component: AdminExposList,
+    meta: { authority: ROLES.ADMIN }
+  },
+  {
+    path: '/expos/admin',
+    redirect: { name: 'PanelAdmin' }
+  },
+  {
+    path: '/expos/gestor',
+    redirect: { name: 'PanelGestor' }
   },
   {
     path: '/admin/usuarios',
@@ -178,7 +200,7 @@ const router = createRouter({
  * Controla el acceso según autenticación y roles
  */
 router.beforeEach((to, from, next) => {
-  auth.isAuthenticationChecked. finally(() => {
+  Promise.resolve(auth.isAuthenticationChecked()).finally(() => {
     const requiresAuth = ! to.meta.public;
     const requiredAuthority = to.meta.authority;
     const userIsLogged = getStore().state.user.logged;
@@ -227,7 +249,7 @@ router.beforeEach((to, from, next) => {
         } else if (loggedUserAuthority === ROLES. GESTOR) {
           next({ name: 'PanelGestor', replace: true });
         } else {
-          next({ name: 'CatalogoPublico', replace: true });
+          next({ name: 'HomeLanding', replace: true });
         }
       } else {
         next();

@@ -9,7 +9,7 @@ export default {
     const params = new URLSearchParams();
     if (filters.fecha) params.append('fecha', filters.fecha);
     if (filters.idSala) params.append('idSala', filters.idSala);
-    if (filters.estado) params.append('estado', filters. estado);
+    if (filters.estado) params.append('estado', filters.estado);
 
     return (await HTTP.get(`ediciones/${idEdicion}/sesiones?${params.toString()}`)).data;
   },
@@ -31,6 +31,13 @@ export default {
   },
 
   /**
+   * Alias para obtener detalle público (usada en la UI de reserva)
+   */
+  async getById(idSesion) {
+    return this.getDetallePublic(idSesion);
+  },
+
+  /**
    * HU31 - Crear sesión
    * POST /api/ediciones/{idEdicion}/sesiones?fecha=...&horaInicio=...&horaFin=...&aforo=...&idSalas=... 
    */
@@ -39,9 +46,9 @@ export default {
     params.append('fecha', sesion.fecha);
     params.append('horaInicio', sesion.horaInicio);
     params.append('horaFin', sesion.horaFin);
-    params.append('aforo', sesion. aforo);
+    params.append('aforo', sesion.aforo);
     // idSalas es un array, se añade múltiples veces
-    sesion.idSalas.forEach(id => params.append('idSalas', id));
+    (sesion.idSalas || []).forEach(id => params.append('idSalas', id));
     
     return (await HTTP.post(`ediciones/${idEdicion}/sesiones?${params.toString()}`)).data;
   },

@@ -21,7 +21,7 @@
           <!-- Menú público -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-if="!store.state.user.logged">
             <li class="nav-item">
-              <router-link class="nav-link" to="/" active-class="active">
+              <router-link class="nav-link" to="/catalogo" active-class="active">
                 <i class="bi bi-house-door"></i> Catálogo
               </router-link>
             </li>
@@ -30,13 +30,13 @@
           <!-- Menú visitante -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0" v-else-if="isVisitante">
             <li class="nav-item">
-              <router-link class="nav-link" to="/" active-class="active">
+              <router-link class="nav-link" to="/catalogo" active-class="active">
                 <i class="bi bi-house-door"></i> Catálogo
               </router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/mis-reservas" active-class="active">
-                <i class="bi bi-ticket-perforated"></i> Mis Reservas
+                <i class="bi bi-ticket-perforated"></i> Mis reservas
               </router-link>
             </li>
           </ul>
@@ -49,12 +49,7 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/gestor/obras" active-class="active">
-                <i class="bi bi-palette"></i> Catálogo Obras
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/" active-class="active">
+              <router-link class="nav-link" to="/catalogo" active-class="active">
                 <i class="bi bi-eye"></i> Vista Pública
               </router-link>
             </li>
@@ -68,22 +63,12 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/admin/usuarios" active-class="active">
-                <i class="bi bi-people"></i> Usuarios
+              <router-link class="nav-link" to="/admin/exposiciones" active-class="active">
+                <i class="bi bi-kanban"></i> Exposiciones
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/admin/salas" active-class="active">
-                <i class="bi bi-grid-3x3"></i> Salas
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/gestor/obras" active-class="active">
-                <i class="bi bi-palette"></i> Obras
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/" active-class="active">
+              <router-link class="nav-link" to="/catalogo" active-class="active">
                 <i class="bi bi-eye"></i> Vista Pública
               </router-link>
             </li>
@@ -115,12 +100,12 @@
     </nav>
 
     <div
-      v-if="store.state.notification.show"
-      class="alert alert-dismissible fade show m-3"
-      :class="`alert-${store.state.notification.type}`"
+      v-if="notification.show"
+      class="toast-wrap"
+      :class="`toast-${notification.type}`"
       role="alert"
     >
-      {{ store.state.notification.message }}
+      <div class="toast-message">{{ notification.message }}</div>
       <button type="button" class="btn-close" @click="clearNotification"></button>
     </div>
 
@@ -146,6 +131,9 @@ export default {
     };
   },
   computed: {
+    notification() {
+      return this.store.state.notification;
+    },
     isAdmin() {
       return auth.isAdmin();
     },
@@ -160,13 +148,11 @@ export default {
     handleLogout() {
       if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
         auth.logout();
-        this.$router.push("/");
+        this.$router.push("/login");
       }
     },
     getHomeRoute() {
-      if (!this.store.state.user.logged) return "/";
-      if (this.store.state.user.authority === ROLES.ADMIN) return "/admin";
-      if (this.store.state.user.authority === ROLES.GESTOR) return "/gestor";
+      // Siempre llevamos a la página inicial pública
       return "/";
     },
     clearNotification() {
@@ -197,5 +183,46 @@ main {
 
 .badge {
   font-size: 0.75rem;
+}
+
+.toast-wrap {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  min-width: 260px;
+  max-width: 360px;
+  background: #111827;
+  color: #f9fafb;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1050;
+}
+
+.toast-wrap .btn-close {
+  filter: invert(1);
+}
+
+.toast-message {
+  font-weight: 600;
+}
+
+.toast-info {
+  border-left: 4px solid #3b82f6;
+}
+
+.toast-success {
+  border-left: 4px solid #10b981;
+}
+
+.toast-warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.toast-error {
+  border-left: 4px solid #ef4444;
 }
 </style>

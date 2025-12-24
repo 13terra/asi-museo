@@ -11,10 +11,18 @@ export default {
 
   /**
    * Obtener cuenta del usuario autenticado
-   * GET /api/auth/account
+   * GET /api/auth/me
    */
   async getAccount() {
-    return (await HTTP.get('auth/account')).data;
+    return (await HTTP.get('auth/me')).data;
+  },
+
+  /**
+   * Cerrar sesión (opcional en backend, limpia estado servidor)
+   * POST /api/auth/logout
+   */
+  async logout() {
+    return (await HTTP.post('auth/logout')).data;
   },
 
   /**

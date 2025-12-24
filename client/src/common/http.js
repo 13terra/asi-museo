@@ -45,7 +45,7 @@ const onResponseFailure = (err) => {
   const responseUrl = err.config?.url ?? "";
 
   // No mostrar error de autenticación si estamos en /authenticate o /register
-  if (responseUrl.includes("authenticate") || responseUrl.includes("register")) {
+  if (responseUrl.includes("auth/login") || responseUrl.includes("auth/register")) {
     return Promise.reject(err);
   }
 
