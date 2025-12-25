@@ -7,9 +7,9 @@
         <p class="lead">Explora el catálogo público, reserva tus visitas o administra exposiciones si formas parte del equipo.</p>
         <div class="cta">
           <router-link class="btn primary" to="/catalogo">Ver catálogo</router-link>
-          <!-- Usar computed para reactividad, si no no desaparece el login-->
+          <!-- ✅ CORRECCIÓN: v-else dentro de la etiqueta -->
           <router-link v-if="!isUserLogged" class="btn ghost" to="/login">Iniciar sesión</router-link>
-          <router-link> v-else class="btn ghost" :to="getDashboardRoute"
+          <router-link v-else class="btn ghost" :to="getDashboardRoute">
             <i class="bi bi-speedometer2"></i> Mi Panel
           </router-link>
         </div>

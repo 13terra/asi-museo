@@ -11,7 +11,7 @@ export default {
   isGestor,
   isVisitante,
   canManageUsers,
-  isAuthenticationChecked: isAuthenticationChecked()
+  isAuthenticationChecked
 };
 
 /**
