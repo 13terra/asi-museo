@@ -27,6 +27,8 @@ import es.museum.asi.security.TokenProvider;
 import es.museum.asi.web.util.dto.RegisterRequest;
 import es.museum.asi.web.util.dto.LoginDTO;
 import es.museum.asi.web.util.ErrorDTO;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 
 /**
  * Resource de autenticación (HU1-HU3)
@@ -85,6 +87,9 @@ public class AuthResource {
   /**
    * HU2 - Login (gestionado por Spring Security). Endpoint informativo.
    */
+/**
+   * HU2 - Login (gestionado por Spring Security).
+   */
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
     try {
@@ -95,11 +100,21 @@ public class AuthResource {
       SecurityContextHolder.getContext().setAuthentication(authentication);
       String jwt = tokenProvider.createToken(authentication);
       return ResponseEntity.ok(new JWTToken(jwt));
-    } catch (AuthenticationException e) {
-      logger.warn("Login fallido para {}: {}", loginDTO.getLogin(), e.getMessage());
+
+    } catch (DisabledException e) {
+      // CASO 1: El usuario existe y la contraseña está bien, pero está INACTIVO
+      logger.warn("Intento de login de usuario desactivado: {}", loginDTO.getLogin());
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(new ErrorDTO("Tu cuenta ha sido desactivada. Contacta con el administrador."));
+
+    } catch (BadCredentialsException e) {
+      //  CASO 2: Usuario no existe o contraseña mal
+      logger.warn("Credenciales incorrectas para: {}", loginDTO.getLogin());
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body(new ErrorDTO("Credenciales incorrectas"));
+
     } catch (Exception e) {
+      // OTROS ERRORES
       logger.error("Error inesperado en login", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(new ErrorDTO("Error en el login"));

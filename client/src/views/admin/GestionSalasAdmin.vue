@@ -82,22 +82,106 @@ export default {
 </script>
 
 <style scoped>
-.page { max-width: 1100px; margin: 0 auto; padding: 28px 18px 48px; display: flex; flex-direction: column; gap: 16px; }
-.head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: #5b6472; margin: 0; }
-.muted { color: #5b6472; margin: 0; }
-.btn { padding: 10px 14px; border-radius: 10px; border: 1px solid #d9deea; background: #fff; cursor: pointer; font-weight: 700; }
-.btn.primary { background: linear-gradient(135deg,#1f4b99,#153a7a); color: #fff; border: none; }
-.btn.ghost { background: #fff; }
-.btn.danger { border-color: #e84a4a; color: #e84a4a; background: #fff3f3; }
-.card { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 16px; box-shadow: 0 8px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
-.form-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 12px; align-items: end; }
-input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #d9deea; }
-.actions { display: flex; gap: 8px; align-items: center; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 12px; }
-.item { border: 1px solid #eef1f6; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.item-actions { display: flex; gap: 8px; }
-.error { color: #d23b3b; margin: 0; }
-.empty { padding: 12px; background: #f6f8ff; border-radius: 10px; color: #4a5460; }
-.center { display: flex; justify-content: center; padding: 20px 0; }
+.gestion-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* --- SOLUCIÓN DEL SOLAPAMIENTO --- */
+.salas-grid {
+  display: grid;
+  /* Crea columnas automáticas de mínimo 300px de ancho */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px; /* Espacio entre tarjetas */
+  margin-top: 24px;
+}
+
+.sala-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  /* Sombra suave */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.sala-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.sala-info h3 {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+  color: #2c3e50;
+}
+
+.sala-info p {
+  margin: 0;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.card-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+/* Botones */
+.btn-primary {
+  background: #1f4b99;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #163a7a;
+}
+
+.btn-edit {
+  background: #eef2f7;
+  color: #1f4b99;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-delete {
+  background: #feebee;
+  color: #b3261e;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
 </style>

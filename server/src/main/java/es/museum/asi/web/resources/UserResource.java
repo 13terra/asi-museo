@@ -1,7 +1,6 @@
 package es.museum.asi.web.resources;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

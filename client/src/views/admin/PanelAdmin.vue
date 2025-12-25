@@ -139,8 +139,8 @@ export default {
 
       try {
         const [usersResult, salasResult, exposResult] = await Promise.allSettled([
-          UserRepository. findAll(),
-          SalaRepository.findAll(),
+          UserRepository.getAll(),
+          SalaRepository.getAll(),
           ExpoRepository.getAllForAdmin(false)
         ]);
 
