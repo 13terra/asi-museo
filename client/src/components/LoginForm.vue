@@ -20,7 +20,7 @@
 
 <script>
 import auth from "../common/auth.js";
-import { clearNotification } from "../common/store.js";
+import { clearNotification, getStore } from "../common/store.js";
 
 export default {
   data() {
@@ -40,8 +40,36 @@ export default {
           login: this.auxLogin,
           password: this.auxPass
         });
+
         clearNotification();
-        this.$router.push({ name: "HomeLanding" });
+
+        //Obtener rol de usuario autenticado
+        const userAuthority = getStore().state.user.authority;
+
+                // Verificar si hay una ruta de redirección guardada (desde router guard)
+        const redirectPath = this.$route.query.redirect;
+        
+        if (redirectPath) {
+          // Si venía de una ruta protegida, volver allí
+          this.$router.push(redirectPath);
+
+        } else {
+          // Redirigir según el ROL del usuario
+          switch (userAuthority) {
+            case ROLES.ADMIN: 
+              this.$router.push({ name: 'PanelAdmin' });
+              break;
+            case ROLES.GESTOR:
+              this.$router.push({ name: 'PanelGestor' });
+              break;
+            case ROLES.VISITANTE:
+              this.$router.push({ name: 'CatalogoPublico' });
+              break;
+            default:
+              this.$router.push({ name: 'HomeLanding' });
+          }
+        }
+
       } catch (e) {
         this.error = e.response?.data?.message || "No se pudo iniciar sesión";
       } finally {

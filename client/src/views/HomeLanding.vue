@@ -7,7 +7,11 @@
         <p class="lead">Explora el catálogo público, reserva tus visitas o administra exposiciones si formas parte del equipo.</p>
         <div class="cta">
           <router-link class="btn primary" to="/catalogo">Ver catálogo</router-link>
-          <router-link v-if="!user.logged" class="btn ghost" to="/login">Iniciar sesión</router-link>
+          <!-- Usar computed para reactividad, si no no desaparece el login-->
+          <router-link v-if="!isUserLogged" class="btn ghost" to="/login">Iniciar sesión</router-link>
+          <router-link> v-else class="btn ghost" :to="getDashboardRoute"
+            <i class="bi bi-speedometer2"></i> Mi Panel
+          </router-link>
         </div>
       </div>
       <div class="hero-panel">
@@ -36,13 +40,37 @@
 
 <script>
 import { getStore } from '@/common/store';
+import { ROLES } from '@/constants';
 
 export default {
   name: 'HomeLanding',
   data() {
     return { user: getStore().state.user };
+  },
+  computed: {
+
+    isUserLogged() {
+      return getStore().state.user.logged;
+    },
+
+    userAuthority() {
+      return getStore().state.user.authority;
+    },
+    getDashboardRoute() {
+      switch (this.userAuthority) {
+        case ROLES.ADMIN:
+          return '/admin';
+        case ROLES.GESTOR:
+          return '/gestor';
+        case ROLES. VISITANTE:
+          return '/mis-reservas';
+        default:
+          return '/catalogo';
+      }
+    }
   }
 };
+
 </script>
 
 <style scoped>
