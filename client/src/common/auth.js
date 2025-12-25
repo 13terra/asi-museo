@@ -30,10 +30,10 @@ async function logout() {
     console.warn("Backend logout failed, cleaning local state anyway");
   }
   
-  // ✅ Limpiar token
+  // Limpiar token
   _removeToken();
   
-  // ✅ Limpiar estado del usuario
+  // Limpiar estado del usuario
   const state = getStore().state.user;
   state.id = null;
   state.login = "";

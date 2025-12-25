@@ -1,7 +1,7 @@
 import axios from "axios";
-import { BACKEND_URL, ERROR_MESSAGES } from "../constants. js";
+import { BACKEND_URL, ERROR_MESSAGES } from "../constants.js";
 import auth from "./auth.js";
-import { setNotification } from "./store. js";
+import { setNotification } from "./store.js";
 
 const HTTP = axios.create({
   baseURL: BACKEND_URL

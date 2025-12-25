@@ -1,7 +1,7 @@
 <template>
   <div class="auth-shell">
     <div class="auth-card">
-      <button class="btn-ghost" @click="$router.back()">Volver atrás</button>
+      <button class="btn-ghost" @click="$router.push('/')">Volver al inicio</button>
       <h2 class="auth-title">Iniciar sesión</h2>
       <div class="auth-field">
         <label for="login">Login</label>
@@ -69,7 +69,7 @@ export default {
               await this.$router.replace({ name: 'PanelAdmin' });
               break;
             case ROLES.GESTOR:  
-              await this.$router.replace({ name: 'GestorExposView' });
+              await this.$router.replace({ name: 'PanelGestor' });
               break;
             case ROLES.VISITANTE:   
               await this.$router. replace({ name: 'CatalogoPublico' });
