@@ -47,17 +47,19 @@ export default {
 
   /**
    * HU8 - Desactivar usuario (ADMIN)
-   * PUT /users/{id}/desactivar
+   * PUT /users/{id}/deactivate
    */
   async desactivar(idUser) {
-    return (await HTTP.put(`users/${idUser}/desactivar`)).data;
+    // Cambio: 'desactivar' -> 'deactivate' para coincidir con @PutMapping("/{idUser}/deactivate")
+    return (await HTTP.put(`users/${idUser}/deactivate`)).data;
   },
 
   /**
    * Activar usuario (ADMIN)
-   * PUT /users/{id}/activar
+   * PUT /users/{id}/activate 
    */
   async activar(idUser) {
-    return (await HTTP.put(`users/${idUser}/activar`)).data;
+    // Cambio: 'activar' -> 'activate' para coincidir con @PutMapping("/{idUser}/activate")
+    return (await HTTP.put(`users/${idUser}/activate`)).data;
   }
 };
