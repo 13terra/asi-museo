@@ -53,6 +53,11 @@
                 <i class="bi bi-eye"></i> Vista Pública
               </router-link>
             </li>
+            <li>
+              <router-link to="/gestor/obras" class="nav-link">
+                <i class="bi bi-palette"></i> Obras
+              </router-link>
+            </li>
           </ul>
 
           <!-- Menú admin -->

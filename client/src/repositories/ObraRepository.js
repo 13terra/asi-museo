@@ -31,7 +31,19 @@ export default {
    * @returns {Promise<Object>}
    */
   async create(obra) {
-    return (await HTTP.post('obras', obra)).data;
+    // ✅ Mapear añoCreacion → anioCreacion
+    const payload = {
+    titulo: obra.titulo,
+    autor: obra.autor,
+    anioCreacion: obra.añoCreacion || obra.anioCreacion,  // ← Mapeo explícito
+    tecnica: obra.tecnica,
+    dimensiones: obra.dimensiones,
+    imagen: obra.imagen,
+    estado: obra.estado,
+    idExterno: obra.idExterno
+    };
+
+    return (await HTTP.post('obras', payload)).data;
   },
 
   /**
@@ -41,7 +53,18 @@ export default {
    * @returns {Promise<Object>}
    */
   async update(idObra, obra) {
-    return (await HTTP.put(`obras/${idObra}`, obra)).data;
+    const payload = {
+      titulo: obra.titulo,
+      autor: obra.autor,
+      anioCreacion: obra.añoCreacion || obra.anioCreacion,  // ← Mapeo explícito
+      tecnica: obra. tecnica,
+      dimensiones:  obra.dimensiones,
+      imagen: obra.imagen,
+      estado: obra.estado,
+      idExterno: obra.idExterno
+    };
+    
+    return (await HTTP.put(`obras/${idObra}`, payload)).data;
   },
 
   /**

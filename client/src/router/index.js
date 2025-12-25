@@ -237,6 +237,7 @@ router.beforeEach((to, from, next) => {
         }
       } else {
         // Usuario no autenticado
+        alert('Esta página requiere autenticación');
         next({ name: 'Login', query: { redirect: to.fullPath } });
       }
     } else {
