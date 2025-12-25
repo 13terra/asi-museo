@@ -1,4 +1,5 @@
-export const BACKEND_URL = "http://localhost:8080/api";
+// Usa la URL configurada en entorno o, por defecto, un path relativo para evitar CORS en dev
+export const BACKEND_URL = import.meta.env.VITE_API_URL || "/api";
 
 
 // Roles del sistema

@@ -21,6 +21,11 @@ export default {
     return (await HTTP.get(`exposiciones/${idExposicion}/ediciones`)).data;
   },
 
+  // Alias usado en vistas (gestor/admin y público)
+  async listByExpo(idExposicion) {
+    return this.getByExposicion(idExposicion);
+  },
+
   /**
    * HU21 - Detalle de edición
    * Admin/Gestor: GET /ediciones/{id}/admin

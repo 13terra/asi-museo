@@ -10,13 +10,15 @@ import ExposicionPublicaDetalle from '@/views/public/ExposicionPublicaDetalle.vu
 import EdicionPublicaDetalle from '@/views/public/EdicionPublicaDetalle.vue';
 
 // ========== AUTH ==========
-import Login from '@/views/auth/Login.vue';
-import Register from '@/views/auth/Register.vue';
+import Login from '@/views/LoginView.vue';
+import Register from '@/views/RegisterView.vue';
 
 // ========== VISITANTE ==========
 import MisReservas from '@/views/visitante/MisReservas.vue';
 import ReservaDetalle from '@/views/visitante/ReservaDetalle.vue';
 import ReservarEntradas from '@/views/visitante/ReservarEntradas.vue';
+import EntradaDetalle from '@/views/visitante/EntradaDetalle.vue';
+import MisEntradas from '@/views/visitante/MisEntradas.vue';
 
 // ========== GESTOR ==========
 import PanelGestor from '@/views/gestor/PanelGestor.vue';
@@ -86,9 +88,21 @@ const routes = [
     meta: { authority: ROLES.VISITANTE }
   },
   {
+    path: '/mis-entradas',
+    name: 'MisEntradas',
+    component: MisEntradas,
+    meta: { authority: ROLES.VISITANTE }
+  },
+  {
     path: '/reservas/:idReserva',
     name: 'ReservaDetalle',
     component: ReservaDetalle,
+    meta: { authority: ROLES.VISITANTE }
+  },
+  {
+    path: '/entradas/:idEntrada',
+    name: 'EntradaDetalle',
+    component: EntradaDetalle,
     meta: { authority: ROLES.VISITANTE }
   },
   {

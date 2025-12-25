@@ -26,7 +26,13 @@ export default {
    * POST /users
    */
   async create(user) {
-    return (await HTTP.post('users', user)).data;
+    const payload = {
+      login: user.login,
+      password: user.password,
+      autoridad: user.authority || user.autoridad,
+      estado: user.estado
+    };
+    return (await HTTP.post('users', payload)).data;
   },
 
   /**
@@ -34,7 +40,13 @@ export default {
    * PUT /users/{id}
    */
   async update(idUser, user) {
-    return (await HTTP.put(`users/${idUser}`, user)).data;
+    const payload = {
+      login: user.login,
+      password: user.password,
+      autoridad: user.authority || user.autoridad,
+      estado: user.estado
+    };
+    return (await HTTP.put(`users/${idUser}`, payload)).data;
   },
 
   /**

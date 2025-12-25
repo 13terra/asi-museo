@@ -10,7 +10,7 @@
           <input type="checkbox" v-model="incluirArchivadas" @change="load" />
           <span>Mostrar archivadas</span>
         </label>
-        <button class="btn-primary" @click="toggleCreate" :disabled="creating">+ Nueva Exposición</button>
+        <button v-if="puedeCrear" class="btn-primary" @click="toggleCreate" :disabled="creating">+ Nueva Exposición</button>
       </div>
     </div>
 
@@ -49,7 +49,8 @@
         <div class="pill">Permiso: {{ expo.miPermiso || '-' }}</div>
         <div class="actions">
           <router-link :to="`/gestor/exposiciones/${expo.idExposicion}`" class="btn-link">Detalle</router-link>
-          <button class="btn-ghost" @click="goEdit(expo)">Editar</button>
+          <button v-if="esCreador(expo)" class="btn-ghost" @click="toggleArchive(expo)" :disabled="actionLoading">{{ expo.estadoExpo === 'ARCHIVADA' ? 'Desarchivar' : 'Archivar' }}</button>
+          <button v-if="esCreador(expo)" class="btn-danger" @click="eliminar(expo)" :disabled="actionLoading">Eliminar</button>
         </div>
       </article>
     </div>
@@ -62,7 +63,7 @@ import ExpoRepository from '@/repositories/ExpoRepository';
 export default {
   name: 'PanelGestor',
   data() {
-    return { expos: [], loading: false, error: '', incluirArchivadas: false, creating: false, form: { titulo: '', descripcion: '' } };
+    return { expos: [], loading: false, actionLoading: false, error: '', incluirArchivadas: false, creating: false, form: { titulo: '', descripcion: '' }, puedeCrear: false };
   },
   created() { this.load(); },
   methods: {
@@ -77,7 +78,12 @@ export default {
     async load() {
       this.loading = true; this.error = '';
       try {
-        this.expos = await ExpoRepository.listGestor({ incluirArchivadas: this.incluirArchivadas });
+        const raw = await ExpoRepository.listGestor({ incluirArchivadas: this.incluirArchivadas });
+        this.expos = (raw || []).map(expo => {
+          const permiso = (expo.miPermiso || expo.permiso || expo.tipoPermiso || '').toString().toUpperCase();
+          return { ...expo, miPermiso: permiso };
+        });
+        this.puedeCrear = this.expos.some(this.esCreador);
       } catch (e) { this.error = 'No se pudieron cargar las exposiciones'; }
       finally { this.loading = false; }
     },
@@ -90,7 +96,33 @@ export default {
       } catch (e) { this.error = 'Error al crear la exposición'; }
       finally { this.loading = false; }
     },
-    goEdit(expo) { this.$router.push({ name: 'ExposicionDetalle', params: { idExposicion: expo.idExposicion } }); }
+    goEdit(expo) { this.$router.push({ name: 'ExposicionDetalle', params: { idExposicion: expo.idExposicion } }); },
+    esCreador(expo) { return (expo.miPermiso || '').toUpperCase() === 'CREADOR'; },
+    async toggleArchive(expo) {
+      if (this.actionLoading) return;
+      this.actionLoading = true; this.error = '';
+      try {
+        if (expo.estadoExpo === 'ARCHIVADA') await ExpoRepository.desarchivar(expo.idExposicion);
+        else await ExpoRepository.archivar(expo.idExposicion);
+        await this.load();
+      } catch (e) {
+        this.error = e.response?.data?.message || 'No se pudo cambiar el estado';
+      } finally {
+        this.actionLoading = false;
+      }
+    },
+    async eliminar(expo) {
+      if (!confirm('¿Eliminar esta exposición?')) return;
+      this.actionLoading = true; this.error = '';
+      try {
+        await ExpoRepository.delete(expo.idExposicion);
+        await this.load();
+      } catch (e) {
+        this.error = e.response?.data?.message || 'No se pudo eliminar';
+      } finally {
+        this.actionLoading = false;
+      }
+    }
   }
 };
 </script>

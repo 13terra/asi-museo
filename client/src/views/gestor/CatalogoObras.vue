@@ -27,6 +27,7 @@
         <button class="btn primary" @click="buscarEnMET" :disabled="metLoading || !metSearchQuery">
           {{ metLoading ? 'Buscando...' : 'Buscar' }}
         </button>
+        <button class="btn ghost" @click="limpiarBusquedaMET" :disabled="metLoading || (!metResultados.length && !metSearchQuery)">Limpiar</button>
       </div>
       
       <div v-if="metError" class="error">{{ metError }}</div>
@@ -229,6 +230,10 @@ export default {
       this.formError = '';
       
       const payload = { ...this.form };
+      if (!this.validarFormulario()) {
+        this.saving = false;
+        return;
+      }
       
       try {
         if (this.editId) {
@@ -307,12 +312,43 @@ export default {
         window.scrollTo({ top: 300, behavior: 'smooth' });
         
         alert('Datos importados.  Revisa y guarda la obra.');
+        // Limpiar búsqueda para evitar confusión tras importar
+        this.limpiarBusquedaMET();
       } catch (e) {
         console.error('Error al importar:', e);
         this.formError = 'No se pudo importar la obra del MET. ';
       } finally {
         this.metLoading = false;
       }
+    },
+
+    limpiarBusquedaMET() {
+      this.metSearchQuery = '';
+      this.metResultados = [];
+      this.metError = '';
+    },
+
+    validarFormulario() {
+      const tituloValido = !!this.form.titulo?.trim();
+      const autorValido = !!this.form.autor?.trim();
+      const anioInput = this.form.añoCreacion;
+      const anio = Number(anioInput);
+      const anioNoVacio = anioInput !== null && anioInput !== undefined && anioInput !== '';
+      const anioValido = anioNoVacio && Number.isFinite(anio) && anio >= 0 && anio <= new Date().getFullYear();
+
+      if (!tituloValido) {
+        this.formError = 'Indica un título para la obra.';
+        return false;
+      }
+      if (!autorValido) {
+        this.formError = 'Indica el autor de la obra.';
+        return false;
+      }
+      if (!anioValido) {
+        this.formError = 'Indica un año de creación válido.';
+        return false;
+      }
+      return true;
     }
   }
 };

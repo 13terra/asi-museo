@@ -39,6 +39,11 @@
                 <i class="bi bi-ticket-perforated"></i> Mis reservas
               </router-link>
             </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/mis-entradas" active-class="active">
+                <i class="bi bi-card-text"></i> Mis entradas
+              </router-link>
+            </li>
           </ul>
 
           <!-- Menú gestor -->

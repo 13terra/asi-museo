@@ -5,17 +5,22 @@
         <p class="eyebrow">Piezas expuestas</p>
         <h1>Edición #{{ idEdicion }}</h1>
       </div>
-      <button class="btn" @click="load" :disabled="loading">Recargar</button>
+      <div class="actions">
+        <button class="btn" @click="$router.back()">Volver</button>
+        <button class="btn" @click="load" :disabled="loading">Recargar</button>
+      </div>
     </header>
 
     <section class="card">
       <h3>Añadir pieza</h3>
       <div class="form-grid">
         <label>Obra
+          <input v-model="obraSearch" type="search" placeholder="Buscar obra" />
           <select v-model.number="form.idObra">
             <option value="">Selecciona obra</option>
-            <option v-for="obra in obras" :key="obra.idObra" :value="obra.idObra">{{ obra.titulo }} ({{ obra.autor }})</option>
+            <option v-for="obra in obrasFiltradas" :key="obra.idObra" :value="obra.idObra">{{ obra.titulo }} ({{ obra.autor }})</option>
           </select>
+          <small class="muted">{{ obrasFiltradas.length }} resultados</small>
         </label>
         <label>Sala
           <select v-model.number="form.idSala">
@@ -68,11 +73,19 @@ export default {
       piezas: [],
       salas: [],
       obras: [],
+      obraSearch: '',
       form: { idObra: '', idSala: '', orden: 1, textoCuratorial: '', portada: false },
       loading: true,
       saving: false,
       error: ''
     };
+  },
+  computed: {
+    obrasFiltradas() {
+      const term = this.obraSearch.toLowerCase().trim();
+      if (!term) return this.obras;
+      return this.obras.filter(o => `${o.titulo} ${o.autor}`.toLowerCase().includes(term));
+    }
   },
   async created() {
     await Promise.all([this.load(), this.loadAux()]);

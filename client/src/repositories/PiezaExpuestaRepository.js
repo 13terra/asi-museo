@@ -11,7 +11,7 @@ export default {
     const params = new URLSearchParams();
     if (filters.sala) params.append('sala', filters.sala);
 
-    return (await HTTP.get(`ediciones/${idEdicion}/piezas?${params.toString()}`)).data;
+    return (await HTTP.get(`ediciones/${idEdicion}/piezas-expuestas?${params.toString()}`)).data;
   },
 
   /**
@@ -21,7 +21,7 @@ export default {
    * @returns {Promise<Object>}
    */
   async create(idEdicion, pieza) {
-    return (await HTTP.post(`ediciones/${idEdicion}/piezas`, pieza)).data;
+    return (await HTTP.post(`ediciones/${idEdicion}/piezas-expuestas`, pieza)).data;
   },
 
   /**

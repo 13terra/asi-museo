@@ -87,6 +87,7 @@ export default {
       edicion: null,
       tipos: [],
       cantidades: {},
+      entradasDetalle: [],
       comprador: { nombrePila: '', apellido1: '', apellido2: '', email: '', telefono: '', pais: '' },
       submitting: false,
       loading: true,
@@ -96,28 +97,6 @@ export default {
   computed: {
     totalEntradas() { return Object.values(this.cantidades).reduce((a, b) => a + b, 0); },
     totalPrecio() { return this.tipos.reduce((acc, t) => acc + (this.cantidades[t.idTipoEntrada] || 0) * (t.precio || 0), 0); },
-    entradasDetalle() {
-      const list = [];
-      this.tipos.forEach(tipo => {
-        const count = this.cantidades[tipo.idTipoEntrada] || 0;
-        for (let i = 0; i < count; i++) {
-          const idx = list.length;
-          const detalle = this.entradasDetalleBase[idx];
-          list.push({ tipo, nombrePila: detalle?.nombrePila || '', apellido1: detalle?.apellido1 || '', apellido2: detalle?.apellido2 || '', dni: detalle?.dni || '' });
-        }
-      });
-      return list;
-    },
-    entradasDetalleBase() {
-      const base = [];
-      this.tipos.forEach(tipo => {
-        const count = this.cantidades[tipo.idTipoEntrada] || 0;
-        for (let i = 0; i < count; i++) {
-          base.push({ tipo, nombrePila: '', apellido1: '', apellido2: '', dni: '' });
-        }
-      });
-      return base;
-    },
     canSubmit() {
       const hasTickets = this.totalEntradas > 0;
       const buyerOk = this.comprador.nombrePila && this.comprador.apellido1 && this.comprador.email && this.comprador.telefono;
@@ -141,6 +120,8 @@ export default {
         ]);
         this.sesion = sesion;
         this.tipos = tipos || [];
+        this.cantidades = {};
+        this.syncEntradasDetalle();
         this.edicion = await EdicionRepository.getDetallePublic(sesion.idEdicion);
       } catch (e) {
         this.error = 'No se pudo cargar la sesión o los tipos de entrada.';
@@ -152,24 +133,42 @@ export default {
     formatHora(value) { return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); },
     formatPrice(value) { return `${Number(value || 0).toFixed(2)} €`; },
     salasTexto(salas = []) { return salas.length ? salas.map(s => s.nombre || s.idSala).join(', ') : 'Sin salas'; },
-    inc(idTipo) { this.$set(this.cantidades, idTipo, (this.cantidades[idTipo] || 0) + 1); },
-    dec(idTipo) { const current = this.cantidades[idTipo] || 0; if (current > 0) this.$set(this.cantidades, idTipo, current - 1); },
-    buildPayload() {
-      const entradas = [];
+    inc(idTipo) {
+      const current = this.cantidades[idTipo] || 0;
+      this.cantidades = { ...this.cantidades, [idTipo]: current + 1 };
+      this.syncEntradasDetalle();
+    },
+    dec(idTipo) {
+      const current = this.cantidades[idTipo] || 0;
+      const next = Math.max(0, current - 1);
+      this.cantidades = { ...this.cantidades, [idTipo]: next };
+      this.syncEntradasDetalle();
+    },
+    syncEntradasDetalle() {
+      const prevByTipo = {};
+      this.entradasDetalle.forEach(e => {
+        if (!prevByTipo[e.idTipoEntrada]) prevByTipo[e.idTipoEntrada] = [];
+        prevByTipo[e.idTipoEntrada].push(e);
+      });
+
+      const next = [];
       this.tipos.forEach(tipo => {
         const count = this.cantidades[tipo.idTipoEntrada] || 0;
         for (let i = 0; i < count; i++) {
-          const idx = entradas.length;
-          const detalle = this.entradasDetalle[idx];
-          entradas.push({
-            idTipoEntrada: tipo.idTipoEntrada,
-            nombrePila: detalle?.nombrePila,
-            apellido1: detalle?.apellido1,
-            apellido2: detalle?.apellido2,
-            dni: detalle?.dni
-          });
+          const reuse = prevByTipo[tipo.idTipoEntrada]?.shift();
+          next.push(reuse ? { ...reuse, tipo } : { idTipoEntrada: tipo.idTipoEntrada, tipo, nombrePila: '', apellido1: '', apellido2: '', dni: '' });
         }
       });
+      this.entradasDetalle = next;
+    },
+    buildPayload() {
+      const entradas = this.entradasDetalle.map(e => ({
+        idTipoEntrada: e.idTipoEntrada,
+        nombrePila: e.nombrePila,
+        apellido1: e.apellido1,
+        apellido2: e.apellido2,
+        dni: e.dni
+      }));
       return { comprador: { ...this.comprador }, entradas };
     },
     async reservar() {

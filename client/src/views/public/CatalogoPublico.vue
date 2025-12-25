@@ -25,15 +25,18 @@
     </div>
 
     <div v-else class="cards-grid">
-      <div v-if="expos.length === 0" class="empty">No hay exposiciones disponibles.</div>
-      <article class="expo-card" v-for="expo in expos" :key="expo.idExposicion">
-        <div class="expo-image">Imagen obra</div>
+      <div v-if="exposOrdenadas.length === 0" class="empty">No hay exposiciones disponibles.</div>
+      <article class="expo-card" v-for="expo in exposOrdenadas" :key="expo.idExposicion">
+        <div class="expo-image" :style="portadaStyle(expo)">
+          <span v-if="!expo.portadaUrl && !expo.portada" class="placeholder">Imagen obra</span>
+        </div>
         <div class="expo-body">
           <div class="expo-meta">
             <span class="badge" :class="badgeClass(expo.estadoExpo)">{{ expo.estadoExpo }}</span>
           </div>
           <h3>{{ expo.titulo }}</h3>
           <p class="description">{{ expo.descripcion || 'Sin descripción' }}</p>
+          <p class="muted">Próxima edición: {{ proxFecha(expo) || 'Sin programar' }}</p>
           <router-link :to="`/exposiciones/${expo.idExposicion}`" class="link-btn">Ver detalle</router-link>
         </div>
       </article>
@@ -57,6 +60,18 @@ export default {
       user: getStore().state.user
     };
   },
+  computed: {
+    exposOrdenadas() {
+      return [...this.expos].sort((a, b) => {
+        const da = this.proxDateValue(a);
+        const db = this.proxDateValue(b);
+        if (da && db) return da - db;
+        if (da) return -1;
+        if (db) return 1;
+        return 0;
+      });
+    }
+  },
   created() {
     this.loadPublic();
   },
@@ -64,6 +79,18 @@ export default {
     badgeClass(estado) {
       const map = { BORRADOR: 'badge-gray', ACTIVA: 'badge-green', ARCHIVADA: 'badge-dark' };
       return map[estado] || 'badge-gray';
+    },
+    proxDateValue(expo) {
+      const fecha = expo.proximaEdicion?.fechaInicio || expo.fechaInicioProximaEdicion || expo.fechaProximaEdicion || expo.proximaFecha;
+      return fecha ? new Date(fecha).getTime() : null;
+    },
+    proxFecha(expo) {
+      const ts = this.proxDateValue(expo);
+      return ts ? new Date(ts).toLocaleDateString() : '';
+    },
+    portadaStyle(expo) {
+      const url = expo.portadaUrl || expo.portada;
+      return url ? { backgroundImage: `url(${url})` } : {};
     },
     async loadPublic() {
       this.loading = true;
@@ -111,6 +138,9 @@ export default {
 .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 .expo-card { background: #fff; border-radius: 14px; box-shadow: 0 8px 22px rgba(0,0,0,0.06); overflow: hidden; display: flex; flex-direction: column; }
 .expo-image { background: linear-gradient(135deg, #dbe6ff, #f0f4ff); height: 160px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.expo-image { background-size: cover; background-position: center; }
+.placeholder { color: #4a5460; }
+.muted { color: #6c7685; margin: 0; }
 .expo-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .expo-meta { display: flex; gap: 10px; align-items: center; }
 .badge { padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; }

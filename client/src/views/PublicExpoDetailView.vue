@@ -19,6 +19,9 @@
       </div>
     </section>
   </div>
+  <div v-else-if="error" class="loading">
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  </div>
   <div v-else class="loading">
     <div class="spinner-border" role="status"></div>
   </div>
@@ -27,6 +30,7 @@
 <script>
 import ExpoRepository from "@/repositories/ExpoRepository";
 import EdicionRepository from "@/repositories/EdicionRepository";
+import { ESTADOS_EDICION } from "@/constants";
 
 export default {
   name: "PublicExpoDetailView",
@@ -66,7 +70,8 @@ export default {
       try {
         const id = this.$route.params.id;
         this.expo = await ExpoRepository.detailPublic(id);
-        this.ediciones = await EdicionRepository.listByExpo(id);
+        const ediciones = await EdicionRepository.listByExpo(id);
+        this.ediciones = (ediciones || []).filter(ed => ed.estadoEdicion === ESTADOS_EDICION.PUBLICADA);
       } catch (e) {
         this.error = "No se pudo cargar la exposición";
       } finally {

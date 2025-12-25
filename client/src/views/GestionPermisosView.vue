@@ -16,7 +16,7 @@
           Gestor
           <select v-model="form.idUser">
             <option value="">Selecciona un gestor</option>
-            <option v-for="u in gestores" :key="u.idUser" :value="u.idUser">{{ u.login }} ({{ u.idUser }})</option>
+            <option v-for="u in gestores" :key="u.idUser || u.id" :value="u.idUser || u.id">{{ u.login }} ({{ u.idUser || u.id }})</option>
           </select>
         </label>
         <label>

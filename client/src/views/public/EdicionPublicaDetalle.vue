@@ -116,7 +116,7 @@ export default {
           SesionRepository.getByEdicion(idEdicion),
           PiezaExpuestaRepository.getByEdicion(idEdicion)
         ]);
-        this.edicion = edicion;
+        this.edicion = { ...edicion, estado: edicion.estado || edicion.estadoEdicion };
         this.sesiones = sesiones || [];
         this.piezas = piezas || [];
       } catch (e) {

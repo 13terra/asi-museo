@@ -13,7 +13,16 @@
       <h3>{{ editId ? 'Editar sala' : 'Nueva sala' }}</h3>
       <div class="form-grid">
         <label>Nombre<input v-model="form.nombre" /></label>
-        <label>Planta<input v-model="form.planta" /></label>
+        <label>Planta
+          <select v-model="form.planta" @change="onPlantaChange">
+            <option value="">Selecciona planta</option>
+            <option v-for="p in plantas" :key="p" :value="p">Planta {{ p }}</option>
+            <option value="__custom">Otra (introducir)</option>
+          </select>
+        </label>
+        <label v-if="form.planta === '__custom'">Planta personalizada
+          <input type="number" v-model.number="form.plantaCustom" min="-10" max="50" placeholder="Ej: 0" />
+        </label>
         <div class="actions">
           <button class="btn primary" :disabled="!form.nombre || saving" @click="save">{{ saving ? 'Guardando...' : editId ? 'Actualizar' : 'Crear' }}</button>
           <button class="btn ghost" v-if="editId" @click="reset">Cancelar</button>
@@ -27,7 +36,7 @@
       <div v-if="loading" class="center"><div class="spinner-border" role="status"></div></div>
       <div v-else-if="salas.length === 0" class="empty">No hay salas registradas.</div>
       <div v-else class="grid">
-        <article v-for="sala in salas" :key="sala.idSala" class="item">
+        <article v-for="sala in salasOrdenadas" :key="sala.idSala" class="item">
           <div>
             <p class="eyebrow">Sala #{{ sala.idSala }}</p>
             <h4>{{ sala.nombre }}</h4>
@@ -49,11 +58,28 @@ import SalaRepository from '@/repositories/SalaRepository';
 export default {
   name: 'GestionSalasAdmin',
   data() {
-    return { salas: [], loading: true, saving: false, error: '', editId: null, form: { nombre: '', planta: '' } };
+    return { salas: [], loading: true, saving: false, error: '', editId: null, form: { nombre: '', planta: '', plantaCustom: '' } };
+  },
+  computed: {
+    plantas() {
+      const uniques = new Set(this.salas.filter(s => s.planta !== null && s.planta !== undefined && s.planta !== '').map(s => s.planta));
+      return Array.from(uniques).sort((a, b) => Number(a) - Number(b));
+    },
+    salasOrdenadas() {
+      return [...this.salas].sort((a, b) => {
+        const pa = Number(a.planta ?? 0);
+        const pb = Number(b.planta ?? 0);
+        if (pa !== pb) return pa - pb;
+        return (a.nombre || '').localeCompare(b.nombre || '');
+      });
+    }
   },
   async created() { await this.load(); },
   methods: {
-    reset() { this.editId = null; this.form = { nombre: '', planta: '' }; this.error = ''; },
+    reset() { this.editId = null; this.form = { nombre: '', planta: '', plantaCustom: '' }; this.error = ''; },
+    onPlantaChange() {
+      if (this.form.planta !== '__custom') this.form.plantaCustom = '';
+    },
     async load() {
       this.loading = true; this.error = '';
       try { this.salas = await SalaRepository.getAll(); }
@@ -62,16 +88,33 @@ export default {
     },
     async save() {
       if (!this.form.nombre) return;
+      const plantaSeleccionada = this.form.planta === '__custom' ? this.form.plantaCustom : this.form.planta;
+      if (plantaSeleccionada === '' || plantaSeleccionada === null || plantaSeleccionada === undefined) {
+        this.error = 'Hay que añadir planta';
+        return;
+      }
+      if (Number(plantaSeleccionada) < -10 || Number(plantaSeleccionada) > 50) {
+        this.error = 'La planta debe estar entre -10 y 50';
+        return;
+      }
+      this.error = '';
+
       this.saving = true; this.error = '';
       try {
-        if (this.editId) await SalaRepository.update(this.editId, { ...this.form });
-        else await SalaRepository.create({ ...this.form });
+        const payload = { nombre: this.form.nombre, planta: plantaSeleccionada };
+        if (this.editId) await SalaRepository.update(this.editId, payload);
+        else await SalaRepository.create(payload);
         this.reset();
         await this.load();
-      } catch (e) { this.error = 'No se pudo guardar la sala.'; }
+      } catch (e) { this.error = e.response?.data?.message || 'No se pudo guardar la sala.'; }
       finally { this.saving = false; }
     },
-    startEdit(sala) { this.editId = sala.idSala; this.form.nombre = sala.nombre; this.form.planta = sala.planta; },
+    startEdit(sala) {
+      this.editId = sala.idSala;
+      this.form.nombre = sala.nombre;
+      this.form.planta = sala.planta ?? '';
+      this.form.plantaCustom = '';
+    },
     async remove(idSala) {
       if (!confirm('¿Eliminar esta sala?')) return;
       try { await SalaRepository.delete(idSala); await this.load(); }

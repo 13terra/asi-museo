@@ -33,6 +33,10 @@
           <p class="eyebrow">Listado</p>
           <h3>Exposiciones registradas</h3>
         </div>
+        <label class="switch">
+          <input type="checkbox" v-model="incluirArchivadas" @change="load" />
+          <span>Mostrar archivadas</span>
+        </label>
       </div>
       <div v-if="loading" class="center"><div class="spinner-border" role="status"></div></div>
       <p v-else-if="error" class="error">{{ error }}</p>
@@ -47,6 +51,8 @@
           <span>{{ expo.numEdiciones || 0 }}</span>
           <span class="actions">
             <router-link class="link" :to="{ name: 'ExposicionDetalle', params: { idExposicion: expo.idExposicion } }">Detalle</router-link>
+            <button class="btn ghost" @click="archivar(expo)" :disabled="actionLoading">{{ expo.estadoExpo === 'ARCHIVADA' ? 'Desarchivar' : 'Archivar' }}</button>
+            <button class="btn danger" @click="eliminar(expo)" :disabled="actionLoading">Eliminar</button>
           </span>
         </div>
       </div>
@@ -60,14 +66,14 @@ import ExpoRepository from '@/repositories/ExpoRepository';
 export default {
   name: 'AdminExposList',
   data() {
-    return { expos: [], loading: true, error: '', form: { titulo: '', descripcion: '' } };
+    return { expos: [], loading: true, actionLoading: false, error: '', form: { titulo: '', descripcion: '' }, incluirArchivadas: true };
   },
   created() { this.load(); },
   methods: {
     async load() {
       this.loading = true; this.error = '';
       try {
-        this.expos = await ExpoRepository.getAllForAdmin(true);
+        this.expos = await ExpoRepository.getAllForAdmin(this.incluirArchivadas);
       } catch (e) {
         this.error = 'No se pudo cargar el listado';
       } finally { this.loading = false; }
@@ -81,6 +87,31 @@ export default {
       } catch (e) {
         this.error = 'Error al crear la exposición';
       } finally { this.loading = false; }
+    },
+    async archivar(expo) {
+      if (this.actionLoading) return;
+      this.actionLoading = true; this.error = '';
+      try {
+        if (expo.estadoExpo === 'ARCHIVADA') await ExpoRepository.desarchivar(expo.idExposicion);
+        else await ExpoRepository.archivar(expo.idExposicion);
+        await this.load();
+      } catch (e) {
+        this.error = e.response?.data?.message || 'No se pudo actualizar el estado';
+      } finally {
+        this.actionLoading = false;
+      }
+    },
+    async eliminar(expo) {
+      if (!confirm('¿Eliminar esta exposición? No se puede deshacer.')) return;
+      this.actionLoading = true; this.error = '';
+      try {
+        await ExpoRepository.delete(expo.idExposicion);
+        await this.load();
+      } catch (e) {
+        this.error = e.response?.data?.message || 'No se pudo eliminar (verifica reservas o ediciones publicadas)';
+      } finally {
+        this.actionLoading = false;
+      }
     }
   }
 };

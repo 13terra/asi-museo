@@ -15,7 +15,7 @@ export default {
    * @returns {Promise<Object>}
    */
   async getById(idEntrada) {
-    return (await HTTP.get(`entradas/${idEntrada}`)).data;
+    return (await HTTP.get(`mis-entradas/${idEntrada}`)).data;
   },
 
   /**

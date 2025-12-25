@@ -5,7 +5,10 @@
         <p class="eyebrow">Sesiones</p>
         <h1>Edición #{{ idEdicion }}</h1>
       </div>
-      <button class="btn" @click="load" :disabled="loading">Recargar</button>
+      <div class="actions">
+        <button class="btn" @click="$router.back()">Volver</button>
+        <button class="btn" @click="load" :disabled="loading">Recargar</button>
+      </div>
     </header>
 
     <section class="card">
@@ -14,12 +17,17 @@
         <label>Fecha<input type="date" v-model="form.fecha" /></label>
         <label>Hora inicio<input type="time" v-model="form.horaInicio" /></label>
         <label>Hora fin<input type="time" v-model="form.horaFin" /></label>
-        <label>Aforo<input type="number" min="1" v-model.number="form.aforo" /></label>
-        <label class="full">Salas
-          <select v-model="form.idSalas" multiple>
-            <option v-for="s in salas" :key="s.idSala" :value="s.idSala">{{ s.nombre }}</option>
-          </select>
-        </label>
+        <label>Aforo<input type="number" min="1" max="10000" v-model.number="form.aforo" /></label>
+        <div class="full sala-picker">
+          <span class="label">Salas (selección múltiple)</span>
+          <div class="sala-list">
+            <label v-for="s in salas" :key="s.idSala" class="sala-item">
+              <input type="checkbox" :value="s.idSala" v-model="form.idSalas" />
+              {{ s.nombre }} <span class="muted">(Planta {{ s.planta ?? '-' }})</span>
+            </label>
+          </div>
+          <small class="muted">{{ form.idSalas.length }} salas seleccionadas</small>
+        </div>
       </div>
       <div class="actions">
         <button class="btn primary" :disabled="saving || !canCreate" @click="create">{{ saving ? 'Creando...' : 'Crear sesión' }}</button>
@@ -34,8 +42,8 @@
       <div v-else class="grid">
         <article v-for="sesion in sesiones" :key="sesion.idSesion" class="item">
           <div>
-            <p class="eyebrow">#{{ sesion.idSesion }} · {{ sesion.fecha }}</p>
-            <h4>{{ sesion.horaInicio }} - {{ sesion.horaFin }}</h4>
+            <p class="eyebrow">#{{ sesion.idSesion }} · {{ formatFecha(sesion.fecha) }}</p>
+            <h4>{{ formatHora(sesion.horaInicio) }} - {{ formatHora(sesion.horaFin) }}</h4>
             <p class="muted">Salas: {{ salasTexto(sesion.salas) }}</p>
             <p class="pill">Aforo: {{ sesion.aforoOcupado ?? 0 }} / {{ sesion.aforo }}</p>
             <span class="chip" :class="stateClass(sesion.estado)">{{ sesion.estado }}</span>
@@ -69,7 +77,13 @@ export default {
     };
   },
   computed: {
-    canCreate() { return this.form.fecha && this.form.horaInicio && this.form.horaFin && this.form.aforo > 0 && this.form.idSalas.length > 0; }
+    canCreate() {
+      return this.form.fecha && this.form.horaInicio && this.form.horaFin && this.form.aforo > 0 && this.form.aforo <= 10000 && this.form.idSalas.length > 0 && this.horasValidas;
+    },
+    horasValidas() {
+      if (!this.form.horaInicio || !this.form.horaFin) return false;
+      return this.form.horaInicio < this.form.horaFin;
+    }
   },
   async created() {
     await Promise.all([this.load(), this.loadSalas()]);
@@ -79,6 +93,8 @@ export default {
     stateClass(estado) {
       return { [ESTADOS_SESION.DISPONIBLE]: 'chip-green', [ESTADOS_SESION.COMPLETA]: 'chip-dark', [ESTADOS_SESION.CANCELADA]: 'chip-red' }[estado] || 'chip-gray';
     },
+    formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },
+    formatHora(v) { return v ? new Date(`1970-01-01T${v}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''; },
     async load() {
       this.loading = true; this.error = '';
       try { this.sesiones = await SesionRepository.getByEdicion(this.idEdicion); }
@@ -89,12 +105,14 @@ export default {
       try { this.salas = await SalaRepository.getAll(); } catch (e) { /* ignore */ }
     },
     async create() {
+      if (!this.horasValidas) { this.error = 'La hora fin debe ser mayor que la inicial.'; return; }
+      if (this.form.aforo <= 0 || this.form.aforo > 10000) { this.error = 'El aforo debe ser entre 1 y 10000.'; return; }
       this.saving = true; this.error = '';
       try {
         await SesionRepository.create(this.idEdicion, { ...this.form });
         this.form = { fecha: '', horaInicio: '', horaFin: '', aforo: 0, idSalas: [] };
         await this.load();
-      } catch (e) { this.error = 'No se pudo crear la sesión.'; }
+      } catch (e) { this.error = e.response?.data?.message || 'No se pudo crear la sesión.'; }
       finally { this.saving = false; }
     },
     async cancelar(idSesion) {
@@ -123,6 +141,9 @@ export default {
 .card { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 16px; box-shadow: 0 8px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 10px; align-items: end; }
 select, input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #d9deea; }
+.sala-picker { display: flex; flex-direction: column; gap: 8px; }
+.sala-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 6px; padding: 6px; border: 1px solid #e3e6ef; border-radius: 10px; background: #f8f9fc; }
+.sala-item { display: flex; gap: 6px; align-items: center; font-weight: 600; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 12px; }
 .item { border: 1px solid #eef1f6; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; gap: 10px; }
 .item-actions { display: flex; gap: 8px; align-items: center; }

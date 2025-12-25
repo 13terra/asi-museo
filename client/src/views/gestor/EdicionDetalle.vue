@@ -19,7 +19,6 @@
         <label>Fecha fin<input type="date" v-model="form.fechaFin" /></label>
         <label>Estado
           <select v-model="form.estado">
-            <option value="">(sin cambio)</option>
             <option value="BORRADOR">BORRADOR</option>
             <option value="PUBLICADA">PUBLICADA</option>
             <option value="FINALIZADA">FINALIZADA</option>
@@ -55,7 +54,7 @@ import { ESTADOS_EDICION } from '@/constants';
 export default {
   name: 'EdicionDetalle',
   data() {
-    return { edicion: null, form: { fechaInicio: '', fechaFin: '', estado: '' }, loading: true, saving: false, error: '' };
+    return { edicion: null, form: { fechaInicio: '', fechaFin: '', estado: 'BORRADOR' }, loading: true, saving: false, error: '' };
   },
   async created() { await this.load(); },
   methods: {
@@ -67,38 +66,68 @@ export default {
       try {
         const id = this.$route.params.idEdicion || this.$route.params.id;
         this.edicion = await EdicionRepository.getDetalleForAdmin(id);
+        const estado = this.edicion.estado || this.edicion.estadoEdicion || ESTADOS_EDICION.BORRADOR;
+        this.edicion.estado = estado;
+
         this.form.fechaInicio = this.edicion.fechaInicio;
         this.form.fechaFin = this.edicion.fechaFin;
-        this.form.estado = '';
+        this.form.estado = estado;
       } catch (e) { this.error = 'No se pudo cargar la edición.'; }
       finally { this.loading = false; }
     },
     async update() {
+      if (this.form.estado === ESTADOS_EDICION.PUBLICADA) {
+        this.error = 'Usa el botón "Publicar" para publicar una edición.';
+        return;
+      }
       this.saving = true; this.error = '';
       try {
         const id = this.$route.params.idEdicion || this.$route.params.id;
         await EdicionRepository.update(id, { ...this.form });
-        await this.load();
+        alert('Cambios guardados correctamente');
+        const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
+        this.$router.push(destino);
       } catch (e) { this.error = 'No se pudo guardar.'; }
       finally { this.saving = false; }
     },
     async publicar() {
+      if (this.edicion.estado !== ESTADOS_EDICION.BORRADOR) return;
       this.saving = true; this.error = '';
-      try { await EdicionRepository.publicar(this.edicion.idEdicion); await this.load(); }
-      catch (e) { this.error = 'No se pudo publicar.'; }
+      try {
+        await EdicionRepository.publicar(this.edicion.idEdicion);
+        alert('Edición publicada');
+        const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
+        this.$router.push(destino);
+      }
+      catch (e) { this.error = e.response?.data?.message || 'No se pudo publicar.'; }
       finally { this.saving = false; }
     },
     async cancelar() {
+      if (this.edicion.estado !== ESTADOS_EDICION.PUBLICADA) return;
       this.saving = true; this.error = '';
-      try { await EdicionRepository.cancelar(this.edicion.idEdicion); await this.load(); }
-      catch (e) { this.error = 'No se pudo cancelar.'; }
+      try {
+        await EdicionRepository.cancelar(this.edicion.idEdicion);
+        alert('Edición cancelada');
+        const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
+        this.$router.push(destino);
+      }
+      catch (e) { this.error = e.response?.data?.message || 'No se pudo cancelar.'; }
       finally { this.saving = false; }
     },
     async eliminar() {
+      if (this.edicion.estado !== ESTADOS_EDICION.BORRADOR) {
+        this.error = 'Solo se puede eliminar una edición en BORRADOR';
+        return;
+      }
       if (!confirm('¿Eliminar esta edición (solo BORRADOR)?')) return;
       this.saving = true; this.error = '';
-      try { await EdicionRepository.delete(this.edicion.idEdicion); this.$router.push('/gestor'); }
-      catch (e) { this.error = 'No se pudo eliminar.'; }
+      try {
+        await EdicionRepository.delete(this.edicion.idEdicion);
+        alert('Edición eliminada');
+        const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
+        this.$router.push(destino);
+      }
+      catch (e) { this.error = e.response?.data?.message || 'No se pudo eliminar.'; }
       finally { this.saving = false; }
     }
   }

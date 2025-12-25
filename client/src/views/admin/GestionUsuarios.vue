@@ -117,7 +117,16 @@ export default {
         const filters = {};
         if (this.filters.autoridad) filters.autoridad = this.filters.autoridad;
         if (this.filters.estado) filters.estado = this.filters.estado;
-        this.users = await UserRepository.getAll(filters);
+
+        const raw = await UserRepository.getAll(filters);
+        const normRole = (u) => (u.authority || u.autoridad || u.role || '').toString().toUpperCase();
+        const normEstado = (u) => (u.estado || 'ACTIVO').toUpperCase();
+
+        this.users = (raw || []).filter(u => {
+          const okEstado = !this.filters.estado || normEstado(u) === this.filters.estado;
+          const okRol = !this.filters.autoridad || normRole(u) === this.filters.autoridad;
+          return okEstado && okRol;
+        });
       } catch (e) { this.error = 'No se pudo cargar la lista de usuarios.'; }
       finally { this.loading = false; }
     },
@@ -131,15 +140,22 @@ export default {
       };
     },
     async save() {
-      if (!this.form.login) return;
+      if (!this.form.login) { this.error = 'El login es obligatorio.'; return; }
+      if (!this.editId && !this.form.password) { this.error = 'La contraseña es obligatoria al crear.'; return; }
+
       this.saving = true; this.error = '';
-      const payload = { login: this.form.login, authority: this.form.authority, estado: this.form.estado };
-      if (this.form.password) payload.password = this.form.password;
+      const payload = {
+        login: this.form.login,
+        authority: this.form.authority,
+        password: this.form.password || undefined,
+        estado: this.form.estado
+      };
+
       try {
         if (this.editId) await UserRepository.update(this.editId, payload);
         else await UserRepository.create(payload);
         this.reset();
-        await this.load();
+        await this.load(); // refresca lista sin necesidad de recargar página
       } catch (e) { this.error = 'No se pudo guardar el usuario.'; }
       finally { this.saving = false; }
     },

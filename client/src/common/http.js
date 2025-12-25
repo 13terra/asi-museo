@@ -11,8 +11,7 @@ const HTTP = axios.create({
  * Handler cuando el usuario no tiene autorización
  */
 const onUnauthorized = () => {
-  console.error("Access denied - Logging out");
-  auth.logout();
+  console.warn("Acceso no autorizado");
 };
 
 const onResponseSuccess = (response) => response;
@@ -42,9 +41,8 @@ const onResponseFailure = (err) => {
   switch (responseStatus) {
     case 401:
       if (! isAuthRequest) {
-        // Solo si NO es una petición de auth
+        // Solo mostrar mensaje; no cerrar sesión para evitar deslogueos accidentales
         setNotification(ERROR_MESSAGES. SESSION_EXPIRED, "error");
-        onUnauthorized();
       }
       break;
 

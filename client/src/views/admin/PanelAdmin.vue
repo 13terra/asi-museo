@@ -146,11 +146,15 @@ export default {
 
         // Procesar usuarios
         if (usersResult.status === 'fulfilled') {
-          const users = usersResult.value;
+          const users = usersResult.value || [];
           this.stats.users = users.length;
-          this. stats.admins = users.filter(u => u.authority === 'ADMIN').length;
-          this.stats.gestores = users.filter(u => u.authority === 'GESTOR').length;
-          this.stats.visitantes = users.filter(u => u.authority === 'VISITANTE').length;
+
+          // Normaliza el rol para soportar distintas claves/formatos devueltos por backend
+          const roleOf = (u) => (u.authority || u.autoridad || u.role || '').toString().toUpperCase();
+
+          this.stats.admins = users.filter(u => roleOf(u) === 'ADMIN').length;
+          this.stats.gestores = users.filter(u => roleOf(u) === 'GESTOR').length;
+          this.stats.visitantes = users.filter(u => roleOf(u) === 'VISITANTE').length;
         }
 
         // Procesar salas

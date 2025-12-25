@@ -56,7 +56,7 @@ export default {
           password: this.auxPass,
           passwordConfirm: this.auxConfirmPass
         });
-        this.$router.push({ name: "PublicCatalog" });
+        this.$router.push({ name: "CatalogoPublico" });
       } catch (e) {
         this.error = e.response?.data?.message || "No se pudo registrar";
       } finally {
