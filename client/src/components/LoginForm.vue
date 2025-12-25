@@ -11,7 +11,13 @@
         <label for="pass">Contraseña</label>
         <input type="password" id="pass" v-model="auxPass" @keyup.enter="autenticarme" />
       </div>
-      <button class="btn-primary" @click="autenticarme" :disabled="loading">Entrar</button>
+      <button class="btn-primary" @click="autenticarme" :disabled="loading">
+        <span v-if="loading">
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Cargando...
+        </span>
+        <span v-else>Entrar</span>
+      </button>
       <p class="auth-link">¿No tienes cuenta? <router-link to="/register">Regístrate</router-link></p>
       <p v-if="error" class="auth-error">{{ error }}</p>
     </div>
@@ -21,12 +27,13 @@
 <script>
 import auth from "../common/auth.js";
 import { clearNotification, getStore } from "../common/store.js";
+import { ROLES } from "@/constants";
 
 export default {
   data() {
     return {
-      auxLogin: null,
-      auxPass: null,
+      auxLogin:   null,
+      auxPass:  null,
       loading: false,
       error: ""
     };
@@ -35,43 +42,45 @@ export default {
     async autenticarme() {
       this.loading = true;
       this.error = "";
+      
       try {
+        // ✅ Login real
         await auth.login({
           login: this.auxLogin,
           password: this.auxPass
         });
-
+        
         clearNotification();
 
-        //Obtener rol de usuario autenticado
-        const userAuthority = getStore().state.user.authority;
+        // ✅ CORRECCIÓN: Pequeño delay para que el token se propague
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-                // Verificar si hay una ruta de redirección guardada (desde router guard)
+        // ✅ Redirigir según ROL
+        const userAuthority = getStore().state.user. authority;
         const redirectPath = this.$route.query.redirect;
         
         if (redirectPath) {
-          // Si venía de una ruta protegida, volver allí
-          this.$router.push(redirectPath);
-
+          // ✅ Usar replace para evitar volver al login con el botón atrás
+          await this.$router.replace(redirectPath);
         } else {
-          // Redirigir según el ROL del usuario
+          // Redirigir según rol
           switch (userAuthority) {
-            case ROLES.ADMIN: 
-              this.$router.push({ name: 'PanelAdmin' });
+            case ROLES.ADMIN:  
+              await this.$router.replace({ name: 'PanelAdmin' });
               break;
-            case ROLES.GESTOR:
-              this.$router.push({ name: 'PanelGestor' });
+            case ROLES.GESTOR:  
+              await this.$router.replace({ name: 'GestorExposView' });
               break;
-            case ROLES.VISITANTE:
-              this.$router.push({ name: 'CatalogoPublico' });
+            case ROLES.VISITANTE:   
+              await this.$router. replace({ name: 'CatalogoPublico' });
               break;
             default:
-              this.$router.push({ name: 'HomeLanding' });
+              await this.$router.replace({ name: 'HomeLanding' });
           }
         }
-
       } catch (e) {
-        this.error = e.response?.data?.message || "No se pudo iniciar sesión";
+        console.error('Error en login:', e);
+        this.error = e.response?.data?.message || "Credenciales incorrectas.  Verifica tu login y contraseña.";
       } finally {
         this.loading = false;
       }
@@ -92,9 +101,9 @@ export default {
 .auth-card {
   width: min(420px, 90vw);
   background: #fff;
-  border-radius: 16px;
+  border-radius:  16px;
   padding: 24px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  box-shadow:  0 12px 30px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -116,8 +125,8 @@ export default {
   border-radius: 10px;
   border: 1px solid #d9deea;
   padding: 12px 14px;
-  font-size: 16px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size:  16px;
+  transition:  border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-field input:focus {
@@ -158,7 +167,7 @@ export default {
 }
 
 .auth-link {
-  margin: 0;
+  margin:  0;
   font-weight: 600;
 }
 
@@ -169,5 +178,12 @@ export default {
 .auth-error {
   color: #b3261e;
   font-weight: 600;
+  margin:  0;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
 }
 </style>

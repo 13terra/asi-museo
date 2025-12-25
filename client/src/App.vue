@@ -138,21 +138,33 @@ export default {
       return auth.isAdmin();
     },
     isGestor() {
-      return auth.isGestor();
+      return auth. isGestor();
     },
     isVisitante() {
-      return auth.isVisitante();
+      return auth. isVisitante();
     }
   },
   methods: {
-    handleLogout() {
+    // ✅ CORRECCIÓN: Hacer logout asíncrono y esperar antes de redirigir
+    async handleLogout() {
       if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
-        auth.logout();
-        this.$router.push("/login");
+        try {
+          // ✅ Esperar a que logout termine
+          await auth.logout();
+          
+          // ✅ Pequeño delay para asegurar limpieza de estado
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // ✅ Usar replace para evitar volver con botón atrás
+          await this.$router.replace("/login");
+        } catch (e) {
+          console.error("Error al cerrar sesión:", e);
+          // Aunque falle, limpiar y redirigir
+          await this.$router.replace("/login");
+        }
       }
     },
     getHomeRoute() {
-      // Siempre llevamos a la página inicial pública
       return "/";
     },
     clearNotification() {

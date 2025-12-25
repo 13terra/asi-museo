@@ -79,49 +79,76 @@
 </template>
 
 <script>
+import ExpoRepository from '@/repositories/ExpoRepository';
 import UserRepository from '@/repositories/UserRepository';
 import SalaRepository from '@/repositories/SalaRepository';
-import ExpoRepository from '@/repositories/ExpoRepository';
-import { ROLES } from '@/constants';
 
 export default {
   name: 'PanelAdmin',
   data() {
     return {
-      loading: true,
-      error: '',
-      stats: { users: 0, admins: 0, gestores: 0, visitantes: 0, salas: 0, expos: 0, archivadas: 0 },
-      expos: []
+      stats: {
+        users: 0,
+        admins: 0,
+        gestores: 0,
+        visitantes: 0,
+        salas: 0,
+        expos: 0,
+        archivadas: 0
+      },
+      expos: [],
+      loading: false,
+      error: ''
     };
   },
-  async created() { await this.load(); },
+  // ✅ CORRECCIÓN:  Cargar datos SOLO cuando el componente ya está montado
+  async mounted() {
+    await this.load();
+  },
   methods: {
     async load() {
-      this.loading = true; this.error = '';
+      this.loading = true;
+      this.error = '';
+      
       try {
-        const [users, salas, expos] = await Promise.all([
-          UserRepository.getAll(),
-          SalaRepository.getAll(),
-          ExpoRepository.getAllForAdmin(true)
+        // ✅ Cargar estadísticas de forma segura
+        const [users, salas, expos] = await Promise.allSettled([
+          UserRepository. findAll().catch(() => []),
+          SalaRepository.findAll().catch(() => []),
+          ExpoRepository. getAllForAdmin(false).catch(() => [])
         ]);
 
-        const byRole = { [ROLES.ADMIN]: 0, [ROLES.GESTOR]: 0, [ROLES.VISITANTE]: 0 };
-        (users || []).forEach(u => { if (byRole[u.authority]) byRole[u.authority] += 1; });
+        // Procesar usuarios
+        if (users.status === 'fulfilled') {
+          const userList = users.value;
+          this.stats.users = userList. length;
+          this.stats.admins = userList.filter(u => u.authority === 'ADMIN').length;
+          this.stats.gestores = userList.filter(u => u.authority === 'GESTOR').length;
+          this. stats.visitantes = userList. filter(u => u.authority === 'VISITANTE').length;
+        }
 
-        this.stats = {
-          users: (users || []).length,
-          admins: byRole[ROLES.ADMIN],
-          gestores: byRole[ROLES.GESTOR],
-          visitantes: byRole[ROLES.VISITANTE],
-          salas: (salas || []).length,
-          expos: (expos || []).filter(e => e.estadoExpo !== 'ARCHIVADA').length,
-          archivadas: (expos || []).filter(e => e.estadoExpo === 'ARCHIVADA').length
-        };
-        this.expos = (expos || []).slice(0, 6);
-      } catch (e) { this.error = 'No se pudo cargar el resumen.'; }
-      finally { this.loading = false; }
+        // Procesar salas
+        if (salas.status === 'fulfilled') {
+          this.stats.salas = salas.value.length;
+        }
+
+        // Procesar exposiciones
+        if (expos.status === 'fulfilled') {
+          const expoList = expos.value;
+          this.expos = expoList.slice(0, 5); // Primeras 5
+          this.stats.expos = expoList.length;
+          this.stats.archivadas = expoList.filter(e => e.estadoExpo === 'ARCHIVADA').length;
+        }
+      } catch (e) {
+        console.error('Error loading admin panel:', e);
+        this.error = 'No se pudieron cargar las estadísticas';
+      } finally {
+        this.loading = false;
+      }
     },
-    go(name) { this.$router.push({ name }); }
+    go(routeName) {
+      this.$router.push({ name: routeName });
+    }
   }
 };
 </script>

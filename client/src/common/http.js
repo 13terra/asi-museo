@@ -1,10 +1,8 @@
 import axios from "axios";
-import { BACKEND_URL, ERROR_MESSAGES } from "../constants.js";
+import { BACKEND_URL, ERROR_MESSAGES } from "../constants. js";
 import auth from "./auth.js";
-import { setNotification } from "./store.js";
+import { setNotification } from "./store. js";
 
-/* LO QUE HACE ES MANDAR TODAS LAS PETICIONES A ESTA URL 
-  DEFINE UNA CONSTANTE Y CREA LA URL BASE DE TODAS LAS PETICIONES */
 const HTTP = axios.create({
   baseURL: BACKEND_URL
 });
@@ -13,8 +11,7 @@ const HTTP = axios.create({
  * Handler cuando el usuario no tiene autorización
  */
 const onUnauthorized = () => {
-  console.error("Access denied!");
-
+  console.error("Access denied - Logging out");
   auth.logout();
 };
 
@@ -22,53 +19,46 @@ const onResponseSuccess = (response) => response;
 
 /**
  * Handler global de errores HTTP
- * CRÍTICO: Jamás mostrar SQLExceptions o trazas Java al usuario
+ * ✅ CORRECCIÓN: No ejecutar logout si estamos en rutas de autenticación
  */
 const onResponseFailure = (err) => {
-  const status = err?.response?.status;
-  const url = err?.config?.url ?? "";
-  // excepto cuando estemos haciendo login/register
-  if (!url.includes("auth/login") && !url.includes("auth/register")) {
-    if (status === 401 || status === 403) {
-      onUnauthorized();
-    }
-  }
-
   // Si no hay respuesta del servidor (error de red)
-  if (!err.response) {
+  if (!err. response) {
     console.error("Network error:", err);
     setNotification(ERROR_MESSAGES.NETWORK_ERROR, "error");
     return Promise.reject(err);
   }
 
   const responseStatus = err.response.status;
-  const responseUrl = err.config?.url ?? "";
+  const responseUrl = err.config?. url ?? "";
 
-  // No mostrar error de autenticación si estamos en /authenticate o /register
-  if (responseUrl.includes("auth/login") || responseUrl.includes("auth/register")) {
-    return Promise.reject(err);
-  }
+  // No hacer logout si es una petición de autenticación
+  const isAuthRequest = 
+    responseUrl.includes("auth/login") || 
+    responseUrl.includes("auth/register") ||
+    responseUrl.includes("auth/me");
 
   // Manejo según código de estado
   switch (responseStatus) {
     case 401:
-      // Sesión expirada o no autenticado
-      setNotification(ERROR_MESSAGES.SESSION_EXPIRED, "error");
-      onUnauthorized();
+      if (! isAuthRequest) {
+        // Solo si NO es una petición de auth
+        setNotification(ERROR_MESSAGES. SESSION_EXPIRED, "error");
+        onUnauthorized();
+      }
       break;
 
     case 403:
-      // Sin permisos suficientes
-      setNotification(ERROR_MESSAGES.UNAUTHORIZED, "error");
+      if (!isAuthRequest) {
+        setNotification(ERROR_MESSAGES.UNAUTHORIZED, "error");
+      }
       break;
 
     case 404:
-      // Recurso no encontrado
       setNotification(ERROR_MESSAGES.NOT_FOUND, "error");
       break;
 
-    case 400: {
-      // Validación fallida
+    case 400:  {
       const errorMsg = err.response.data?.message || ERROR_MESSAGES.VALIDATION_ERROR;
       setNotification(errorMsg, "error");
       break;
@@ -77,21 +67,22 @@ const onResponseFailure = (err) => {
     case 500:
     case 502:
     case 503:
-      // Error del servidor - NUNCA mostrar trazas técnicas
-      console.error("Server error:", err.response.data);
-      setNotification(ERROR_MESSAGES.GENERIC, "error");
+      console.error("Server error:", err. response.data);
+      setNotification(ERROR_MESSAGES. GENERIC, "error");
       break;
 
     default:
-      setNotification(ERROR_MESSAGES.GENERIC, "error");
+      if (! isAuthRequest) {
+        setNotification(ERROR_MESSAGES. GENERIC, "error");
+      }
   }
 
   return Promise.reject(err);
 };
 
-
-// en cada request hay que añadir el token de autenticación
-// si es que lo tenemos
+/**
+ * Interceptor de peticiones - Añade token de autorización
+ */
 const onRequest = (config) => {
   const token = localStorage.getItem("token");
   if (token) {
