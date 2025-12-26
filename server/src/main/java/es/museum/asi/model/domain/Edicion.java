@@ -32,6 +32,9 @@ public class Edicion {
   @Enumerated(EnumType.STRING)
   private EstadoEdicion estado = EstadoEdicion.BORRADOR;
 
+  @Column
+  private String nombre;
+
   // optional? supongo que false
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Exposicion exposicion;
@@ -79,6 +82,14 @@ public class Edicion {
 
   public void setEstado(EstadoEdicion estado) {
     this.estado = estado;
+  }
+
+  public String getNombre() {
+    return nombre;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
   }
 
   public Exposicion getExposicion() {

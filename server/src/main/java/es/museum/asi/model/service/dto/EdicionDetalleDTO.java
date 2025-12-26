@@ -14,6 +14,7 @@ public class EdicionDetalleDTO {
   private LocalDate fechaInicio;
   private LocalDate fechaFin;
   private EstadoEdicion estadoEdicion;
+  private String nombre;
 
   // Info expo padre
   private Long idExpo;
@@ -37,6 +38,7 @@ public class EdicionDetalleDTO {
     this.fechaInicio = edicion.getFechaInicio();
     this.fechaFin = edicion.getFechaFin();
     this.estadoEdicion = edicion.getEstado();
+    this.nombre = edicion.getNombre();
     this.idExpo = edicion.getExposicion().getIdExposicion();
     this.tituloExpo = edicion.getExposicion().getTitulo();
 
@@ -117,6 +119,14 @@ public class EdicionDetalleDTO {
 
   public void setTituloExpo(String tituloExpo) {
     this.tituloExpo = tituloExpo;
+  }
+
+  public String getNombre() {
+    return nombre;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
   }
 
   public Integer getNumPiezas() {

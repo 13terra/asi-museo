@@ -63,7 +63,7 @@ public class EdicionService {
    */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
-  public EdicionDTO create(Long idExposicion, LocalDate fechaInicio, LocalDate fechaFin)
+  public EdicionDTO create(Long idExposicion, LocalDate fechaInicio, LocalDate fechaFin, String nombre)
     throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
 
     Exposicion exposicion = exposicionDao.findById(idExposicion);
@@ -85,6 +85,10 @@ public class EdicionService {
 
     // Crear edición
     Edicion edicion = new Edicion(exposicion, fechaInicio, fechaFin);
+    if (nombre != null) {
+      String nombreLimpio = nombre.trim();
+      edicion.setNombre(nombreLimpio.isEmpty() ? null : nombreLimpio);
+    }
     edicionDao.create(edicion);
 
     logger.info("Edición creada para exposición '{}':  {} - {}",
@@ -164,7 +168,7 @@ public class EdicionService {
    */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
-  public EdicionDTO update(Long idEdicion, LocalDate nuevaFechaInicio, LocalDate nuevaFechaFin, EstadoEdicion nuevoEstado)
+  public EdicionDTO update(Long idEdicion, LocalDate nuevaFechaInicio, LocalDate nuevaFechaFin, EstadoEdicion nuevoEstado, String nuevoNombre)
     throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
 
     Edicion edicion = edicionDao.findById(idEdicion);
@@ -195,8 +199,18 @@ public class EdicionService {
       }
     }
 
-    edicion.setFechaInicio(nuevaFechaInicio);
-    edicion.setFechaFin(nuevaFechaFin);
+    if (nuevaFechaInicio != null) {
+      edicion.setFechaInicio(nuevaFechaInicio);
+    }
+
+    if (nuevaFechaFin != null) {
+      edicion.setFechaFin(nuevaFechaFin);
+    }
+
+    if (nuevoNombre != null) {
+      String nombreLimpio = nuevoNombre.trim();
+      edicion.setNombre(nombreLimpio.isEmpty() ? null : nombreLimpio);
+    }
 
     //Solo CREADOR/ADMIN puede modificar estado
     if (nuevoEstado != null && nuevoEstado != edicion.getEstado()) {
@@ -366,7 +380,7 @@ public class EdicionService {
 
   /**
    * HU26 - Eliminar Edición, sólo CREADOR o ADMIN
-   * Solo se puede eliminar si está en BORRADOR
+    * Solo se puede eliminar si está en BORRADOR, CANCELADA o FINALIZADA
    */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
@@ -379,8 +393,10 @@ public class EdicionService {
       throw new NotFoundException(idEdicion.toString(), Edicion.class);
     }
 
-    if (edicion.getEstado() != EstadoEdicion.BORRADOR) {
-      throw new OperationNotAllowed("Sólo se pueden eliminar ediciones que estén estado BORRADOR.");
+    if (edicion.getEstado() != EstadoEdicion.BORRADOR
+      && edicion.getEstado() != EstadoEdicion.CANCELADA
+      && edicion.getEstado() != EstadoEdicion.FINALIZADA) {
+      throw new OperationNotAllowed("Sólo se pueden eliminar ediciones en estado BORRADOR, CANCELADA o FINALIZADA.");
     }
 
     verificarPermisoCreador(edicion.getExposicion().getIdExposicion(), "Eliminar ediciones");

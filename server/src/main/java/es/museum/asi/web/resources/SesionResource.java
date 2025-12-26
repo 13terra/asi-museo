@@ -46,13 +46,24 @@ public class SesionResource {
   @PostMapping("/ediciones/{idEdicion}/sesiones")
   public ResponseEntity<?> create(
       @PathVariable Long idEdicion,
-      @RequestParam LocalDate fecha,
-      @RequestParam LocalTime horaInicio,
-      @RequestParam LocalTime horaFin,
-      @RequestParam int aforo,
-      @RequestParam List<Long> idSalas) {
+      @RequestParam(required = false) LocalDate fecha,
+      @RequestParam(required = false) LocalTime horaInicio,
+      @RequestParam(required = false) LocalTime horaFin,
+      @RequestParam(required = false) Integer aforo,
+      @RequestParam(required = false) List<Long> idSalas,
+      @RequestBody(required = false) SesionCreateRequest body) {
     try {
-      SesionDTO dto = sesionService.create(idEdicion, fecha, horaInicio, horaFin, aforo, idSalas);
+      LocalDate finalFecha = coalesce(fecha, body != null ? body.getFecha() : null);
+      LocalTime finalHoraInicio = coalesce(horaInicio, body != null ? body.getHoraInicio() : null);
+      LocalTime finalHoraFin = coalesce(horaFin, body != null ? body.getHoraFin() : null);
+      Integer finalAforo = coalesce(aforo, body != null ? body.getAforo() : null);
+      List<Long> finalSalas = firstNonEmpty(idSalas, body != null ? body.getIdSalas() : null);
+
+      if (finalFecha == null || finalHoraInicio == null || finalHoraFin == null || finalAforo == null || finalSalas == null) {
+        return ResponseEntity.badRequest().body(new ErrorDTO("Debe indicar fecha, horaInicio, horaFin, aforo e idSalas."));
+      }
+
+      SesionDTO dto = sesionService.create(idEdicion, finalFecha, finalHoraInicio, finalHoraFin, finalAforo, finalSalas);
       return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     } catch (Exception e) {
       return handle(e);
@@ -136,9 +147,12 @@ public class SesionResource {
   }
 
   @PostMapping("/sesiones/{idSesion}/salas")
-  public ResponseEntity<?> asignarSala(@PathVariable Long idSesion, @RequestParam List<Long> idSalas) {
+  public ResponseEntity<?> asignarSala(@PathVariable Long idSesion,
+                                       @RequestParam(required = false) List<Long> idSalas,
+                                       @RequestBody(required = false) SesionSalasRequest body) {
     try {
-      sesionService.asignarSala(idSesion, idSalas);
+      List<Long> finalSalas = firstNonEmpty(idSalas, body != null ? body.getIdSalas() : null);
+      sesionService.asignarSala(idSesion, finalSalas);
       return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (Exception e) {
       return handle(e);
@@ -166,5 +180,76 @@ public class SesionResource {
       return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
     }
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDTO("Error interno"));
+  }
+
+  private <T> T coalesce(T first, T second) {
+    return first != null ? first : second;
+  }
+
+  private List<Long> firstNonEmpty(List<Long> first, List<Long> second) {
+    if (first != null && !first.isEmpty()) {
+      return first;
+    }
+    return second;
+  }
+
+  public static class SesionCreateRequest {
+    private LocalDate fecha;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
+    private Integer aforo;
+    private List<Long> idSalas;
+
+    public LocalDate getFecha() {
+      return fecha;
+    }
+
+    public void setFecha(LocalDate fecha) {
+      this.fecha = fecha;
+    }
+
+    public LocalTime getHoraInicio() {
+      return horaInicio;
+    }
+
+    public void setHoraInicio(LocalTime horaInicio) {
+      this.horaInicio = horaInicio;
+    }
+
+    public LocalTime getHoraFin() {
+      return horaFin;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+      this.horaFin = horaFin;
+    }
+
+    public Integer getAforo() {
+      return aforo;
+    }
+
+    public void setAforo(Integer aforo) {
+      this.aforo = aforo;
+    }
+
+    public List<Long> getIdSalas() {
+      return idSalas;
+    }
+
+    public void setIdSalas(List<Long> idSalas) {
+      this.idSalas = idSalas;
+    }
+  }
+
+  public static class SesionSalasRequest {
+    private List<Long> idSalas;
+
+    public List<Long> getIdSalas() {
+      return idSalas;
+    }
+
+    public void setIdSalas(List<Long> idSalas) {
+      this.idSalas = idSalas;
+    }
   }
 }

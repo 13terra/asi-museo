@@ -39,10 +39,11 @@ public class EdicionResource {
   @PostMapping("/exposiciones/{idExposicion}/ediciones")
   public ResponseEntity<?> create(@PathVariable Long idExposicion,
                                   @RequestParam LocalDate fechaInicio,
-                                  @RequestParam LocalDate fechaFin) {
+                                  @RequestParam LocalDate fechaFin,
+                                  @RequestParam(required = false) String nombre) {
     try {
       return ResponseEntity.status(HttpStatus.CREATED)
-        .body(edicionService.create(idExposicion, fechaInicio, fechaFin));
+        .body(edicionService.create(idExposicion, fechaInicio, fechaFin, nombre));
     } catch (Exception e) {
       return handle(e);
     }
@@ -82,9 +83,10 @@ public class EdicionResource {
       @PathVariable Long idEdicion,
       @RequestParam(required = false) LocalDate fechaInicio,
       @RequestParam(required = false) LocalDate fechaFin,
-      @RequestParam(required = false) EstadoEdicion estado) {
+      @RequestParam(required = false) EstadoEdicion estado,
+      @RequestParam(required = false) String nombre) {
     try {
-      return ResponseEntity.ok(edicionService.update(idEdicion, fechaInicio, fechaFin, estado));
+      return ResponseEntity.ok(edicionService.update(idEdicion, fechaInicio, fechaFin, estado, nombre));
     } catch (Exception e) {
       return handle(e);
     }

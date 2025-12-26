@@ -22,6 +22,8 @@ import es.museum.asi.model.exception.OperationNotAllowed;
 import es.museum.asi.model.service.ObraService;
 import es.museum.asi.model.service.dto.ObraDTO;
 import es.museum.asi.web.util.ErrorDTO;
+import es.museum.asi.web.resources.dto.ObraCreateRequest;
+import es.museum.asi.web.resources.dto.ObraUpdateRequest;
 
 /**
  * Resource de obras (HU43-HU47) + búsqueda.
@@ -76,6 +78,26 @@ public class ObraResource {
     }
   }
 
+  @PostMapping(consumes = {"application/json"})
+  public ResponseEntity<?> createJson(@org.springframework.web.bind.annotation.RequestBody ObraCreateRequest request) {
+    try {
+      ObraDTO dto = obraService.create(
+        request.getTitulo(),
+        request.getAutor(),
+        request.getAnioCreacion(),
+        request.getTecnica(),
+        request.getDimensiones(),
+        request.getImagen(),
+        null,
+        request.getIdExterno(),
+        request.getEstado()
+      );
+      return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    } catch (OperationNotAllowed e) {
+      return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
+    }
+  }
+
   @PutMapping(value = "/{idObra}", consumes = {"multipart/form-data"})
   public ResponseEntity<?> update(
       @PathVariable Long idObra,
@@ -89,6 +111,30 @@ public class ObraResource {
     try {
       return ResponseEntity.ok(
         obraService.update(idObra, titulo, autor, anoCreacion, tecnica, dimensiones, imagenFile, estado)
+      );
+    } catch (NotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Obra no encontrada"));
+    } catch (OperationNotAllowed e) {
+      return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
+    }
+  }
+
+  @PutMapping(value = "/{idObra}", consumes = {"application/json"})
+  public ResponseEntity<?> updateJson(
+      @PathVariable Long idObra,
+      @org.springframework.web.bind.annotation.RequestBody ObraUpdateRequest request) {
+    try {
+      return ResponseEntity.ok(
+        obraService.update(
+          idObra,
+          request.getTitulo(),
+          request.getAutor(),
+          request.getAnioCreacion(),
+          request.getTecnica(),
+          request.getDimensiones(),
+          null,
+          request.getEstado()
+        )
       );
     } catch (NotFoundException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Obra no encontrada"));

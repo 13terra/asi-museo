@@ -18,6 +18,7 @@ public class EdicionDTO {
   @NotNull
   private LocalDate fechaFin;
 
+  private String nombre;
   private EstadoEdicion estadoEdicion;
   private String tituloExpo;
   private Integer numSesiones;
@@ -29,6 +30,7 @@ public class EdicionDTO {
     this.idEdicion = edicion.getIdEdicion();
     this.fechaInicio = edicion.getFechaInicio();
     this.fechaFin = edicion.getFechaFin();
+    this.nombre = edicion.getNombre();
     this.estadoEdicion = edicion.getEstado();
     this.tituloExpo = edicion.getExposicion().getTitulo();
     this.numSesiones = edicion.getSesiones() != null ?  edicion.getSesiones().size() : 0;
@@ -58,6 +60,14 @@ public class EdicionDTO {
 
   public void setFechaFin(LocalDate fechaFin) {
     this.fechaFin = fechaFin;
+  }
+
+  public String getNombre() {
+    return nombre;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
   }
 
   public EstadoEdicion getEstadoEdicion() {

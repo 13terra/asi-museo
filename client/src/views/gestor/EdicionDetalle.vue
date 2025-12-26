@@ -119,8 +119,9 @@ export default {
       } finally { this.saving = false; }
     },
     async eliminar() {
-      if (this.edicion.estado !== ESTADOS_EDICION.BORRADOR) {
-        this.error = 'Solo se puede eliminar una edición en BORRADOR';
+      const eliminables = [ESTADOS_EDICION.BORRADOR, ESTADOS_EDICION.CANCELADA, ESTADOS_EDICION.FINALIZADA];
+      if (!eliminables.includes(this.edicion.estado)) {
+        this.error = 'Solo se pueden eliminar ediciones en BORRADOR, CANCELADA o FINALIZADA';
         return;
       }
       if (!confirm('¿Eliminar esta edición (solo BORRADOR)?')) return;

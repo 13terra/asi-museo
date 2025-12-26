@@ -297,7 +297,7 @@ export default {
         this.form = {
           titulo: detalle.titulo || obraMET.titulo || '',
           autor: detalle. autor || obraMET.autor || '',
-          añoCreacion: detalle.añoCreacion || null,
+          añoCreacion: detalle.añoCreacion || detalle.anoCreacion || null,
           tecnica: detalle.tecnica || '',
           dimensiones: detalle. dimensiones || '',
           estado:  'EN_ALMACEN',
