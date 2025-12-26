@@ -41,8 +41,7 @@
         <div class="met-grid">
           <article v-for="obra in metResultados" :key="obra.idExterno" class="met-card">
             <div class="met-image">
-              <img v-if="obra.imagen" :src="obra.imagen" :alt="obra.titulo" />
-              <div v-else class="placeholder">Sin imagen</div>
+              <img :src="getImagenUrl(obra.imagen)" :alt="obra.titulo" />
             </div>
             <div class="met-body">
               <h4>{{ obra.titulo || "Sin título" }}</h4>
@@ -82,6 +81,7 @@
         </div>
         <button v-if="editId" class="btn ghost" @click="reset">Limpiar</button>
       </div>
+
       <div class="form-grid">
         <label>Título *<input v-model="form.titulo" required /></label>
         <label>Autor *<input v-model="form.autor" required /></label>
@@ -90,13 +90,12 @@
           <input v-model.number="form.añoCreacion" type="number" min="0" max="2100" />
         </label>
         <label
-          >Técnica *
-          <input v-model="form.tecnica" required />
-        </label>
+          >Técnica *<input v-model="form.tecnica" required placeholder="Ej: Óleo sobre lienzo"
+        /></label>
         <label
-          >Dimensiones *
-          <input v-model="form.dimensiones" required />
-        </label>
+          >Dimensiones *<input v-model="form.dimensiones" required placeholder="Ej: 100x80 cm"
+        /></label>
+
         <label
           >Estado
           <select v-model="form.estado">
@@ -149,8 +148,7 @@
       <div v-else class="grid">
         <article v-for="obra in obras" :key="obra.idObra" class="item">
           <div class="item-image">
-            <img v-if="obra.imagen" :src="obra.imagen" :alt="obra.titulo" />
-            <div v-else class="placeholder">Sin imagen</div>
+            <img :src="getImagenUrl(obra.imagen)" :alt="obra.titulo" />
           </div>
           <div class="item-body">
             <p class="eyebrow">Obra #{{ obra.idObra }}</p>
@@ -201,9 +199,8 @@ export default {
         dimensiones: "",
         estado: "EN_ALMACEN",
         idExterno: null,
-        // Híbrido:
-        imagen: null, // Lo que se enviará (File o URL)
-        imagenTexto: "" // Lo que se escribe en el input URL
+        imagen: null, // Objeto File o String final
+        imagenTexto: "" // Input visible de URL
       },
       metSearchQuery: "",
       metResultados: [],
@@ -215,16 +212,23 @@ export default {
     await this.load();
   },
   methods: {
-    // --- GESTIÓN DE FICHEROS ---
+    // --- HELPER IMÁGENES ---
+    getImagenUrl(ruta) {
+      if (!ruta) return DEFAULT_IMAGE;
+      if (ruta.startsWith("http")) return ruta;
+      // Ajusta el puerto si tu backend no es el 8080
+      return `http://localhost:8080/api/obras/imagenes/${ruta}`;
+    },
+
+    // --- GESTIÓN FICHEROS ---
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.form.imagen = file; // Guardamos el binario
-        this.form.imagenTexto = ""; // Limpiamos la URL visual
+        this.form.imagen = file;
+        this.form.imagenTexto = "";
       }
     },
     limpiarFichero() {
-      // Si escriben URL, esa es la prioridad
       this.form.imagen = this.form.imagenTexto;
       if (this.$refs.fileInput) this.$refs.fileInput.value = "";
     },
@@ -265,14 +269,13 @@ export default {
       this.form = {
         titulo: obra.titulo || "",
         autor: obra.autor || "",
-        // Mapeo robusto del año
         añoCreacion: obra.añoCreacion || obra.anoCreacion || obra.anioCreacion || null,
         tecnica: obra.tecnica || "",
         dimensiones: obra.dimensiones || "",
         estado: obra.estado || "EN_ALMACEN",
         idExterno: obra.idExterno || null,
         imagen: imgActual,
-        imagenTexto: imgActual // Si es URL, la mostramos
+        imagenTexto: imgActual
       };
 
       if (this.$refs.fileInput) this.$refs.fileInput.value = "";
@@ -280,31 +283,26 @@ export default {
     },
 
     async save() {
-      // 1. VALIDACIÓN ESTRICTA (Coincidiendo con Obra.java)
+      // 1. VALIDACIÓN ESTRICTA: Evita error SQL 500
       if (!this.form.titulo || !this.form.autor || !this.form.tecnica || !this.form.dimensiones) {
-        Swal.fire({
+        return Swal.fire({
           title: "Faltan datos",
           text: "Título, Autor, Técnica y Dimensiones son obligatorios.",
           icon: "warning"
         });
-        return;
       }
 
-      if (!this.form.titulo) {
-        return Swal.fire("Faltan datos", "El título es obligatorio", "warning");
-      }
-
-      // Sincronización final imagen
+      // Sincronizar imagen URL si no hay fichero
       if (this.form.imagenTexto && typeof this.form.imagen !== "object") {
         this.form.imagen = this.form.imagenTexto;
       }
-      // Imagen por defecto
       if (!this.form.imagen) {
         this.form.imagen = DEFAULT_IMAGE;
       }
 
       this.saving = true;
 
+      // Preparar payload
       const payload = {
         ...this.form,
         añoCreacion: this.form.añoCreacion ? Number(this.form.añoCreacion) : null
@@ -317,36 +315,34 @@ export default {
           await ObraRepository.create(payload);
         }
 
-        // SweetAlert de Éxito
         Swal.fire({
           title: "¡Guardado!",
-          text: "La obra se ha registrado correctamente.",
+          text: "Operación realizada con éxito.",
           icon: "success",
-          timer: 2000,
+          timer: 1500,
           showConfirmButton: false
         });
 
         this.reset();
         await this.load();
       } catch (e) {
-        console.error(e);
-        let msg = "No se pudo guardar la obra.";
+        console.error("Error al guardar:", e);
 
-        // Mensaje específico si falla el año (SQL)
-        if (JSON.stringify(e).includes("ano_creacion")) {
-          msg = "El Año de Creación es obligatorio.";
-        } else if (e.response?.data?.message) {
-          msg = e.response.data.message;
+        // Mensaje de error inteligente
+        let msg = "No se pudo guardar la obra.";
+        if (e.response && e.response.data && e.response.data.message) {
+          msg = e.response.data.message; // Mensaje del backend (ej: Extensión no permitida)
+        } else if (JSON.stringify(e).includes("ano_creacion")) {
+          msg = "El año de creación no es válido.";
         }
 
-        Swal.fire({ title: "Error", text: msg, icon: "error" });
+        Swal.fire("Error", msg, "error");
       } finally {
         this.saving = false;
       }
     },
 
     async remove(idObra) {
-      // SweetAlert Confirmación (Mucho más bonito que el alert gris)
       const result = await Swal.fire({
         title: "¿Estás seguro?",
         text: "No podrás revertir esta acción.",
@@ -362,12 +358,11 @@ export default {
 
       try {
         await ObraRepository.delete(idObra);
-
         Swal.fire("Eliminado", "La obra ha sido eliminada.", "success");
         await this.load();
       } catch (e) {
-        // Ignoramos 'e' si no lo usamos, pero mostramos alerta
-        Swal.fire("Error", "No se pudo eliminar (puede estar en una edición).", "error");
+        console.error(e);
+        Swal.fire("Error", "No se pudo eliminar (puede estar en uso).", "error");
       }
     },
 
@@ -382,6 +377,7 @@ export default {
         this.metResultados = res;
         if (res.length === 0) this.metError = "No se encontraron resultados.";
       } catch (e) {
+        console.error(e);
         this.metError = "Error al conectar con The MET.";
       } finally {
         this.metLoading = false;
@@ -408,7 +404,7 @@ export default {
           dimensiones: detalle.dimensiones || "",
           estado: "EN_ALMACEN",
           imagen: img,
-          imagenTexto: img, // Mostramos la URL
+          imagenTexto: img,
           idExterno: obraMET.idExterno
         };
 
@@ -416,7 +412,6 @@ export default {
         if (this.$refs.fileInput) this.$refs.fileInput.value = "";
         window.scrollTo({ top: 300, behavior: "smooth" });
 
-        // Feedback con Toasts
         const Toast = Swal.mixin({
           toast: true,
           position: "top-end",
@@ -425,12 +420,10 @@ export default {
           timerProgressBar: true
         });
 
-        if (placeholder) {
-          Toast.fire({ icon: "warning", title: "Importado sin imagen (usando por defecto)." });
-        } else {
-          Toast.fire({ icon: "success", title: "Datos importados correctamente." });
-        }
+        if (placeholder) Toast.fire({ icon: "warning", title: "Importado sin imagen." });
+        else Toast.fire({ icon: "success", title: "Datos importados." });
       } catch (e) {
+        console.error(e);
         Swal.fire("Error", "No se pudieron traer los detalles.", "error");
       } finally {
         this.metLoading = false;
@@ -447,7 +440,7 @@ export default {
 </script>
 
 <style scoped>
-/* ESTILOS (Mantenemos los tuyos, son limpios y funcionan) */
+/* ESTILOS PRESERVADOS */
 .page {
   max-width: 1200px;
   margin: 0 auto;
