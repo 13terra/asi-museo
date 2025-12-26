@@ -6,7 +6,6 @@
         <h1>Exposiciones</h1>
         <p class="muted">Listado completo y creación rápida.</p>
       </div>
-      <button class="btn" @click="load" :disabled="loading">Recargar</button>
     </header>
 
     <section class="card create">
@@ -92,8 +91,12 @@ export default {
       if (this.actionLoading) return;
       this.actionLoading = true; this.error = '';
       try {
-        if (expo.estadoExpo === 'ARCHIVADA') await ExpoRepository.desarchivar(expo.idExposicion);
-        else await ExpoRepository.archivar(expo.idExposicion);
+        if (expo.estadoExpo === 'ARCHIVADA') {
+          await ExpoRepository.desarchivar(expo.idExposicion);
+          await ExpoRepository.update(expo.idExposicion, { estado: 'BORRADOR' });
+        } else {
+          await ExpoRepository.archivar(expo.idExposicion);
+        }
         await this.load();
       } catch (e) {
         this.error = e.response?.data?.message || 'No se pudo actualizar el estado';

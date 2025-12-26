@@ -17,7 +17,14 @@ export default {
    * @returns {Promise<void>}
    */
   async asignarPermiso(idExposicion, permiso) {
-    return (await HTTP.post(`exposiciones/${idExposicion}/permisos`, permiso)).data;
+    const params = new URLSearchParams();
+    params.append('idGestor', permiso.idGestor);
+    params.append('permiso', permiso.permiso);
+    // Se envía doble: query + body por compatibilidad
+    return (await HTTP.post(`exposiciones/${idExposicion}/permisos?${params.toString()}`, {
+      idGestor: permiso.idGestor,
+      permiso: permiso.permiso
+    })).data;
   },
 
   /**

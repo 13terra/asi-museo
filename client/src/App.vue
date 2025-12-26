@@ -78,6 +78,11 @@
               </router-link>
             </li>
             <li class="nav-item">
+              <router-link class="nav-link" to="/admin/obras" active-class="active">
+                <i class="bi bi-collection"></i> Catálogo de obras
+              </router-link>
+            </li>
+            <li class="nav-item">
               <router-link class="nav-link" to="/catalogo" active-class="active">
                 <i class="bi bi-eye"></i> Vista Pública
               </router-link>
@@ -175,6 +180,9 @@ export default {
       }
     },
     getHomeRoute() {
+      if (this.isAdmin) return "/admin";
+      if (this.isGestor) return "/gestor";
+      if (this.isVisitante) return "/mis-reservas";
       return "/";
     },
     clearNotification() {

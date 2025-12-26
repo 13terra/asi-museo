@@ -3,6 +3,7 @@ package es.museum.asi.model.service;
 
 import es.museum.asi.model.domain.User;
 import es.museum.asi.model.enums.EstadoUser;
+import es.museum.asi.model.enums.TipoPermiso;
 import es.museum.asi.model.enums.UserAuthority;
 import es.museum.asi.model.exception.NotFoundException;
 import es.museum.asi.model.exception.OperationNotAllowed;
@@ -88,7 +89,7 @@ public class UserService {
    */
   @Transactional(readOnly = false)
   public UserDTOPrivate registerUser(String login, String contrasena) throws UserLoginExistsException {
-    return registerUser(login, contrasena, UserAuthority.VISITANTE);
+    return registerUser(login, contrasena, UserAuthority.VISITANTE, null);
   }
 
   /**
@@ -97,13 +98,13 @@ public class UserService {
    */
   @PreAuthorize("hasAuthority('ADMIN')")
   @Transactional(readOnly = false)
-  public UserDTOPrivate createUser(String login, String contrasena, UserAuthority autoridad) throws UserLoginExistsException {
-    return registerUser(login, contrasena, autoridad);
+  public UserDTOPrivate createUser(String login, String contrasena, UserAuthority autoridad, TipoPermiso permisoGestor) throws UserLoginExistsException {
+    return registerUser(login, contrasena, autoridad, permisoGestor);
   }
 
   @PreAuthorize("hasAuthority('ADMIN')")
   @Transactional(readOnly = false)
-  public UserDTOPrivate registerUser(String login, String contrasena, UserAuthority autoridad)
+  public UserDTOPrivate registerUser(String login, String contrasena, UserAuthority autoridad, TipoPermiso permisoGestor)
     throws UserLoginExistsException  {
     if(userDao.findByLogin(login) != null) {
       throw new UserLoginExistsException(login);
@@ -116,6 +117,9 @@ public class UserService {
     user.setContrasena(encryptedPassword);
     user.setAutoridad(autoridad);
     user.setEstado(EstadoUser.ACTIVO);
+    if (autoridad == UserAuthority.GESTOR) {
+      user.setPermisoGestor(permisoGestor != null ? permisoGestor : TipoPermiso.EDITOR);
+    }
 
     userDao.create(user);
     return new UserDTOPrivate(user);
@@ -127,7 +131,7 @@ public class UserService {
    * */
   @PreAuthorize("hasAuthority('ADMIN')")
   @Transactional(readOnly = false)
-  public UserDTOPublic updateUser(Long idUser,String login, String contrasena, UserAuthority autoridad, EstadoUser estado)
+  public UserDTOPublic updateUser(Long idUser,String login, String contrasena, UserAuthority autoridad, EstadoUser estado, TipoPermiso permisoGestor)
     throws NotFoundException, OperationNotAllowed {
     User user = userDao.findById(idUser);
     if(user == null) {
@@ -157,6 +161,17 @@ public class UserService {
 
     if(autoridad != null) {
       user.setAutoridad(autoridad);
+    }
+
+    if (autoridad == UserAuthority.GESTOR || user.getAutoridad() == UserAuthority.GESTOR) {
+      // Si viene permiso, lo actualizamos; si no, aplicamos EDITOR por defecto para evitar nulls
+      if (permisoGestor != null) {
+        user.setPermisoGestor(permisoGestor);
+      } else if (user.getPermisoGestor() == null) {
+        user.setPermisoGestor(TipoPermiso.EDITOR);
+      }
+    } else {
+      user.setPermisoGestor(null);
     }
 
     if(estado != null) {

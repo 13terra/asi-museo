@@ -30,7 +30,12 @@ export default {
       login: user.login,
       password: user.password,
       autoridad: user.authority || user.autoridad,
-      estado: user.estado
+      estado: user.estado,
+      // Enviamos rol específico de gestor si aplica
+      tipoGestor: user.tipoGestor,
+      gestorRol: user.gestorRol || user.tipoGestor,
+      permiso: user.permiso || user.tipoGestor,
+      permisoGestor: user.permisoGestor || user.tipoGestor
     };
     return (await HTTP.post('users', payload)).data;
   },
@@ -44,7 +49,12 @@ export default {
       login: user.login,
       password: user.password,
       autoridad: user.authority || user.autoridad,
-      estado: user.estado
+      estado: user.estado,
+      // Enviamos rol específico de gestor si aplica
+      tipoGestor: user.tipoGestor,
+      gestorRol: user.gestorRol || user.tipoGestor,
+      permiso: user.permiso || user.tipoGestor,
+      permisoGestor: user.permisoGestor || user.tipoGestor
     };
     return (await HTTP.put(`users/${idUser}`, payload)).data;
   },

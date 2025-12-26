@@ -27,7 +27,7 @@ import EdicionDetalle from '@/views/gestor/EdicionDetalle.vue';
 import GestionPiezas from '@/views/gestor/GestionPiezas.vue';
 import GestionSesiones from '@/views/gestor/GestionSesiones.vue';
 import GestionSalas from '@/views/gestor/GestionSalas.vue';
-import GestionPermisos from '@/views/gestor/GestionPermisos.vue';
+import GestionPermisos from '@/views/GestionPermisosView.vue';
 import CatalogoObras from '@/views/gestor/CatalogoObras.vue';
 
 // ========== ADMIN ==========
@@ -141,7 +141,7 @@ const routes = [
     path: '/gestor/ediciones/:idEdicion/sesiones',
     name: 'GestionSesiones',
     component:  GestionSesiones,
-    meta: { authority: ROLES. GESTOR }
+    meta: { authority: ROLES.GESTOR }
   },
   {
     path: '/gestor/ediciones/:idEdicion/salas',
@@ -195,6 +195,12 @@ const routes = [
     component: GestionSalasAdmin,
     meta: { authority: ROLES.ADMIN }
   },
+  {
+    path: '/admin/obras',
+    name: 'AdminCatalogoObras',
+    component: CatalogoObras,
+    meta: { authority: ROLES.ADMIN }
+  },
 
   // ========== ERROR 404 ==========
   {
@@ -237,7 +243,7 @@ router.beforeEach((to, from, next) => {
             // Rol insuficiente
             alert('No tienes permisos para acceder a esta sección');
             // Redirigir según rol
-            if (loggedUserAuthority === ROLES. VISITANTE) {
+            if (loggedUserAuthority === ROLES.VISITANTE) {
               next('/');
             } else if (loggedUserAuthority === ROLES.GESTOR) {
               next('/gestor');
@@ -258,9 +264,9 @@ router.beforeEach((to, from, next) => {
       // Página pública
       if (userIsLogged && guestOnly) {
         // Si está logueado, redirigir al panel correspondiente
-        if (loggedUserAuthority === ROLES. ADMIN) {
+        if (loggedUserAuthority === ROLES.ADMIN) {
           next({ name: 'PanelAdmin', replace: true });
-        } else if (loggedUserAuthority === ROLES. GESTOR) {
+        } else if (loggedUserAuthority === ROLES.GESTOR) {
           next({ name: 'PanelGestor', replace: true });
         } else {
           next({ name: 'HomeLanding', replace: true });

@@ -6,7 +6,7 @@
         <h1>{{ expoTitle || `Exposición #${idExposicion}` }}</h1>
         <p class="muted">Asigna o revoca permisos de gestores sobre esta exposición.</p>
       </div>
-      <button class="btn" @click="load" :disabled="loading">Recargar</button>
+      <button class="btn" @click="$router.back()">Volver</button>
     </header>
 
     <section class="card">
@@ -14,9 +14,9 @@
       <div class="form-grid">
         <label>
           Gestor
-          <select v-model="form.idUser">
+          <select v-model.number="form.idGestor">
             <option value="">Selecciona un gestor</option>
-            <option v-for="u in gestores" :key="u.idUser || u.id" :value="u.idUser || u.id">{{ u.login }} ({{ u.idUser || u.id }})</option>
+            <option v-for="u in gestores" :key="u.idUser || u.id" :value="u.idUser || u.id">{{ u.login }} · {{ rolGestor(u) }}</option>
           </select>
         </label>
         <label>
@@ -59,12 +59,13 @@
 import GestionRepository from '@/repositories/GestionRepository';
 import UserRepository from '@/repositories/UserRepository';
 import ExpoRepository from '@/repositories/ExpoRepository';
+import { ROLES } from '@/constants';
 
 export default {
   name: 'GestionPermisosView',
   data() {
     return {
-      idExposicion: this.$route.params.id,
+      idExposicion: this.$route.params.idExposicion || this.$route.params.id,
       permisos: [],
       gestores: [],
       expoTitle: '',
@@ -72,20 +73,29 @@ export default {
       saving: false,
       error: '',
       form: {
-        idUser: '',
+        idGestor: '',
         permiso: 'EDITOR'
       }
     };
   },
   computed: {
     canAssign() {
-      return this.form.idUser && this.form.permiso;
+      return this.form.idGestor && this.form.permiso;
     }
   },
   async created() {
     await this.load();
   },
   methods: {
+    rolGestor(user) {
+      const role = (user.authority || user.autoridad || '').toString().toUpperCase();
+      if (role !== ROLES.GESTOR) return role || 'GESTOR';
+      const raw = (user.tipoGestor || user.rolGestor || user.permiso || '').toString().toUpperCase();
+      if (raw === '1') return 'CREADOR';
+      if (raw === '2') return 'EDITOR';
+      if (raw === 'CREADOR' || raw === 'EDITOR') return raw;
+      return 'GESTOR';
+    },
     async load() {
       this.loading = true;
       this.error = '';
@@ -97,7 +107,7 @@ export default {
         ]);
         this.permisos = permisos || [];
         this.gestores = gestores || [];
-        this.expoTitle = expo?.titulo || '';
+        this.expoTitle = expo?.titulo || `Exposición #${this.idExposicion}`;
       } catch (e) {
         this.error = 'No se pudieron cargar los permisos.';
       } finally {
@@ -112,7 +122,7 @@ export default {
         await GestionRepository.asignarPermiso(this.idExposicion, { ...this.form });
         await this.load();
       } catch (e) {
-        this.error = 'No se pudo asignar el permiso.';
+        this.error = e.response?.data?.message || 'No se pudo asignar el permiso.';
       } finally {
         this.saving = false;
       }

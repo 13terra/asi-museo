@@ -6,9 +6,6 @@
         <h1>Resumen general</h1>
         <p class="subtitle">Visión rápida de usuarios, salas y exposiciones. </p>
       </div>
-      <button class="btn-secondary" @click="load" :disabled="loading">
-        <i class="bi bi-arrow-clockwise"></i> Recargar
-      </button>
     </div>
 
     <!-- ESTADÍSTICAS -->
@@ -82,6 +79,17 @@
           <div class="shortcut-content">
             <h4>Ver exposiciones</h4>
             <p>Consulta y crea exposiciones</p>
+          </div>
+          <i class="bi bi-arrow-right shortcut-arrow"></i>
+        </div>
+
+        <div class="shortcut-card" @click="go('AdminCatalogoObras')">
+          <div class="shortcut-icon bg-info">
+            <i class="bi bi-collection"></i>
+          </div>
+          <div class="shortcut-content">
+            <h4>Catálogo de obras</h4>
+            <p>Consulta e importa obras</p>
           </div>
           <i class="bi bi-arrow-right shortcut-arrow"></i>
         </div>
@@ -164,9 +172,10 @@ export default {
 
         // Procesar exposiciones
         if (exposResult. status === 'fulfilled') {
-          const expos = exposResult.value;
+          const expos = exposResult.value || [];
           this.stats.expos = expos.length;
-          this.stats.archivadas = expos.filter(e => e. estadoExpo === 'ARCHIVADA').length;
+          const estadoOf = (e) => (e.estadoExpo || e.estadoExposicion || e.estado || '').toString().toUpperCase();
+          this.stats.archivadas = expos.filter(e => estadoOf(e) === 'ARCHIVADA').length;
         }
       } catch (e) {
         console.error('Error loading admin panel:', e);

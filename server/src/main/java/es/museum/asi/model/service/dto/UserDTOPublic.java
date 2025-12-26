@@ -2,6 +2,7 @@ package es.museum.asi.model.service.dto;
 
 import es.museum.asi.model.domain.User;
 import es.museum.asi.model.enums.EstadoUser;
+import es.museum.asi.model.enums.TipoPermiso;
 import es.museum.asi.model.enums.UserAuthority;
 
 public class UserDTOPublic {
@@ -9,6 +10,7 @@ public class UserDTOPublic {
   private String login;
   private UserAuthority autoridad;
   private EstadoUser estado;
+  private TipoPermiso permisoGestor;
 
   public UserDTOPublic() {
   }
@@ -18,6 +20,7 @@ public class UserDTOPublic {
     this.login = user.getLogin();
     this.autoridad = user.getAutoridad();
     this.estado = user.getEstado();
+    this.permisoGestor = user.getPermisoGestor();
   }
 
 
@@ -51,5 +54,13 @@ public class UserDTOPublic {
 
   public void setEstado(EstadoUser estado) {
     this.estado = estado;
+  }
+
+  public TipoPermiso getPermisoGestor() {
+    return permisoGestor;
+  }
+
+  public void setPermisoGestor(TipoPermiso permisoGestor) {
+    this.permisoGestor = permisoGestor;
   }
 }

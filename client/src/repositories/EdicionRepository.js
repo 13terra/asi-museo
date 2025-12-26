@@ -48,6 +48,7 @@ export default {
     if (edicion.fechaInicio) params.append('fechaInicio', edicion.fechaInicio);
     if (edicion.fechaFin) params.append('fechaFin', edicion.fechaFin);
     if (edicion.estado) params.append('estado', edicion.estado);
+    if (edicion.nombre) params.append('nombre', edicion.nombre);
     
     return (await HTTP.put(`ediciones/${idEdicion}?${params.toString()}`)).data;
   },

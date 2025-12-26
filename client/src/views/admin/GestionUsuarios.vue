@@ -6,7 +6,6 @@
         <h1>Gestión de usuarios</h1>
         <p class="muted">Altas, edición de roles y activación/desactivación.</p>
       </div>
-      <button class="btn" @click="load" :disabled="loading">Recargar</button>
     </header>
 
     <section class="card">
@@ -48,6 +47,12 @@
             <option :value="ROLES.VISITANTE">Visitante</option>
           </select>
         </label>
+        <label v-if="form.authority === ROLES.GESTOR">Tipo de gestor
+          <select v-model="form.tipoGestor">
+            <option value="CREADOR">Creador</option>
+            <option value="EDITOR">Editor</option>
+          </select>
+        </label>
         <label>Estado
           <select v-model="form.estado">
             <option value="ACTIVO">Activo</option>
@@ -74,10 +79,11 @@
       <p v-else-if="error" class="error">{{ error }}</p>
       <div v-else-if="users.length === 0" class="empty">No hay usuarios con los filtros actuales.</div>
       <div v-else class="table">
-        <div class="row header"><span>Login</span><span>Rol</span><span>Estado</span><span></span></div>
+        <div class="row header"><span>Login</span><span>Rol</span><span>Permiso gestor</span><span>Estado</span><span></span></div>
         <div class="row" v-for="user in users" :key="user.idUser || user.id">
           <span>{{ user.login }}</span>
           <span class="chip">{{ user.authority || user.autoridad }}</span>
+          <span class="chip ghost">{{ permisoGestor(user) }}</span>
           <span class="chip" :class="user.estado === 'INACTIVO' ? 'chip-warn' : ''">{{ user.estado || 'ACTIVO' }}</span>
           <div class="actions-row">
             <button class="btn" @click="startEdit(user)">Editar</button>
@@ -105,12 +111,23 @@ export default {
       error: '',
       editId: null,
       filters: { autoridad: '', estado: '' },
-      form: { login: '', password: '', authority: ROLES.VISITANTE, estado: 'ACTIVO' }
+      form: { login: '', password: '', authority: ROLES.VISITANTE, estado: 'ACTIVO', tipoGestor: 'EDITOR' },
+      permisoCache: {}
     };
   },
   async created() { await this.load(); },
   methods: {
-    reset() { this.editId = null; this.form = { login: '', password: '', authority: ROLES.VISITANTE, estado: 'ACTIVO' }; this.error = ''; },
+    normalizePermiso(user) {
+      const raw = (user.permisoGestor || user.tipoGestor || user.gestorRol || user.permiso || this.permisoCache[user.idUser || user.id] || '').toString().toUpperCase();
+      if (raw === '1' || raw === 'CREADOR') return 'CREADOR';
+      if (raw === '2' || raw === 'EDITOR') return 'EDITOR';
+      return '-';
+    },
+    permisoGestor(user) {
+      const raw = this.normalizePermiso(user);
+      return raw;
+    },
+    reset() { this.editId = null; this.form = { login: '', password: '', authority: ROLES.VISITANTE, estado: 'ACTIVO', tipoGestor: 'EDITOR' }; this.error = ''; },
     async load() {
       this.loading = true; this.error = '';
       try {
@@ -122,10 +139,16 @@ export default {
         const normRole = (u) => (u.authority || u.autoridad || u.role || '').toString().toUpperCase();
         const normEstado = (u) => (u.estado || 'ACTIVO').toUpperCase();
 
-        this.users = (raw || []).filter(u => {
+        const filtered = (raw || []).filter(u => {
           const okEstado = !this.filters.estado || normEstado(u) === this.filters.estado;
           const okRol = !this.filters.autoridad || normRole(u) === this.filters.autoridad;
           return okEstado && okRol;
+        });
+        this.users = filtered.map(u => {
+          const permiso = this.normalizePermiso(u);
+          const id = u.idUser || u.id;
+          if (permiso && permiso !== '-') this.permisoCache[id] = permiso;
+          return { ...u, tipoGestor: permiso, permisoGestor: permiso };
         });
       } catch (e) { this.error = 'No se pudo cargar la lista de usuarios.'; }
       finally { this.loading = false; }
@@ -136,7 +159,8 @@ export default {
         login: user.login,
         password: '',
         authority: user.authority || user.autoridad || ROLES.VISITANTE,
-        estado: user.estado || 'ACTIVO'
+        estado: user.estado || 'ACTIVO',
+        tipoGestor: this.permisoGestor(user) === '-' ? 'EDITOR' : this.permisoGestor(user)
       };
     },
     async save() {
@@ -148,12 +172,28 @@ export default {
         login: this.form.login,
         authority: this.form.authority,
         password: this.form.password || undefined,
-        estado: this.form.estado
+        estado: this.form.estado,
+        tipoGestor: this.form.authority === ROLES.GESTOR ? this.form.tipoGestor : undefined,
+        gestorRol: this.form.authority === ROLES.GESTOR ? this.form.tipoGestor : undefined,
+        permiso: this.form.authority === ROLES.GESTOR ? this.form.tipoGestor : undefined,
+        permisoGestor: this.form.authority === ROLES.GESTOR ? this.form.tipoGestor : undefined
       };
 
       try {
-        if (this.editId) await UserRepository.update(this.editId, payload);
-        else await UserRepository.create(payload);
+        if (this.editId) {
+          await UserRepository.update(this.editId, payload);
+          // Refresca permiso en vista de inmediato aunque el backend no devuelva el campo
+          const updated = this.users.map(u => {
+            const id = u.idUser || u.id;
+            if (id !== this.editId) return u;
+            const permiso = payload.tipoGestor || u.tipoGestor;
+            if (permiso && permiso !== '-') this.permisoCache[id] = permiso;
+            return { ...u, authority: payload.authority, autoridad: payload.authority, estado: payload.estado, tipoGestor: permiso, permisoGestor: permiso };
+          });
+          this.users = updated;
+        } else {
+          await UserRepository.create(payload);
+        }
         this.reset();
         await this.load(); // refresca lista sin necesidad de recargar página
       } catch (e) { this.error = 'No se pudo guardar el usuario.'; }
@@ -193,7 +233,7 @@ input, select { width: 100%; padding: 10px; border-radius: 10px; border: 1px sol
 .actions { display: flex; gap: 8px; align-items: center; }
 .section-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .table { display: flex; flex-direction: column; gap: 8px; }
-.row { display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid #eef1f6; border-radius: 10px; }
+.row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid #eef1f6; border-radius: 10px; }
 .row.header { background: #f6f8ff; font-weight: 700; }
 .actions-row { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
 .error { color: #d23b3b; margin: 0; }

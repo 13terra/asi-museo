@@ -23,7 +23,6 @@
         </div>
       </div>
       <div class="hero-actions">
-        <button class="btn-ghost" @click="load" :disabled="loading">Recargar</button>
         <router-link class="btn-primary" to="/expos/admin">Volver</router-link>
       </div>
     </div>

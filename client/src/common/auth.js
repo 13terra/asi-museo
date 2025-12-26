@@ -87,10 +87,12 @@ function _removeToken() {
 async function _authenticate() {
   const response = await AccountRepository.getAccount();
   const store = getStore();
-  store.state.user. id = response.id;
+  store.state.user.id = response.id;
+  store.state.user.idUser = response.idUser || response.id;
   store.state.user.login = response.login;
   store.state.user.authority = response.authority || response.autoridad;
   store.state.user.estado = response.estado;
+  store.state.user.gestorRol = response.permisoGestor || response.gestorRol || response.tipoGestor || '';
   store.state.user.logged = true;
   return store.state.user;
 }

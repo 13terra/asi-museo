@@ -6,7 +6,7 @@
         <h1>Salas disponibles</h1>
         <p class="muted">Crea, edita o elimina salas para asignarlas a sesiones.</p>
       </div>
-      <button class="btn" @click="load" :disabled="loading">Recargar</button>
+      <button class="btn" @click="$router.back()">Volver</button>
     </header>
 
     <section class="card">
@@ -14,14 +14,10 @@
       <div class="form-grid">
         <label>Nombre<input v-model="form.nombre" /></label>
         <label>Planta
-          <select v-model="form.planta" @change="onPlantaChange">
+          <select v-model="form.planta">
             <option value="">Selecciona planta</option>
-            <option v-for="p in plantas" :key="p" :value="p">Planta {{ p }}</option>
-            <option value="__custom">Otra (introducir)</option>
+            <option v-for="p in plantasBase" :key="p" :value="p">Planta {{ p }}</option>
           </select>
-        </label>
-        <label v-if="form.planta === '__custom'">Planta personalizada
-          <input type="number" v-model.number="form.plantaCustom" min="-10" max="50" placeholder="Ej: 0" />
         </label>
         <div class="actions">
           <button class="btn primary" :disabled="!form.nombre || saving" @click="save">{{ saving ? 'Guardando...' : editId ? 'Actualizar' : 'Crear' }}</button>
@@ -33,6 +29,15 @@
 
     <section class="card">
       <h3>Listado</h3>
+      <div class="filters">
+        <label>Ordenar por
+          <select v-model="orden" @change="ordenar">
+            <option value="planta">Planta</option>
+            <option value="nombre">Nombre</option>
+            <option value="id">Creación</option>
+          </select>
+        </label>
+      </div>
       <div v-if="loading" class="center"><div class="spinner-border" role="status"></div></div>
       <div v-else-if="salas.length === 0" class="empty">No hay salas registradas.</div>
       <div v-else class="grid">
@@ -58,15 +63,14 @@ import SalaRepository from '@/repositories/SalaRepository';
 export default {
   name: 'GestionSalas',
   data() {
-    return { salas: [], loading: true, saving: false, error: '', editId: null, form: { nombre: '', planta: '', plantaCustom: '' } };
+    return { salas: [], loading: true, saving: false, error: '', editId: null, form: { nombre: '', planta: '' }, orden: 'planta', plantasBase: ['0','1','2','3'] };
   },
   computed: {
-    plantas() {
-      const uniques = new Set(this.salas.filter(s => s.planta !== null && s.planta !== undefined && s.planta !== '').map(s => s.planta));
-      return Array.from(uniques).sort((a, b) => Number(a) - Number(b));
-    },
     salasOrdenadas() {
-      return [...this.salas].sort((a, b) => {
+      const base = [...this.salas];
+      if (this.orden === 'nombre') return base.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+      if (this.orden === 'id') return base.sort((a, b) => (a.idSala || 0) - (b.idSala || 0));
+      return base.sort((a, b) => {
         const pa = Number(a.planta ?? 0);
         const pb = Number(b.planta ?? 0);
         if (pa !== pb) return pa - pb;
@@ -76,8 +80,8 @@ export default {
   },
   async created() { await this.load(); },
   methods: {
-    reset() { this.editId = null; this.form = { nombre: '', planta: '', plantaCustom: '' }; this.error = ''; },
-    onPlantaChange() { if (this.form.planta !== '__custom') this.form.plantaCustom = ''; },
+    reset() { this.editId = null; this.form = { nombre: '', planta: '' }; this.error = ''; },
+    ordenar() { /* la computada ya reordena */ },
     async load() {
       this.loading = true; this.error = '';
       try { this.salas = await SalaRepository.getAll(); }
@@ -86,15 +90,12 @@ export default {
     },
     async save() {
       if (!this.form.nombre) return;
-      const plantaSeleccionada = this.form.planta === '__custom' ? this.form.plantaCustom : this.form.planta;
+      const plantaSeleccionada = this.form.planta;
       if (plantaSeleccionada === '' || plantaSeleccionada === null || plantaSeleccionada === undefined) {
         this.error = 'Hay que añadir planta';
         return;
       }
-      if (Number(plantaSeleccionada) < -10 || Number(plantaSeleccionada) > 50) {
-        this.error = 'La planta debe estar entre -10 y 50';
-        return;
-      }
+      if (!this.plantasBase.includes(String(plantaSeleccionada))) { this.error = 'Solo plantas 0,1,2 y 3'; return; }
       this.error = '';
       this.saving = true; this.error = '';
       try {
@@ -109,8 +110,7 @@ export default {
     startEdit(sala) {
       this.editId = sala.idSala;
       this.form.nombre = sala.nombre;
-      this.form.planta = sala.planta ?? '';
-      this.form.plantaCustom = '';
+      this.form.planta = String(sala.planta ?? '');
     },
     async remove(idSala) {
       if (!confirm('¿Eliminar esta sala?')) return;

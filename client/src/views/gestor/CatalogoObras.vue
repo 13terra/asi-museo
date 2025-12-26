@@ -6,7 +6,6 @@
         <h1>Catálogo de obras</h1>
         <p class="muted">Consulta, crea o edita obras disponibles para las ediciones. </p>
       </div>
-      <button class="btn" @click="load" :disabled="loading">Recargar</button>
     </header>
 
     <!-- ========== SECCIÓN:  BUSCAR EN THE MET ========== -->

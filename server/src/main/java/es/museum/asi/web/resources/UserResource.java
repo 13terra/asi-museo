@@ -76,7 +76,7 @@ public class UserResource {
     logger.info("Creando usuario: login={}, autoridad={}", request.getLogin(), request.getAutoridad());
 
     try {
-      UserDTOPrivate created = userService.createUser(request.getLogin(), request.getPassword(), request.getAutoridad());
+      UserDTOPrivate created = userService.createUser(request.getLogin(), request.getPassword(), request.getAutoridad(), request.getPermisoGestor());
       return ResponseEntity.status(HttpStatus.CREATED).body(toPublic(created));
     } catch (UserLoginExistsException e) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDTO("El login ya existe"));
@@ -102,7 +102,8 @@ public class UserResource {
         request.getLogin(),
         request.getPassword(),
         request.getAutoridad(),
-        request.getEstado()
+        request.getEstado(),
+        request.getPermisoGestor()
       );
       return ResponseEntity.ok(updated);
     } catch (NotFoundException e) {
@@ -161,6 +162,7 @@ public class UserResource {
     pu.setLogin(dto.getLogin());
     pu.setAutoridad(dto.getAuthority());
     pu.setEstado(dto.getEstadoUser());
+    pu.setPermisoGestor(dto.getPermisoGestor());
     return pu;
   }
 }

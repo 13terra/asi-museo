@@ -62,7 +62,7 @@ export default {
           return '/admin';
         case ROLES.GESTOR:
           return '/gestor';
-        case ROLES. VISITANTE:
+        case ROLES.VISITANTE:
           return '/mis-reservas';
         default:
           return '/catalogo';

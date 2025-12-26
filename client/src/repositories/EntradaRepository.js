@@ -6,7 +6,7 @@ export default {
    * @returns {Promise<Array>}
    */
   async getMisEntradas() {
-    return (await HTTP.get('entradas/mis-entradas')).data;
+    return (await HTTP.get('mis-entradas')).data;
   },
 
   /**

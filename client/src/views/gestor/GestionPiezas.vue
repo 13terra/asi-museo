@@ -7,7 +7,6 @@
       </div>
       <div class="actions">
         <button class="btn" @click="$router.back()">Volver</button>
-        <button class="btn" @click="load" :disabled="loading">Recargar</button>
       </div>
     </header>
 

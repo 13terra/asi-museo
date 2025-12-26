@@ -35,16 +35,19 @@ const onResponseFailure = (err) => {
   const isAuthRequest = 
     responseUrl.includes("auth/login") || 
     responseUrl.includes("auth/register") ||
-    responseUrl.includes("auth/me");
+    responseUrl.includes("auth/me") ||
+    responseUrl.includes("auth/logout");
 
   // Manejo según código de estado
   switch (responseStatus) {
-    case 401:
+    case 401: {
       if (! isAuthRequest) {
-        // Solo mostrar mensaje; no cerrar sesión para evitar deslogueos accidentales
         setNotification(ERROR_MESSAGES. SESSION_EXPIRED, "error");
+        // Limpia token/estado para evitar bucles con token expirado
+        auth.logout().catch(() => {});
       }
       break;
+    }
 
     case 403:
       if (!isAuthRequest) {

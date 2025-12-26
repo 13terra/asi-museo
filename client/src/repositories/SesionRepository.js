@@ -44,13 +44,22 @@ export default {
   async create(idEdicion, sesion) {
     const params = new URLSearchParams();
     params.append('fecha', sesion.fecha);
-    params.append('horaInicio', sesion.horaInicio);
-    params.append('horaFin', sesion.horaFin);
+    // Normaliza hora a HH:mm:ss
+    const hInicio = sesion.horaInicio && sesion.horaInicio.length === 5 ? `${sesion.horaInicio}:00` : sesion.horaInicio;
+    const hFin = sesion.horaFin && sesion.horaFin.length === 5 ? `${sesion.horaFin}:00` : sesion.horaFin;
+    params.append('horaInicio', hInicio);
+    params.append('horaFin', hFin);
     params.append('aforo', sesion.aforo);
-    // idSalas es un array, se añade múltiples veces
-    (sesion.idSalas || []).forEach(id => params.append('idSalas', id));
-    
-    return (await HTTP.post(`ediciones/${idEdicion}/sesiones?${params.toString()}`)).data;
+    // idSalas: enviar en distintos nombres
+    const ids = sesion.idSalas || [];
+    ids.forEach(id => {
+      params.append('idSalas', id);
+      params.append('idSala', id);
+    });
+    if (ids.length) {
+      params.append('salas', ids.join(','));
+    }
+    return (await HTTP.post(`ediciones/${idEdicion}/sesiones?${params.toString()}`, { idSalas: ids, idSala: ids })).data;
   },
 
   /**
@@ -59,7 +68,13 @@ export default {
    * Body: SesionUpdateDTO (JSON)
    */
   async update(idSesion, sesion) {
-    return (await HTTP.put(`sesiones/${idSesion}`, sesion)).data;
+    const payload = { ...sesion };
+    if (payload.horaInicio && payload.horaInicio.length === 5) payload.horaInicio = `${payload.horaInicio}:00`;
+    if (payload.horaFin && payload.horaFin.length === 5) payload.horaFin = `${payload.horaFin}:00`;
+    if (payload.idSalas) {
+      payload.idSala = payload.idSalas;
+    }
+    return (await HTTP.put(`sesiones/${idSesion}`, payload)).data;
   },
 
   /**

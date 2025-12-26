@@ -2,6 +2,7 @@ package es.museum.asi.config;
 
 import es.museum.asi.model.domain.TipoEntrada;
 import es.museum.asi.model.enums.UserAuthority;
+import es.museum.asi.model.enums.TipoPermiso;
 import es.museum.asi.repository.TipoEntradaDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,16 +51,16 @@ public class DatabaseLoader {
 
     try {
       // ADMIN SEMILLA
-      userService.createUser("admin", "admin", UserAuthority.ADMIN);
+      userService.createUser("admin", "admin", UserAuthority.ADMIN, null);
       logger.info("Admin semilla creado");
 
       // ADMIN ADICIONAL
-      userService.createUser("pepemin", "pepemin",  UserAuthority.ADMIN);
+      userService.createUser("pepemin", "pepemin",  UserAuthority.ADMIN, null);
       logger.info("Admin adicional creado");
 
       // Gestores de expos
-      userService.createUser("gestor1", "gestor1", UserAuthority.GESTOR);
-      userService.createUser("gestor2", "gestor2", UserAuthority.GESTOR);
+      userService.createUser("gestor1", "gestor1", UserAuthority.GESTOR, TipoPermiso.CREADOR);
+      userService.createUser("gestor2", "gestor2", UserAuthority.GESTOR, TipoPermiso.EDITOR);
       logger.info("Gestores creados");
 
       // Visitantes de prueba

@@ -73,6 +73,7 @@ public class AuthResource {
       response.setLogin(created.getLogin());
       response.setAutoridad(created.getAuthority());
       response.setEstado(created.getEstadoUser());
+      response.setPermisoGestor(created.getPermisoGestor());
       return ResponseEntity.status(HttpStatus.CREATED).body(response);
     } catch (UserLoginExistsException e) {
       logger.warn("Login ya existe: {}", request.getLogin());
@@ -151,6 +152,7 @@ public class AuthResource {
     response.setLogin(current.getLogin());
     response.setAutoridad(current.getAuthority());
     response.setEstado(current.getEstadoUser());
+    response.setPermisoGestor(current.getPermisoGestor());
     return ResponseEntity.ok(response);
   }
 }

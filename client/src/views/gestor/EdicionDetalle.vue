@@ -7,29 +7,23 @@
         <p class="muted">{{ edicion.fechaInicio }} → {{ edicion.fechaFin }}</p>
       </div>
       <div class="chips">
-        <span class="chip" :class="stateClass(edicion.estado)">{{ edicion.estado }}</span>
-        <button class="btn" @click="load" :disabled="loading">Recargar</button>
+        <span class="chip" :class="stateClass(edicion.estado)">Estado: {{ edicion.estado }}</span>
+        <button class="btn" @click="$router.back()">Volver</button>
       </div>
     </header>
 
     <section class="card">
       <h3>Actualizar edición</h3>
       <div class="form-grid">
+        <label>Nombre<input v-model="form.nombre" placeholder="Nombre de la edición" /></label>
         <label>Fecha inicio<input type="date" v-model="form.fechaInicio" /></label>
         <label>Fecha fin<input type="date" v-model="form.fechaFin" /></label>
-        <label>Estado
-          <select v-model="form.estado">
-            <option value="BORRADOR">BORRADOR</option>
-            <option value="PUBLICADA">PUBLICADA</option>
-            <option value="FINALIZADA">FINALIZADA</option>
-            <option value="CANCELADA">CANCELADA</option>
-          </select>
-        </label>
       </div>
       <div class="actions">
         <button class="btn primary" :disabled="saving" @click="update">Guardar</button>
         <button class="btn" :disabled="saving" @click="publicar">Publicar</button>
         <button class="btn" :disabled="saving" @click="cancelar">Cancelar</button>
+        <button class="btn" :disabled="saving" @click="finalizar">Finalizar</button>
         <button class="btn danger" :disabled="saving" @click="eliminar">Eliminar</button>
       </div>
       <p v-if="error" class="error">{{ error }}</p>
@@ -54,7 +48,7 @@ import { ESTADOS_EDICION } from '@/constants';
 export default {
   name: 'EdicionDetalle',
   data() {
-    return { edicion: null, form: { fechaInicio: '', fechaFin: '', estado: 'BORRADOR' }, loading: true, saving: false, error: '' };
+    return { edicion: null, form: { nombre: '', fechaInicio: '', fechaFin: '', estado: 'BORRADOR' }, loading: true, saving: false, error: '', ESTADOS_EDICION };
   },
   async created() { await this.load(); },
   methods: {
@@ -69,6 +63,7 @@ export default {
         const estado = this.edicion.estado || this.edicion.estadoEdicion || ESTADOS_EDICION.BORRADOR;
         this.edicion.estado = estado;
 
+        this.form.nombre = this.edicion.nombre || '';
         this.form.fechaInicio = this.edicion.fechaInicio;
         this.form.fechaFin = this.edicion.fechaFin;
         this.form.estado = estado;
@@ -76,43 +71,52 @@ export default {
       finally { this.loading = false; }
     },
     async update() {
-      if (this.form.estado === ESTADOS_EDICION.PUBLICADA) {
-        this.error = 'Usa el botón "Publicar" para publicar una edición.';
-        return;
-      }
       this.saving = true; this.error = '';
       try {
         const id = this.$route.params.idEdicion || this.$route.params.id;
-        await EdicionRepository.update(id, { ...this.form });
-        alert('Cambios guardados correctamente');
-        const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
-        this.$router.push(destino);
+        const payload = {
+          nombre: this.form.nombre || this.edicion.nombre || `Edición ${id}`,
+          fechaInicio: this.form.fechaInicio || this.edicion.fechaInicio,
+          fechaFin: this.form.fechaFin || this.edicion.fechaFin,
+          estado: this.form.estado || this.edicion.estado
+        };
+        await EdicionRepository.update(id, payload);
+        await this.load();
       } catch (e) { this.error = 'No se pudo guardar.'; }
       finally { this.saving = false; }
     },
     async publicar() {
-      if (this.edicion.estado !== ESTADOS_EDICION.BORRADOR) return;
       this.saving = true; this.error = '';
       try {
         await EdicionRepository.publicar(this.edicion.idEdicion);
-        alert('Edición publicada');
-        const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
-        this.$router.push(destino);
-      }
-      catch (e) { this.error = e.response?.data?.message || 'No se pudo publicar.'; }
-      finally { this.saving = false; }
+        await this.load();
+      } catch (e) {
+        this.error = e.response?.data?.message || 'No se pudo publicar.';
+      } finally { this.saving = false; }
     },
     async cancelar() {
-      if (this.edicion.estado !== ESTADOS_EDICION.PUBLICADA) return;
       this.saving = true; this.error = '';
       try {
         await EdicionRepository.cancelar(this.edicion.idEdicion);
-        alert('Edición cancelada');
-        const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
-        this.$router.push(destino);
-      }
-      catch (e) { this.error = e.response?.data?.message || 'No se pudo cancelar.'; }
-      finally { this.saving = false; }
+        await this.load();
+      } catch (e) {
+        this.error = e.response?.data?.message || 'No se pudo cancelar.';
+      } finally { this.saving = false; }
+    },
+    async finalizar() {
+      this.saving = true; this.error = '';
+      try {
+        const payload = {
+          nombre: this.form.nombre || this.edicion.nombre || `Edición ${this.edicion.idEdicion}`,
+          fechaInicio: this.form.fechaInicio || this.edicion.fechaInicio,
+          fechaFin: this.form.fechaFin || this.edicion.fechaFin,
+          estado: ESTADOS_EDICION.FINALIZADA
+        };
+        await EdicionRepository.update(this.edicion.idEdicion, payload);
+        await this.load();
+      } catch (e) {
+        this.error = e.response?.data?.message || 'No se pudo finalizar.';
+      } finally { this.saving = false; }
     },
     async eliminar() {
       if (this.edicion.estado !== ESTADOS_EDICION.BORRADOR) {
@@ -123,7 +127,6 @@ export default {
       this.saving = true; this.error = '';
       try {
         await EdicionRepository.delete(this.edicion.idEdicion);
-        alert('Edición eliminada');
         const destino = `/gestor/exposiciones/${this.$route.params.idExposicion || this.edicion.idExpo}`;
         this.$router.push(destino);
       }

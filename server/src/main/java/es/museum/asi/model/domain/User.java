@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import es.museum.asi.model.enums.EstadoUser;
+import es.museum.asi.model.enums.TipoPermiso;
 import es.museum.asi.model.enums.UserAuthority;
 import jakarta.persistence.*;
 
@@ -27,6 +28,10 @@ public class User {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private UserAuthority autoridad;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "permiso_gestor")
+  private TipoPermiso permisoGestor;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -86,6 +91,14 @@ public class User {
 
   public void setEstado(EstadoUser estado) {
     this.estado = estado;
+  }
+
+  public TipoPermiso getPermisoGestor() {
+    return permisoGestor;
+  }
+
+  public void setPermisoGestor(TipoPermiso permisoGestor) {
+    this.permisoGestor = permisoGestor;
   }
 
   public List<Reserva> getReservas() {

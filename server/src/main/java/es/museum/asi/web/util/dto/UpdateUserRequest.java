@@ -1,6 +1,8 @@
 package es.museum.asi.web.util.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import es.museum.asi.model.enums.EstadoUser;
+import es.museum.asi.model.enums.TipoPermiso;
 import es.museum.asi.model.enums.UserAuthority;
 
 /**
@@ -9,8 +11,11 @@ import es.museum.asi.model.enums.UserAuthority;
 public class UpdateUserRequest {
   private String login;
   private String password;
+  @JsonAlias({"authority", "role"})
   private UserAuthority autoridad;
   private EstadoUser estado;
+  @JsonAlias({"permiso", "tipoGestor", "gestorRol"})
+  private TipoPermiso permisoGestor;
 
   public UpdateUserRequest() {
   }
@@ -26,4 +31,7 @@ public class UpdateUserRequest {
 
   public EstadoUser getEstado() { return estado; }
   public void setEstado(EstadoUser estado) { this.estado = estado; }
+
+  public TipoPermiso getPermisoGestor() { return permisoGestor; }
+  public void setPermisoGestor(TipoPermiso permisoGestor) { this.permisoGestor = permisoGestor; }
 }

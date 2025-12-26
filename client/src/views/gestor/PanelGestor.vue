@@ -59,6 +59,7 @@
 
 <script>
 import ExpoRepository from '@/repositories/ExpoRepository';
+import { getStore } from '@/common/store';
 
 export default {
   name: 'PanelGestor',
@@ -67,6 +68,14 @@ export default {
   },
   created() { this.load(); },
   methods: {
+    canCreateByRole() {
+      const user = getStore().state.user || {};
+      const role = (user.authority || user.autoridad || '').toUpperCase();
+      const permiso = (user.gestorRol || user.permisoGestor || user.tipoGestor || '').toUpperCase();
+      if (role === 'ADMIN') return true;
+      if (role === 'GESTOR') return permiso === 'CREADOR';
+      return false;
+    },
     badgeClass(estado) {
       const map = { ACTIVA: 'badge-success', EN_PREPARACION: 'badge-secondary', BORRADOR: 'badge-secondary', ARCHIVADA: 'badge-dark' };
       return map[estado] || 'badge-secondary';
@@ -83,7 +92,8 @@ export default {
           const permiso = (expo.miPermiso || expo.permiso || expo.tipoPermiso || '').toString().toUpperCase();
           return { ...expo, miPermiso: permiso };
         });
-        this.puedeCrear = this.expos.some(this.esCreador);
+        // Un gestor CREATOR puede crear aunque todavía no tenga expos asignadas
+        this.puedeCrear = this.canCreateByRole() || this.expos.some(this.esCreador);
       } catch (e) { this.error = 'No se pudieron cargar las exposiciones'; }
       finally { this.loading = false; }
     },
