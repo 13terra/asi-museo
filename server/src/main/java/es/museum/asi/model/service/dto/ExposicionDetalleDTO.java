@@ -16,6 +16,7 @@ public class ExposicionDetalleDTO {
   private Long idExposicion;
   private String titulo;
   private String descripcion;
+  private String portadaUrl;
   private EstadoExpo estadoExpo;
 
   //Ediciones asociadas (resumen)
@@ -31,6 +32,7 @@ public class ExposicionDetalleDTO {
     this.idExposicion = exposicion.getIdExposicion();
     this.titulo = exposicion.getTitulo();
     this.descripcion = exposicion.getDescripcion();
+    this.portadaUrl = exposicion.getPortadaUrl();
     this.estadoExpo = exposicion.getEstadoExpo();
     // Mapeamos ediciones a DTOs resumidos
     this.ediciones = exposicion.getEdiciones().stream()
@@ -70,8 +72,16 @@ public class ExposicionDetalleDTO {
     return descripcion;
   }
 
+  public String getPortadaUrl() {
+    return portadaUrl;
+  }
+
   public void setDescripcion(String descripcion) {
     this.descripcion = descripcion;
+  }
+
+  public void setPortadaUrl(String portadaUrl) {
+    this.portadaUrl = portadaUrl;
   }
 
   public EstadoExpo getEstadoExpo() {

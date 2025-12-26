@@ -21,6 +21,10 @@ export default {
     return (await HTTP.get(`exposiciones/${idExposicion}/ediciones`)).data;
   },
 
+  async getByExposicionPublic(idExposicion) {
+    return (await HTTP.get(`exposiciones/${idExposicion}/ediciones/publico`)).data;
+  },
+
   // Alias usado en vistas (gestor/admin y público)
   async listByExpo(idExposicion) {
     return this.getByExposicion(idExposicion);

@@ -77,16 +77,20 @@ public class SecurityConfiguration {
 
         // EXPOS (HU9 - HU19)
         .requestMatchers(HttpMethod.GET, "/api/exposiciones/publico/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/exposiciones/*/publico").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/exposiciones/admin").hasAuthority(UserAuthority.ADMIN.toString())
         .requestMatchers(HttpMethod.GET, "/api/exposiciones/gestor").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
         .requestMatchers("/api/exposiciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // EDICIONES (HU20 - HU26)
         .requestMatchers(HttpMethod.GET, "/api/ediciones/*/publico").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/exposiciones/*/ediciones/publico").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/ediciones/*/piezas-expuestas").permitAll()
         .requestMatchers("/api/ediciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // SESIONES HU31-HU36
         .requestMatchers(HttpMethod.GET, "/api/sesiones/*/publico").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/ediciones/*/sesiones/publico").permitAll()
         .requestMatchers("/api/sesiones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // PIEZAS EXPUESTAS HU27-HU30

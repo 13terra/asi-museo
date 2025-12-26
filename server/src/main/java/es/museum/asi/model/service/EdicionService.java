@@ -160,6 +160,25 @@ public class EdicionService {
       .collect(Collectors.toList());
   }
 
+  /**
+   * Listado de ediciones de una expo (para PÚBLICO)
+   * Solo PUBLICADA
+   */
+  public Collection<EdicionDTO> findPublicByExpo(Long idExposicion)
+    throws NotFoundException {
+
+    Exposicion exposicion = exposicionDao.findById(idExposicion);
+    if (exposicion == null) {
+      throw new NotFoundException(idExposicion.toString(), Exposicion.class);
+    }
+
+    // No verificamos permiso, es público. Pero filtramos por estado.
+    return edicionDao.findByExposicion(idExposicion).stream()
+      .filter(e -> e.getEstado() == EstadoEdicion.PUBLICADA)
+      .map(EdicionDTO::new)
+      .collect(Collectors.toList());
+  }
+
 
   /**
    * HU22 - Editar edición

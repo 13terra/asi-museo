@@ -45,6 +45,8 @@ public class SesionDetalleDTO {
     this.horaInicio = sesion.getHoraInicio();
     this.horaFin = sesion.getHoraFin();
     this.aforo = sesion.getAforo();
+    this.idEdicion = sesion.getEdicion().getIdEdicion();
+    this.nombreExposicion = sesion.getEdicion().getExposicion().getTitulo();
     //Aforo ocupado --> siempre visible
     this.aforoOcupado = sesion.getReservas().stream()
       .filter(r -> r.getEstadoReserva() == EstadoReserva.CONFIRMADA)

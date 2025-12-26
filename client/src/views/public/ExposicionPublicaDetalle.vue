@@ -15,11 +15,19 @@
           <strong>{{ ed.nombre || ed.fechaInicio }}</strong>
           <p class="muted">{{ ed.fechaInicio }} → {{ ed.fechaFin }}</p>
         </div>
-        <router-link :to="`/exposiciones/${expo.idExposicion}/ediciones/${ed.idEdicion}`" class="chip" :class="edBadge(ed.estadoEdicion)">
-          {{ ed.estadoEdicion }}
-        </router-link>
+        <div class="edition-actions">
+          <router-link :to="`/exposiciones/${expo.idExposicion}/ediciones/${ed.idEdicion}`" class="btn-reservar">
+            Reservar entradas
+          </router-link>
+          <router-link :to="`/exposiciones/${expo.idExposicion}/ediciones/${ed.idEdicion}`" class="chip" :class="edBadge(ed.estadoEdicion)">
+            {{ ed.estadoEdicion }}
+          </router-link>
+        </div>
       </div>
     </section>
+  </div>
+  <div v-else-if="error" class="alert alert-danger" style="margin: 20px;">
+    {{ error }}
   </div>
   <div v-else class="loading">
     <div class="spinner-border" role="status"></div>
@@ -53,7 +61,7 @@ export default {
       try {
         const id = this.$route.params.idExposicion || this.$route.params.id;
         this.expo = await ExpoRepository.detailPublic(id);
-        this.ediciones = await EdicionRepository.getByExposicion(id);
+        this.ediciones = await EdicionRepository.getByExposicionPublic(id);
       } catch (e) {
         this.error = 'No se pudo cargar la exposición';
       } finally {
@@ -75,6 +83,9 @@ export default {
 .description { color: #4a5460; }
 .card-box { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 10px 24px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 10px; }
 .edition { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eceff5; padding: 8px 0; }
+.edition-actions { display: flex; align-items: center; gap: 12px; }
+.btn-reservar { background: #1f4b99; color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; text-decoration: none; transition: background 0.2s; }
+.btn-reservar:hover { background: #163a7a; }
 .chip { background: #e8f0ff; color: #1f4b99; padding: 6px 10px; border-radius: 999px; font-weight: 700; text-decoration: none; }
 .chip-green { background: #e3f7e9; color: #1f7a3d; }
 .chip-gray { background: #eef1f6; color: #4a5460; }

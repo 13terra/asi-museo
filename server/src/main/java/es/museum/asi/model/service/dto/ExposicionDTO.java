@@ -1,10 +1,14 @@
 package es.museum.asi.model.service.dto;
 
 import es.museum.asi.model.domain.Exposicion;
+import es.museum.asi.model.domain.Edicion;
+import es.museum.asi.model.enums.EstadoEdicion;
 import es.museum.asi.model.enums.EstadoExpo;
 import es.museum.asi.model.enums.TipoPermiso;
 import jakarta.validation.constraints.NotEmpty;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,9 @@ public class ExposicionDTO {
   private String titulo;
 
   private String descripcion;
+
+  private String portadaUrl;
+  private LocalDate fechaInicioProximaEdicion;
 
   private EstadoExpo estadoExpo;
 
@@ -35,8 +42,17 @@ public class ExposicionDTO {
     this.idExposicion = exposicion.getIdExposicion();
     this.titulo = exposicion.getTitulo();
     this.descripcion = exposicion.getDescripcion();
+    this.portadaUrl = exposicion.getPortadaUrl();
     this.estadoExpo = exposicion.getEstadoExpo();
     this.numEdiciones = exposicion.getEdiciones() != null ? exposicion.getEdiciones().size() : 0;
+
+    if (exposicion.getEdiciones() != null) {
+      this.fechaInicioProximaEdicion = exposicion.getEdiciones().stream()
+        .filter(e -> e.getEstado() == EstadoEdicion.PUBLICADA && (e.getFechaFin().isAfter(LocalDate.now()) || e.getFechaFin().isEqual(LocalDate.now())))
+        .map(Edicion::getFechaInicio)
+        .min(Comparator.naturalOrder())
+        .orElse(null);
+    }
 
     if (incluirPermisos) {
       this.gestores = exposicion.getGestiones().stream()
@@ -69,6 +85,14 @@ public class ExposicionDTO {
 
   public String getDescripcion() {
     return descripcion;
+  }
+
+  public String getPortadaUrl() {
+    return portadaUrl;
+  }
+
+  public LocalDate getFechaInicioProximaEdicion() {
+    return fechaInicioProximaEdicion;
   }
 
   public void setDescripcion(String descripcion) {

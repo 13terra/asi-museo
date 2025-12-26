@@ -14,6 +14,14 @@ export default {
     return (await HTTP.get(`ediciones/${idEdicion}/sesiones?${params.toString()}`)).data;
   },
 
+  async getByEdicionPublic(idEdicion, filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.fecha) params.append('fecha', filters.fecha);
+    if (filters.idSala) params.append('idSala', filters.idSala);
+    
+    return (await HTTP.get(`ediciones/${idEdicion}/sesiones/publico?${params.toString()}`)).data;
+  },
+
   /**
    * HU33 - Detalle de sesión (ADMIN/GESTOR)
    * GET /api/sesiones/{id}/admin

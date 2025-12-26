@@ -62,8 +62,8 @@
                 <span class="badge" v-if="pieza.portada">Portada</span>
                 <span class="muted">Orden {{ pieza.orden }}</span>
               </div>
-              <h4>{{ pieza.obra?.titulo || 'Obra' }}</h4>
-              <p class="muted">{{ pieza.obra?.autor }}</p>
+              <h4>{{ pieza.tituloObra || 'Obra' }}</h4>
+              <p class="muted">{{ pieza.autorObra }}</p>
               <p class="body">{{ pieza.textoCuratorial || 'Sin texto curatorial' }}</p>
             </article>
           </div>
@@ -113,7 +113,7 @@ export default {
         const idEdicion = this.$route.params.idEdicion || this.$route.params.id;
         const [edicion, sesiones, piezas] = await Promise.all([
           EdicionRepository.getDetallePublic(idEdicion),
-          SesionRepository.getByEdicion(idEdicion),
+          SesionRepository.getByEdicionPublic(idEdicion),
           PiezaExpuestaRepository.getByEdicion(idEdicion)
         ]);
         this.edicion = { ...edicion, estado: edicion.estado || edicion.estadoEdicion };

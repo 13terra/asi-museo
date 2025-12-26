@@ -65,6 +65,11 @@ export default {
     return (await HTTP.get(`exposiciones/${idExposicion}/publico`)).data;
   },
 
+  // Alias usado en vistas
+  async detailPublic(idExposicion) {
+    return this.getDetallePublic(idExposicion);
+  },
+
   /**
    * HU12 - Crear exposición
    * POST /api/exposiciones? titulo=...&descripcion=... 

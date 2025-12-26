@@ -172,6 +172,35 @@ public class SesionService {
   }
 
   /**
+   * Listar sesiones (PÚBLICO)
+   * Solo sesiones de ediciones PUBLICADAS.
+   * Solo sesiones DISPONIBLES o COMPLETAS (no CANCELADAS ni BORRADOR si existiera)
+   */
+  public Collection<SesionDTO> findPublicByEdicion(Long idEdicion, LocalDate fecha, Long idSala)
+    throws NotFoundException {
+
+    Edicion edicion =  edicionDao.findById(idEdicion);
+    if (edicion == null) {
+      throw new NotFoundException(idEdicion.toString(), Edicion.class);
+    }
+
+    if (edicion.getEstado() != EstadoEdicion.PUBLICADA) {
+      // Si la edición no es pública, no mostramos sesiones
+      return new ArrayList<>();
+    }
+
+    Collection<Sesion> sesiones = sesionDao.findByEdicion(idEdicion);
+
+    return sesiones.stream()
+      .filter(s -> s.getEstadoSesion() == EstadoSesion.DISPONIBLE || s.getEstadoSesion() == EstadoSesion.COMPLETA)
+      .filter(s -> fecha == null || s.getHoraInicio().toLocalDate().equals(fecha))
+      .filter(s -> idSala == null ||
+        s.getOrdenes().stream().anyMatch(o -> o.getSala().getIdSala().equals(idSala)))
+      .map(SesionDTO::new)
+      .collect(Collectors.toList());
+  }
+
+  /**
    * HU33 - Ver detalle sesion
    * Admin o gestor
    */

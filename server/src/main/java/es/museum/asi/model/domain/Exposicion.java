@@ -23,6 +23,9 @@ public class Exposicion {
   @Column(length = 2000)
   private String descripcion;
 
+  @Column
+  private String portadaUrl;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private EstadoExpo estadoExpo = EstadoExpo.BORRADOR;  //si se usa el constructor de lombok si no inicializamos sería nulo
@@ -64,6 +67,14 @@ public class Exposicion {
 
   public void setDescripcion(String descripcion) {
     this.descripcion = descripcion;
+  }
+
+  public String getPortadaUrl() {
+    return portadaUrl;
+  }
+
+  public void setPortadaUrl(String portadaUrl) {
+    this.portadaUrl = portadaUrl;
   }
 
   public EstadoExpo getEstadoExpo() {

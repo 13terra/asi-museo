@@ -84,6 +84,21 @@ public class SesionResource {
     }
   }
 
+  @GetMapping("/ediciones/{idEdicion}/sesiones/publico")
+  public ResponseEntity<?> findPublicByEdicion(
+      @PathVariable Long idEdicion,
+      @RequestParam(required = false) LocalDate fecha,
+      @RequestParam(required = false) Long idSala) {
+    try {
+      // Público solo ve sesiones DISPONIBLES (o COMPLETA, pero no CANCELADA/BORRADOR si hubiera)
+      // Asumimos que público quiere ver sesiones para reservar.
+      Collection<SesionDTO> sesiones = sesionService.findPublicByEdicion(idEdicion, fecha, idSala);
+      return ResponseEntity.ok(sesiones);
+    } catch (Exception e) {
+      return handle(e);
+    }
+  }
+
   @GetMapping("/sesiones/{idSesion}/admin")
   public ResponseEntity<?> findDetalle(@PathVariable Long idSesion) {
     try {

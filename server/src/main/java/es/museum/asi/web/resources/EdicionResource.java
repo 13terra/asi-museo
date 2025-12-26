@@ -59,6 +59,16 @@ public class EdicionResource {
     }
   }
 
+  @GetMapping("/exposiciones/{idExposicion}/ediciones/publico")
+  public ResponseEntity<?> findPublicByExpo(@PathVariable Long idExposicion) {
+    try {
+      Collection<EdicionDTO> ediciones = edicionService.findPublicByExpo(idExposicion);
+      return ResponseEntity.ok(ediciones);
+    } catch (Exception e) {
+      return handle(e);
+    }
+  }
+
   @GetMapping("/ediciones/{idEdicion}/admin")
   public ResponseEntity<?> findDetalleForAdmin(@PathVariable Long idEdicion) {
     try {

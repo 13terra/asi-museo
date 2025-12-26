@@ -201,7 +201,7 @@ public class ExpoService {
    */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
-  public ExposicionDTO update(Long idExposicion, String titulo, String descripcion, EstadoExpo nuevoEstado)
+  public ExposicionDTO update(Long idExposicion, String titulo, String descripcion, EstadoExpo nuevoEstado, String portadaUrl)
    throws NotFoundException, InvalidPermissionException, OperationNotAllowed {
 
     Exposicion exposicion = exposicionDao.findById(idExposicion);
@@ -222,6 +222,9 @@ public class ExpoService {
     }
     if (descripcion != null) {
       exposicion.setDescripcion(descripcion);
+    }
+    if (portadaUrl != null) {
+      exposicion.setPortadaUrl(portadaUrl);
     }
 
     // Solo CREADOR o ADMIN pueden cambiar el estado

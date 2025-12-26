@@ -102,9 +102,10 @@ public class ExpoResource {
       @PathVariable Long idExposicion,
       @RequestParam(required = false) String titulo,
       @RequestParam(required = false) String descripcion,
-      @RequestParam(required = false) EstadoExpo estado) {
+      @RequestParam(required = false) EstadoExpo estado,
+      @RequestParam(required = false) String portadaUrl) {
     try {
-      return ResponseEntity.ok(expoService.update(idExposicion, titulo, descripcion, estado));
+      return ResponseEntity.ok(expoService.update(idExposicion, titulo, descripcion, estado, portadaUrl));
     } catch (NotFoundException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Exposición no encontrada"));
     } catch (InvalidPermissionException | OperationNotAllowed e) {

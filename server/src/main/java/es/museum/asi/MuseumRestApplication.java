@@ -29,7 +29,7 @@ public class MuseumRestApplication {
   public void init() throws InterruptedException {
     try {
       databaseLoader.loadData();
-    } catch (UserLoginExistsException e) {
+    } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }
   }
