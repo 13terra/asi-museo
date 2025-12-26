@@ -138,6 +138,7 @@
 import { getStore, clearNotification } from "./common/store";
 import auth from "./common/auth";
 import { ROLES } from "./constants";
+import Swal from 'sweetalert2';
 
 export default {
   data() {
@@ -162,7 +163,18 @@ export default {
   methods: {
     // ✅ CORRECCIÓN: Hacer logout asíncrono y esperar antes de redirigir
     async handleLogout() {
-      if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+      const result = await Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: "¿Estás seguro de que quieres salir?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar'
+      });
+
+      if (result.isConfirmed) {
         try {
           // ✅ Esperar a que logout termine
           await auth.logout();
@@ -172,6 +184,12 @@ export default {
           
           // ✅ Usar replace para evitar volver con botón atrás
           await this.$router.replace("/login");
+
+          Swal.fire(
+            '¡Hasta pronto!',
+            'Has cerrado sesión correctamente.',
+            'success'
+          );
         } catch (e) {
           console.error("Error al cerrar sesión:", e);
           // Aunque falle, limpiar y redirigir

@@ -70,7 +70,7 @@ export default {
       try {
         const id = this.$route.params.id;
         this.expo = await ExpoRepository.detailPublic(id);
-        const ediciones = await EdicionRepository.listByExpo(id);
+        const ediciones = await EdicionRepository.getByExposicionPublic(id);
         this.ediciones = (ediciones || []).filter(ed => ed.estadoEdicion === ESTADOS_EDICION.PUBLICADA);
       } catch (e) {
         this.error = "No se pudo cargar la exposición";

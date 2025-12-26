@@ -82,6 +82,7 @@
 import PiezaExpuestaRepository from "@/repositories/PiezaExpuestaRepository";
 import SalaRepository from "@/repositories/SalaRepository";
 import ObraRepository from "@/repositories/ObraRepository";
+import { setNotification } from "@/common/store";
 
 export default {
   name: "GestionPiezas",
@@ -176,7 +177,7 @@ export default {
           portada: pieza.portada
         });
       } catch (e) {
-        alert("No se pudo actualizar portada");
+        setNotification("No se pudo actualizar portada", "error");
       }
     },
     async remove(id) {
@@ -185,7 +186,7 @@ export default {
         await PiezaExpuestaRepository.delete(id);
         await this.load();
       } catch (e) {
-        alert("No se pudo eliminar");
+        setNotification("No se pudo eliminar", "error");
       }
     }
   }

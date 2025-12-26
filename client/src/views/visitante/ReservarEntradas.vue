@@ -78,6 +78,7 @@ import SesionRepository from '@/repositories/SesionRepository';
 import EdicionRepository from '@/repositories/EdicionRepository';
 import TipoEntradaRepository from '@/repositories/TipoEntradaRepository';
 import { ESTADOS_SESION } from '@/constants';
+import { setNotification } from '@/common/store';
 
 export default {
   name: 'ReservarEntradas',
@@ -100,7 +101,15 @@ export default {
     canSubmit() {
       const hasTickets = this.totalEntradas > 0;
       const buyerOk = this.comprador.nombrePila && this.comprador.apellido1 && this.comprador.email && this.comprador.telefono;
-      const asistentesOk = this.entradasDetalle.every(e => e.nombrePila && e.apellido1 && e.dni);
+      
+      const dniRegex = /^\d{8}[A-Za-z]$/;
+      const asistentesOk = this.entradasDetalle.every(e => 
+        e.nombrePila && 
+        e.apellido1 && 
+        e.dni && 
+        dniRegex.test(e.dni)
+      );
+      
       const sesionDisponible = this.sesion?.estado === ESTADOS_SESION.DISPONIBLE;
       return hasTickets && buyerOk && asistentesOk && sesionDisponible;
     }
@@ -162,14 +171,25 @@ export default {
       this.entradasDetalle = next;
     },
     buildPayload() {
-      const entradas = this.entradasDetalle.map(e => ({
-        idTipoEntrada: e.idTipoEntrada,
+      // Filtrar cantidades > 0
+      const entradasPorTipo = {};
+      Object.keys(this.cantidades).forEach(k => {
+        if (this.cantidades[k] > 0) entradasPorTipo[k] = this.cantidades[k];
+      });
+
+      const datosAsistentes = this.entradasDetalle.map(e => ({
         nombrePila: e.nombrePila,
         apellido1: e.apellido1,
         apellido2: e.apellido2,
         dni: e.dni
       }));
-      return { comprador: { ...this.comprador }, entradas };
+
+      return {
+        idSesion: this.sesion.idSesion,
+        ...this.comprador,
+        entradasPorTipo,
+        datosAsistentes
+      };
     },
     async reservar() {
       if (!this.canSubmit) return;
@@ -177,11 +197,14 @@ export default {
       this.error = '';
       try {
         const payload = this.buildPayload();
+        // ReservaRepository.create espera (idSesion, reservaObject)
+        // reservaObject se mezcla con idSesion dentro del repo, así que pasamos payload completo como 2o arg
         await ReservaRepository.create(this.sesion.idSesion, payload);
-        alert('Reserva creada correctamente.');
+        setNotification('Reserva creada correctamente.', 'success');
         this.$router.push({ name: 'MisReservas' });
       } catch (e) {
-        this.error = 'No se pudo crear la reserva.';
+        console.error(e);
+        this.error = 'No se pudo crear la reserva. Verifique los datos.';
       } finally {
         this.submitting = false;
       }

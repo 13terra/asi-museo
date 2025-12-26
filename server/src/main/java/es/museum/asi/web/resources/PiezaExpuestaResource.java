@@ -22,6 +22,9 @@ import es.museum.asi.model.service.PiezaExpuestaService;
 import es.museum.asi.model.service.dto.PiezaExpuestaDTO;
 import es.museum.asi.web.exceptions.InvalidPermissionException;
 import es.museum.asi.web.util.ErrorDTO;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Resource de piezas expuestas (HU27-HU30).
@@ -64,11 +67,27 @@ public class PiezaExpuestaResource {
   @GetMapping("/ediciones/{idEdicion}/piezas-expuestas")
   public ResponseEntity<?> listByEdicion(@PathVariable Long idEdicion) {
     try {
-      Collection<PiezaExpuestaDTO> list = piezaExpuestaService.findByEdicion(idEdicion);
-      return ResponseEntity.ok(list);
+      if (isAdminOrGestor()) {
+        Collection<PiezaExpuestaDTO> list = piezaExpuestaService.findByEdicion(idEdicion);
+        return ResponseEntity.ok(list);
+      } else {
+        Collection<PiezaExpuestaDTO> list = piezaExpuestaService.findByEdicionPublic(idEdicion);
+        return ResponseEntity.ok(list);
+      }
     } catch (Exception e) {
       return handle(e);
     }
+  }
+
+  private boolean isAdminOrGestor() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null) return false;
+    for (GrantedAuthority a : auth.getAuthorities()) {
+      if (a.getAuthority().equals("ADMIN") || a.getAuthority().equals("GESTOR")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @GetMapping("/salas/{idSala}/ediciones/{idEdicion}/piezas-expuestas")

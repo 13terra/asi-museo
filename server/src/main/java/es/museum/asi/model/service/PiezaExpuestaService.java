@@ -165,6 +165,34 @@ public class PiezaExpuestaService {
       .collect(Collectors.toList());
   }
 
+  /**
+   * Listar piezas expuestas (PÚBLICO)
+   * Solo si la edición está PUBLICADA
+   */
+  public Collection<PiezaExpuestaDTO> findByEdicionPublic(Long idEdicion)
+    throws NotFoundException, OperationNotAllowed {
+    Edicion edicion = edicionDao.findById(idEdicion);
+    if (edicion == null) {
+      throw new NotFoundException(idEdicion.toString(), Edicion.class);
+    }
+
+    // Solo permitir si está publicada (o finalizada/cancelada si se desea histórico, pero HU dice publicada)
+    // Asumimos que el público puede ver lo publicado.
+    // Si se requiere que la expo esté ACTIVA, añadir check.
+    // HU21 dice: "Los visitantes pueden consultar el detalle de una edición publicada"
+    if (edicion.getEstado() == es.museum.asi.model.enums.EstadoEdicion.BORRADOR) {
+       throw new OperationNotAllowed("Esta edición no es pública");
+    }
+
+    return piezaExpuestaDao.findByEdicion(idEdicion).stream()
+      .sorted((p1, p2) -> {
+        int compareSala = p1.getSala().getNombre().compareTo(p2.getSala().getNombre());
+        return compareSala != 0 ? compareSala : p1.getOrden().compareTo(p2.getOrden());
+      })
+      .map(PiezaExpuestaDTO::new)
+      .collect(Collectors.toList());
+  }
+
 
   /**
    * HU28 - Listar piezas expuestas

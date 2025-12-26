@@ -45,6 +45,7 @@
 import ReservaRepository from '@/repositories/ReservaRepository';
 import EntradaRepository from '@/repositories/EntradaRepository';
 import { ESTADOS_RESERVA } from '@/constants';
+import { setNotification } from '@/common/store';
 
 export default {
   name: 'ReservaDetalle',
@@ -80,7 +81,7 @@ export default {
         await ReservaRepository.cancelar(this.reserva.idReserva);
         await this.load();
       } catch (e) {
-        alert('No se pudo cancelar la reserva.');
+        setNotification('No se pudo cancelar la reserva.', 'error');
       }
     },
     formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },

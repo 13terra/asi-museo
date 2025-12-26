@@ -42,6 +42,7 @@
 <script>
 import ReservaRepository from '@/repositories/ReservaRepository';
 import { ESTADOS_RESERVA } from '@/constants';
+import { setNotification } from '@/common/store';
 
 export default {
   name: 'MisReservas',
@@ -67,7 +68,7 @@ export default {
         await ReservaRepository.cancelar(id);
         await this.load();
       } catch (e) {
-        alert('No se pudo cancelar la reserva.');
+        setNotification('No se pudo cancelar la reserva.', 'error');
       }
     },
     formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },

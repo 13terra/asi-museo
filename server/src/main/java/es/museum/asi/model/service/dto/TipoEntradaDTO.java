@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 
 public class TipoEntradaDTO {
-  private Long id;
+  private Long idTipoEntrada;
 
   @NotEmpty
   private String nombre;
@@ -21,18 +21,18 @@ public class TipoEntradaDTO {
   }
 
   public TipoEntradaDTO(TipoEntrada tipoEntrada) {
-    this.id = tipoEntrada.getIdTipoEntrada();
+    this.idTipoEntrada = tipoEntrada.getIdTipoEntrada();
     this.nombre = tipoEntrada.getNombre();
     this.precio = tipoEntrada.getPrecio();
     this.descripcion = tipoEntrada.getDescripcion();
   }
 
-  public Long getId() {
-    return id;
+  public Long getIdTipoEntrada() {
+    return idTipoEntrada;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+  public void setIdTipoEntrada(Long idTipoEntrada) {
+    this.idTipoEntrada = idTipoEntrada;
   }
 
   public String getNombre() {

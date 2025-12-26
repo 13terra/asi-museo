@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import auth from '@/common/auth';
-import { getStore } from '@/common/store';
+import { getStore, setNotification } from '@/common/store';
 import { ROLES } from '@/constants';
 
 // ========== VISTAS PÚBLICAS ==========
@@ -241,7 +241,7 @@ router.beforeEach((to, from, next) => {
             next();
           } else {
             // Rol insuficiente
-            alert('No tienes permisos para acceder a esta sección');
+            setNotification('No tienes permisos para acceder a esta sección', 'error');
             // Redirigir según rol
             if (loggedUserAuthority === ROLES.VISITANTE) {
               next('/');
@@ -257,7 +257,7 @@ router.beforeEach((to, from, next) => {
         }
       } else {
         // Usuario no autenticado
-        alert('Esta página requiere autenticación');
+        setNotification('Esta página requiere autenticación', 'warning');
         next({ name: 'Login', query: { redirect: to.fullPath } });
       }
     } else {

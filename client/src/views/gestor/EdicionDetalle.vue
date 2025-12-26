@@ -51,6 +51,7 @@
 import EdicionRepository from "@/repositories/EdicionRepository";
 import ExpoRepository from "@/repositories/ExpoRepository"; // ✅ FIX: Added import
 import { ESTADOS_EDICION, ESTADOS_EXPOSICION } from "@/constants"; // ✅ FIX: Added ESTADOS_EXPOSICION
+import { setNotification } from "@/common/store";
 
 export default {
   name: "EdicionDetalle",
@@ -139,9 +140,9 @@ export default {
             ...this.exposicion,
             estadoExpo: "ACTIVA"
           });
-          alert("Edición publicada y Exposición Activada automáticamente.");
+          setNotification("Edición publicada y Exposición Activada automáticamente.", "success");
         } else {
-          alert("Edición publicada.");
+          setNotification("Edición publicada.", "success");
         }
 
         await this.load();
