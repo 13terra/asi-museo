@@ -100,41 +100,21 @@ public class ObraResource {
 
   @PutMapping(value = "/{idObra}", consumes = {"multipart/form-data"})
   public ResponseEntity<?> update(
-      @PathVariable Long idObra,
-      @RequestParam(required = false) String titulo,
-      @RequestParam(required = false) String autor,
-      @RequestParam(required = false) Integer anoCreacion,
-      @RequestParam(required = false) String tecnica,
-      @RequestParam(required = false) String dimensiones,
-      @RequestParam(required = false) MultipartFile imagenFile,
-      @RequestParam(required = false) EstadoObra estado) {
-    try {
-      return ResponseEntity.ok(
-        obraService.update(idObra, titulo, autor, anoCreacion, tecnica, dimensiones, imagenFile, estado)
-      );
-    } catch (NotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Obra no encontrada"));
-    } catch (OperationNotAllowed e) {
-      return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
-    }
-  }
+    @PathVariable Long idObra,
+    @RequestParam(required = false) String titulo,
+    @RequestParam(required = false) String autor,
+    @RequestParam(required = false) Integer anoCreacion,
+    @RequestParam(required = false) String tecnica,
+    @RequestParam(required = false) String dimensiones,
 
-  @PutMapping(value = "/{idObra}", consumes = {"application/json"})
-  public ResponseEntity<?> updateJson(
-      @PathVariable Long idObra,
-      @org.springframework.web.bind.annotation.RequestBody ObraUpdateRequest request) {
+    @RequestParam(required = false) String imagenUrlMET,
+
+    @RequestParam(required = false) MultipartFile imagenFile,
+    @RequestParam(required = false) EstadoObra estado) {
     try {
+      // Asegúrate de pasar 'imagenUrlMET' a tu servicio también
       return ResponseEntity.ok(
-        obraService.update(
-          idObra,
-          request.getTitulo(),
-          request.getAutor(),
-          request.getAnioCreacion(),
-          request.getTecnica(),
-          request.getDimensiones(),
-          null,
-          request.getEstado()
-        )
+        obraService.update(idObra, titulo, autor, anoCreacion, tecnica, dimensiones, imagenUrlMET, imagenFile, estado)
       );
     } catch (NotFoundException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Obra no encontrada"));

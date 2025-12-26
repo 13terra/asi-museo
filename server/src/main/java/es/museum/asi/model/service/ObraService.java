@@ -154,44 +154,46 @@ public class ObraService {
 
   /**
    * Editar obra del catálogo
+   * AHORA SOPORTA URL DE IMAGEN (MET) Y FICHERO LOCAL
    */
   @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   @Transactional(readOnly = false)
-  public ObraDTO update(Long idObra, String titulo, String autor, Integer anoCreacion, String tecnica, String dimensiones, MultipartFile nuevaImagen, EstadoObra nuevoEstado)
+  public ObraDTO update(Long idObra, String titulo, String autor, Integer anoCreacion,
+                        String tecnica, String dimensiones,
+                        String imagenUrl, // <--- NUEVO PARÁMETRO
+                        MultipartFile nuevaImagen, EstadoObra nuevoEstado)
     throws NotFoundException, OperationNotAllowed  {
+
     Obra obra = obraDao.findById(idObra);
     if (obra == null) {
       throw new NotFoundException(idObra.toString(), Obra.class);
     }
 
-    //Comprobamos si necesitamos actualizar metadatos
+    // 1. Actualizar metadatos básicos
+    if (titulo != null && !titulo.trim().isEmpty()) obra.setTitulo(titulo);
+    if (autor != null) obra.setAutor(autor);
+    if (anoCreacion != null) obra.setAnoCreacion(anoCreacion);
+    if (tecnica != null) obra.setTecnica(tecnica);
+    if (dimensiones != null) obra.setDimensiones(dimensiones);
+    if (nuevoEstado != null) obra.setEstado(nuevoEstado);
 
-    if (titulo != null && !titulo.trim().isEmpty()) {
-      obra.setTitulo(titulo);
-    }
-    if (autor != null) {
-      obra.setAutor(autor);
-    }
-    if (anoCreacion != null) {
-      obra.setAnoCreacion(anoCreacion);
-    }
-    if (tecnica != null) {
-      obra.setTecnica(tecnica);
-    }
-    if (dimensiones != null) {
-      obra.setDimensiones(dimensiones);
-    }
-    if (nuevoEstado != null) {
-      obra.setEstado(nuevoEstado);
-    }
-
-    //Cambio de imagen
+    // 2. Lógica de Imagen (Prioridad: Fichero Local > URL > Mantener la actual)
     if (nuevaImagen != null && !nuevaImagen.isEmpty()) {
-      //Eliminamos la anterior SOLO si es local
+      // CASO A: Subida de fichero
+      // Borramos la anterior si era local para ahorrar espacio
       if (obra.getImagen() != null && !obra.getImagen().startsWith("http")) {
         imagenService.eliminarImagen(obra.getImagen());
       }
       String nuevaRutaImagen = imagenService.guardarImagen(nuevaImagen, "obras");
+      obra.setImagen(nuevaRutaImagen);
+
+    } else if (imagenUrl != null && !imagenUrl.trim().isEmpty()) {
+      // CASO B: Actualización de URL (The MET)
+      // Borramos la anterior si era local, porque ahora pasamos a usar una URL externa
+      if (obra.getImagen() != null && !obra.getImagen().startsWith("http")) {
+        imagenService.eliminarImagen(obra.getImagen());
+      }
+      obra.setImagen(imagenUrl);
     }
 
     obraDao.update(obra);
