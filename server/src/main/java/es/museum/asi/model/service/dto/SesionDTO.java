@@ -29,6 +29,7 @@ public class SesionDTO {
   private Long idEdicion;
   private String nombreExposicion;
   private List<String> nombresSalas;
+  private List<Long> idSalas;
 
   public SesionDTO(Sesion sesion) {
     this.idSesion = sesion.getIdSesion();
@@ -49,6 +50,12 @@ public class SesionDTO {
     this.nombresSalas = sesion.getOrdenes().stream()
       .sorted((o1, o2) -> o1.getOrden().compareTo(o2.getOrden()))
       .map(orden -> orden.getSala().getNombre())
+      .collect(Collectors.toList());
+
+    // Obtener ids de salas ordenadas
+    this.idSalas = sesion.getOrdenes().stream()
+      .sorted((o1, o2) -> o1.getOrden().compareTo(o2.getOrden()))
+      .map(orden -> orden.getSala().getIdSala())
       .collect(Collectors.toList());
   }
 
@@ -123,5 +130,13 @@ public class SesionDTO {
 
   public void setNombresSalas(List<String> nombresSalas) {
     this.nombresSalas = nombresSalas;
+  }
+
+  public List<Long> getIdSalas() {
+    return idSalas;
+  }
+
+  public void setIdSalas(List<Long> idSalas) {
+    this.idSalas = idSalas;
   }
 }

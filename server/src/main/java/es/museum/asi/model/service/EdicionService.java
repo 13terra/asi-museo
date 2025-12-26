@@ -292,6 +292,14 @@ public class EdicionService {
     edicion.setEstado(EstadoEdicion.PUBLICADA);
     edicionDao.update(edicion);
 
+    // Auto-publicar exposición si está en borrador
+    Exposicion expo = edicion.getExposicion();
+    if (expo.getEstadoExpo() == EstadoExpo.BORRADOR) {
+      expo.setEstadoExpo(EstadoExpo.ACTIVA);
+      exposicionDao.update(expo);
+      logger.info("Exposición {} activada automáticamente al publicar edición {}", expo.getIdExposicion(), idEdicion);
+    }
+
     logger.info("Edición {} publicada.  Exposición:  '{}'",
       idEdicion, edicion.getExposicion().getTitulo());
 

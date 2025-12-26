@@ -73,7 +73,7 @@
       </div>
     </section>
 
-    <section class="card">
+    <section class="card" ref="formSection">
       <div class="section-head">
         <div>
           <p class="eyebrow">Formulario</p>
@@ -279,7 +279,12 @@ export default {
       };
 
       if (this.$refs.fileInput) this.$refs.fileInput.value = "";
-      window.scrollTo({ top: 300, behavior: "smooth" });
+      
+      this.$nextTick(() => {
+        if (this.$refs.formSection) {
+          this.$refs.formSection.scrollIntoView({ behavior: "smooth" });
+        }
+      });
     },
 
     async save() {
@@ -410,7 +415,12 @@ export default {
 
         this.editId = null;
         if (this.$refs.fileInput) this.$refs.fileInput.value = "";
-        window.scrollTo({ top: 300, behavior: "smooth" });
+        
+        this.$nextTick(() => {
+          if (this.$refs.formSection) {
+            this.$refs.formSection.scrollIntoView({ behavior: "smooth" });
+          }
+        });
 
         const Toast = Swal.mixin({
           toast: true,

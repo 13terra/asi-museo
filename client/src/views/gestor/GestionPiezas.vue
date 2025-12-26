@@ -59,9 +59,9 @@
         <article v-for="pieza in piezas" :key="pieza.idPiezaExpuesta" class="item">
           <div>
             <p class="eyebrow">#{{ pieza.idPiezaExpuesta }} · Orden {{ pieza.orden }}</p>
-            <h4>{{ pieza.obra?.titulo || "Obra" }}</h4>
-            <p class="muted">{{ pieza.obra?.autor }}</p>
-            <p class="muted">Sala: {{ pieza.sala?.nombre || pieza.idSala }}</p>
+            <h4>{{ pieza.tituloObra || "Obra" }}</h4>
+            <p class="muted">{{ pieza.autorObra }}</p>
+            <p class="muted">Sala: {{ pieza.nombreSala || pieza.idSala }}</p>
             <p class="body">{{ pieza.textoCuratorial || "Sin texto curatorial" }}</p>
           </div>
           <div class="item-actions">
@@ -160,8 +160,8 @@ export default {
     startEdit(pieza) {
       this.editingId = pieza.idPiezaExpuesta;
       this.form = {
-        idObra: pieza.obra?.idObra || pieza.idObra,
-        idSala: pieza.sala?.idSala || pieza.idSala,
+        idObra: pieza.idObra,
+        idSala: pieza.idSala,
         orden: pieza.orden,
         textoCuratorial: pieza.textoCuratorial,
         portada: pieza.portada
