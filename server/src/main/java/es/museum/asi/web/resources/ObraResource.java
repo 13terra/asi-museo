@@ -1,9 +1,15 @@
 package es.museum.asi.web.resources;
 
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.Collection;
 
+import es.museum.asi.model.service.ImagenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +29,6 @@ import es.museum.asi.model.service.ObraService;
 import es.museum.asi.model.service.dto.ObraDTO;
 import es.museum.asi.web.util.ErrorDTO;
 import es.museum.asi.web.resources.dto.ObraCreateRequest;
-import es.museum.asi.web.resources.dto.ObraUpdateRequest;
 
 /**
  * Resource de obras (HU43-HU47) + búsqueda.
@@ -35,6 +40,9 @@ public class ObraResource {
 
   @Autowired
   private ObraService obraService;
+
+  @Autowired
+  private ImagenService imagenService;
 
   @GetMapping
   public ResponseEntity<Collection<ObraDTO>> findAll(
@@ -134,4 +142,27 @@ public class ObraResource {
       return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
     }
   }
+
+
+  @GetMapping("/imagenes/{carpeta}/{nombreFichero:.+}")
+  public ResponseEntity<Resource> servirImagen(@PathVariable String carpeta, @PathVariable String nombreFichero) {
+    // Reconstruimos la ruta relativa que guardamos en BD (ej: "obras/foto.jpg")
+    String rutaRelativa = carpeta + "/" + nombreFichero;
+
+    try {
+      Path rutaArchivo = imagenService.getImagePath(rutaRelativa);
+      Resource recurso = new UrlResource(rutaArchivo.toUri());
+
+      if (recurso.exists() && recurso.isReadable()) {
+        return ResponseEntity.ok()
+          .contentType(MediaType.IMAGE_JPEG)
+          .body(recurso);
+      } else {
+        return ResponseEntity.notFound().build();
+      }
+    } catch (MalformedURLException e) {
+      return ResponseEntity.badRequest().build();
+    }
+  }
 }
+
