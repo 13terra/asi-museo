@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "reserva")
-@NoArgsConstructor(access = AccessLevel.PUBLIC)    //hacerlo así o con el constructor sin parámetros --> pero siempre de la misma manera
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Reserva {
 
   @Id

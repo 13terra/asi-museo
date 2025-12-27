@@ -35,7 +35,6 @@ public class Edicion {
   @Column
   private String nombre;
 
-  // optional? supongo que false
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Exposicion exposicion;
 
@@ -45,7 +44,6 @@ public class Edicion {
   @OneToMany(mappedBy = "edicion")
   private List<PiezaExpuesta> piezasExpuestas = new ArrayList<>();
 
-  // no estoy seguro --> ¿hace falta el estado?
   public Edicion(Exposicion exposicion, LocalDate fechaInicio, LocalDate fechaFin) {
     this.exposicion = exposicion;
     this.fechaInicio = fechaInicio;
