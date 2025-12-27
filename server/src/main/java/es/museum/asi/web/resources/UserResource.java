@@ -38,7 +38,6 @@ import es.museum.asi.web.util.dto.UpdateUserRequest;
  */
 @RestController
 @RequestMapping("/api/users")
-@PreAuthorize("hasAuthority('ADMIN')")
 @CrossOrigin(origins = "*")
 public class UserResource {
 
@@ -51,6 +50,7 @@ public class UserResource {
    * HU4 - Listar usuarios con filtros opcionales.
    */
   @GetMapping
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   public ResponseEntity<Collection<UserDTOPublic>> listUsers(
       @RequestParam(required = false) UserAuthority autoridad,
       @RequestParam(required = false) EstadoUser estado) {
@@ -70,13 +70,15 @@ public class UserResource {
    * HU5 - Crear usuario (ADMIN).
    */
   @PostMapping
+  @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<?> createUser(@RequestBody CreateUserRequest request)
       throws UserLoginExistsException {
 
     logger.info("Creando usuario: login={}, autoridad={}", request.getLogin(), request.getAutoridad());
 
     try {
-      UserDTOPrivate created = userService.createUser(request.getLogin(), request.getPassword(), request.getAutoridad(), request.getPermisoGestor());
+      UserDTOPrivate created = userService.createUser(request.getLogin(), request.getPassword(), request.getAutoridad(),
+          request.getPermisoGestor());
       return ResponseEntity.status(HttpStatus.CREATED).body(toPublic(created));
     } catch (UserLoginExistsException e) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDTO("El login ya existe"));
@@ -98,13 +100,12 @@ public class UserResource {
 
     try {
       UserDTOPublic updated = userService.updateUser(
-        idUser,
-        request.getLogin(),
-        request.getPassword(),
-        request.getAutoridad(),
-        request.getEstado(),
-        request.getPermisoGestor()
-      );
+          idUser,
+          request.getLogin(),
+          request.getPassword(),
+          request.getAutoridad(),
+          request.getEstado(),
+          request.getPermisoGestor());
       return ResponseEntity.ok(updated);
     } catch (NotFoundException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Usuario no encontrado"));
@@ -117,6 +118,7 @@ public class UserResource {
    * HU8 - Activar usuario.
    */
   @PutMapping("/{idUser}/activate")
+  @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<?> activate(@PathVariable Long idUser) {
     try {
       return ResponseEntity.ok(userService.activateUser(idUser));
@@ -131,6 +133,7 @@ public class UserResource {
    * HU8 - Desactivar usuario.
    */
   @PutMapping("/{idUser}/deactivate")
+  @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<?> deactivate(@PathVariable Long idUser) {
     try {
       return ResponseEntity.ok(userService.deactivateUser(idUser));
@@ -145,6 +148,7 @@ public class UserResource {
    * HU7 - Eliminar usuario.
    */
   @DeleteMapping("/{idUser}")
+  @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<?> delete(@PathVariable Long idUser) {
     try {
       userService.deleteById(idUser);
