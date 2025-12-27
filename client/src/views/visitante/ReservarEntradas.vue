@@ -252,7 +252,14 @@ export default {
         this.$router.push({ name: 'MisReservas' });
       } catch (e) {
         console.error('Error creating reserva:', e);
-        this.error = e.response?.data?.message || 'No se pudo crear la reserva. Verifique los datos.';
+        // Si es error de permisos (403), mostrar notificación en lugar de bloquear la vista
+        if (e.response && e.response.status === 403) {
+           setNotification('No tienes permisos para realizar reservas (Solo VISITANTES).', 'error');
+        } else {
+           // Otros errores sí pueden mostrarse en el formulario o como notificación
+           const msg = e.response?.data?.message || 'No se pudo crear la reserva. Verifique los datos.';
+           setNotification(msg, 'error');
+        }
       } finally {
         this.submitting = false;
       }

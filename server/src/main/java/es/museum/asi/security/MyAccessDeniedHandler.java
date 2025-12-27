@@ -21,6 +21,6 @@ public class MyAccessDeniedHandler implements AccessDeniedHandler {
       AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
     logger.debug("Access denied");
-    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access Denied");
+    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
   }
 }

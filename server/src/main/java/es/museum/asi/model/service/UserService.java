@@ -50,7 +50,7 @@ public class UserService {
    * HU 4 - Listado de usuarios (sólo para ADMIN)
    * Filtra por rol o estado según parámetros
    */
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   public List<UserDTOPublic> findAll() {
     return userDao.findAll().stream().map(UserDTOPublic::new).collect(Collectors.toList());
   }
@@ -58,7 +58,7 @@ public class UserService {
   /**
    * HU 4 - Listado de usuarios por autoridad
    */
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   public List<UserDTOPublic> findByAutoridad(UserAuthority autoridad) {
     return userDao.findAll().stream().filter(user -> user.getAutoridad().equals(autoridad)).map(UserDTOPublic::new).collect(Collectors.toList());
   }
@@ -66,7 +66,7 @@ public class UserService {
   /**
    * HU 4 - Listado de usuarios por estado
    */
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'GESTOR')")
   public List<UserDTOPublic> findByEstado(EstadoUser estado) {
     return userDao.findAll().stream().filter(user -> user.getEstado().equals(estado)).map(UserDTOPublic::new).collect(Collectors.toList());
   }

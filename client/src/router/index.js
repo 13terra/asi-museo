@@ -109,7 +109,7 @@ const routes = [
     path: '/sesiones/:idSesion/reservar',
     name: 'ReservarEntradas',
     component: ReservarEntradas,
-    meta: { authority: ROLES.VISITANTE }
+    meta: { authority: [ROLES.VISITANTE, ROLES.GESTOR, ROLES.ADMIN] }
   },
 
   // ========== GESTOR ==========
@@ -236,6 +236,14 @@ router.beforeEach((to, from, next) => {
           if (loggedUserAuthority === ROLES.ADMIN) {
             // ADMIN tiene acceso total (puede acceder a rutas de GESTOR también)
             next();
+          } else if (Array.isArray(requiredAuthority)) {
+            // Si requiredAuthority es un array, comprobamos si el rol del usuario está incluido
+            if (requiredAuthority.includes(loggedUserAuthority)) {
+              next();
+            } else {
+              setNotification('No tienes permisos para acceder a esta sección', 'error');
+              next(false);
+            }
           } else if (requiredAuthority === loggedUserAuthority) {
             // El rol coincide
             next();

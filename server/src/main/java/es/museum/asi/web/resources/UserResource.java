@@ -89,6 +89,7 @@ public class UserResource {
    * HU6 - Editar usuario (login/autoridad/estado/contraseña).
    */
   @PutMapping("/{idUser}")
+  @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<?> updateUser(
       @PathVariable Long idUser,
       @RequestBody UpdateUserRequest request,

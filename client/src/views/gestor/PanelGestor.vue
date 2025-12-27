@@ -117,7 +117,7 @@
 
 <script>
 import ExpoRepository from '@/repositories/ExpoRepository';
-import { getStore } from '@/common/store';
+import { getStore, setNotification } from '@/common/store';
 
 export default {
   name: 'PanelGestor',
@@ -173,25 +173,29 @@ export default {
     esCreador(expo) { return (expo.miPermiso || '').toUpperCase() === 'CREADOR'; },
     async toggleArchive(expo) {
       if (this.actionLoading) return;
-      this.actionLoading = true; this.error = '';
+      this.actionLoading = true;
+      // No limpiamos this.error aquí para no ocultar la lista si falla
       try {
         if (expo.estadoExpo === 'ARCHIVADA') await ExpoRepository.desarchivar(expo.idExposicion);
         else await ExpoRepository.archivar(expo.idExposicion);
         await this.load();
       } catch (e) {
-        this.error = e.response?.data?.message || 'No se pudo cambiar el estado';
+        // Usar alert o notificación en lugar de bloquear la vista
+        const msg = e.response?.data?.message || 'No se pudo cambiar el estado';
+        setNotification(msg, 'error');
       } finally {
         this.actionLoading = false;
       }
     },
     async eliminar(expo) {
       if (!confirm('¿Eliminar esta exposición?')) return;
-      this.actionLoading = true; this.error = '';
+      this.actionLoading = true;
       try {
         await ExpoRepository.delete(expo.idExposicion);
         await this.load();
       } catch (e) {
-        this.error = e.response?.data?.message || 'No se pudo eliminar';
+        const msg = e.response?.data?.message || 'No se pudo eliminar';
+        setNotification(msg, 'error');
       } finally {
         this.actionLoading = false;
       }

@@ -28,12 +28,20 @@ public class GlobalControllerExceptionHandler {
     return new ErrorDTO(e.getMessage());
   }
 
-  @ExceptionHandler({ CredentialsAreNotValidException.class, AccessDeniedException.class })
+  @ExceptionHandler({ CredentialsAreNotValidException.class })
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ResponseBody
   public ErrorDTO badCredentialsExceptionHandler(Exception e) {
     logger.info(e.getMessage(), e);
     return new ErrorDTO("Bad Credentials");
+  }
+
+  @ExceptionHandler({ AccessDeniedException.class })
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  @ResponseBody
+  public ErrorDTO accessDeniedExceptionHandler(Exception e) {
+    logger.info(e.getMessage(), e);
+    return new ErrorDTO("Access Denied");
   }
 
   @ExceptionHandler({ UserNotActiveException.class })
