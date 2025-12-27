@@ -1,42 +1,73 @@
 <template>
-  <div class="catalog-shell">
-    <header class="catalog-header">
-      <div class="brand">Catálogo público</div>
-      <div class="auth-links">
-        <router-link v-if="!user.logged" to="/login">Iniciar sesión</router-link>
-        <router-link v-if="!user.logged" to="/register">Registrarse</router-link>
-        <button v-if="user.logged" class="link-btn" @click="logout">Salir</button>
+  <div class="container animate-slide-up">
+    <header class="d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <h1 class="display-5 mb-2">Catálogo Público</h1>
+        <p class="text-muted">Exposiciones activas con ediciones publicadas vigentes.</p>
+      </div>
+      <div class="d-flex gap-3 align-items-center">
+        <template v-if="!user.logged">
+          <router-link class="btn btn-outline-primary" to="/login">Iniciar sesión</router-link>
+          <router-link class="btn btn-primary" to="/register">Registrarse</router-link>
+        </template>
+        <button v-else class="btn btn-outline-danger" @click="logout">
+          <i class="bi bi-box-arrow-right"></i> Salir
+        </button>
       </div>
     </header>
 
-    <section class="search-bar">
-      <input v-model="searchTerm" type="search" placeholder="Buscar exposiciones" @keyup.enter="search" />
-      <button @click="search" :disabled="loading">Buscar</button>
+    <section class="row justify-content-center mb-5">
+      <div class="col-md-8">
+        <div class="input-group input-group-lg shadow-sm">
+          <input 
+            v-model="searchTerm" 
+            type="search" 
+            class="form-control border-0" 
+            placeholder="Buscar exposiciones por título..." 
+            @keyup.enter="search" 
+          />
+          <button class="btn btn-primary px-4" @click="search" :disabled="loading">
+            <i class="bi bi-search"></i> Buscar
+          </button>
+        </div>
+      </div>
     </section>
 
-    <p class="subtitle">Exposiciones activas con ediciones publicadas vigentes.</p>
-
-    <div v-if="loading" class="center">
-      <div class="spinner-border" role="status"></div>
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
     </div>
 
-    <div v-else-if="error" class="alert alert-danger" role="alert">
-      {{ error }}
+    <div v-else-if="error" class="alert alert-danger shadow-sm" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
     </div>
 
-    <div v-else class="cards-grid">
-      <div v-if="expos.length === 0" class="empty">No hay exposiciones disponibles.</div>
-      <article class="expo-card" v-for="expo in expos" :key="expo.idExposicion">
-        <div class="expo-image">Imagen obra</div>
-        <div class="expo-body">
-          <div class="expo-meta">
-            <span class="badge" :class="badgeClass(expo.estadoExpo)">{{ expo.estadoExpo }}</span>
-          </div>
-          <h3>{{ expo.titulo }}</h3>
-          <p class="description">{{ expo.descripcion || "Sin descripción" }}</p>
-          <router-link :to="`/catalogo/${expo.idExposicion}`" class="link-btn">Ver detalle</router-link>
+    <div v-else class="row g-4">
+      <div v-if="expos.length === 0" class="col-12 text-center py-5">
+        <div class="p-5 border border-dashed rounded-3 bg-light">
+          <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+          <p class="h5 text-muted">No hay exposiciones disponibles.</p>
         </div>
-      </article>
+      </div>
+      
+      <div class="col-md-6 col-lg-4" v-for="expo in expos" :key="expo.idExposicion">
+        <article class="card h-100 shadow-hover border-0">
+          <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+            <i class="bi bi-image text-muted display-4"></i>
+          </div>
+          <div class="card-body d-flex flex-column">
+            <div class="mb-2">
+              <span class="badge rounded-pill" :class="badgeClass(expo.estadoExpo)">{{ expo.estadoExpo }}</span>
+            </div>
+            <h3 class="card-title h5 fw-bold mb-3">{{ expo.titulo }}</h3>
+            <p class="card-text text-muted flex-grow-1">{{ expo.descripcion || "Sin descripción disponible." }}</p>
+            <router-link :to="`/catalogo/${expo.idExposicion}`" class="btn btn-outline-primary w-100 mt-3">
+              Ver detalle <i class="bi bi-arrow-right ms-1"></i>
+            </router-link>
+          </div>
+        </article>
+      </div>
     </div>
   </div>
 </template>
@@ -63,11 +94,11 @@ export default {
   methods: {
     badgeClass(estado) {
       const map = {
-        BORRADOR: "badge-gray",
-        ACTIVA: "badge-green",
-        ARCHIVADA: "badge-dark"
+        BORRADOR: "bg-secondary",
+        ACTIVA: "bg-success",
+        ARCHIVADA: "bg-dark"
       };
-      return map[estado] || "badge-gray";
+      return map[estado] || "bg-secondary";
     },
     async loadPublic() {
       this.loading = true;
@@ -103,150 +134,5 @@ export default {
 </script>
 
 <style scoped>
-.catalog-shell {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 32px 20px 48px;
-}
-
-.catalog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.brand {
-  font-weight: 800;
-  font-size: 24px;
-}
-
-.auth-links {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  font-weight: 700;
-}
-
-.auth-links a,
-.link-btn {
-  color: #1f4b99;
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.search-bar {
-  display: flex;
-  gap: 12px;
-  margin: 12px 0 8px;
-}
-
-.search-bar input {
-  flex: 1;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #d9deea;
-}
-
-.search-bar button {
-  padding: 12px 18px;
-  border-radius: 12px;
-  border: none;
-  background: #1f4b99;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.subtitle {
-  color: #5b6472;
-  margin: 0 0 16px;
-}
-
-.center {
-  display: flex;
-  justify-content: center;
-  padding: 40px 0;
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.expo-card {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.expo-image {
-  background: linear-gradient(135deg, #dbe6ff, #f0f4ff);
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #345;
-}
-
-.expo-body {
-  padding: 14px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.expo-meta {
-  display: flex;
-  justify-content: space-between;
-}
-
-.badge {
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 12px;
-}
-
-.badge-green {
-  background: #e3f7e9;
-  color: #1f7a3d;
-}
-
-.badge-gray {
-  background: #eef1f6;
-  color: #5b6472;
-}
-
-.badge-dark {
-  background: #dfe2e7;
-  color: #2a2f36;
-}
-
-.description {
-  margin: 0;
-  color: #4a5460;
-  min-height: 48px;
-}
-
-.empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  color: #5b6472;
-  padding: 24px;
-  border: 1px dashed #d9deea;
-  border-radius: 12px;
-}
+/* Styles are now handled by global main.css */
 </style>

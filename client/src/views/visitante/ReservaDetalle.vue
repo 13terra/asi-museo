@@ -3,8 +3,8 @@
     <header class="head" v-if="reserva">
       <div>
         <p class="eyebrow">Reserva #{{ reserva.idReserva }}</p>
-        <h1>{{ reserva.exposicion?.titulo || 'Exposición' }}</h1>
-        <p class="muted">{{ formatFecha(reserva.sesion?.fecha) }} · {{ formatHora(reserva.sesion?.horaInicio) }} · {{ reserva.sesion?.salas?.map(s=>s.nombre).join(', ') }}</p>
+        <h1>{{ reserva.nombreExposicion || 'Exposición' }}</h1>
+        <p class="muted">{{ formatFecha(reserva.fechaHoraSesion) }} · {{ formatHora(reserva.fechaHoraSesion) }}</p>
       </div>
       <span class="chip" :class="stateClass(reserva.estado)">{{ reserva.estado }}</span>
     </header>
@@ -15,8 +15,8 @@
     <div v-else class="grid">
       <section class="card">
         <h3>Datos del comprador</h3>
-        <p class="body">{{ reserva.comprador?.nombrePila }} {{ reserva.comprador?.apellido1 }} {{ reserva.comprador?.apellido2 }}</p>
-        <p class="muted">{{ reserva.comprador?.email }} · {{ reserva.comprador?.telefono }} · {{ reserva.comprador?.pais }}</p>
+        <p class="body">{{ reserva.nombrePila }} {{ reserva.apellido1 }} {{ reserva.apellido2 }}</p>
+        <p class="muted">{{ reserva.email }} · {{ reserva.telefono }} · {{ reserva.pais }}</p>
         <div class="pill">{{ formatPrice(reserva.importeTotal || 0) }}</div>
       </section>
 
@@ -27,8 +27,8 @@
           <article v-for="entrada in entradas" :key="entrada.idEntrada" class="entrada">
             <div>
               <strong>#{{ entrada.idEntrada }}</strong>
-              <p class="muted">{{ entrada.tipoEntrada?.nombre }} · {{ formatPrice(entrada.precio || entrada.tipoEntrada?.precio) }}</p>
-              <p class="body">{{ entrada.nombrePila }} {{ entrada.apellido1 }} {{ entrada.apellido2 }} · {{ entrada.dni }}</p>
+              <p class="muted">{{ entrada.tipoEntrada }} · {{ formatPrice(entrada.precio) }}</p>
+              <p class="body">{{ entrada.nombreCompletoAsistente }} · {{ entrada.dni }}</p>
             </div>
             <router-link :to="{ name: 'EntradaDetalle', params: { idEntrada: entrada.idEntrada } }" class="btn-ghost">Ver entrada</router-link>
           </article>
@@ -84,8 +84,22 @@ export default {
         setNotification('No se pudo cancelar la reserva.', 'error');
       }
     },
-    formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },
-    formatHora(v) { return v ? new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''; },
+    formatFecha(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) return new Date(v[0], v[1] - 1, v[2]).toLocaleDateString();
+      return new Date(v).toLocaleDateString();
+    },
+    formatHora(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) {
+        if (v.length === 2) return `${v[0].toString().padStart(2, '0')}:${v[1].toString().padStart(2, '0')}`;
+        if (v.length >= 5) return `${v[3].toString().padStart(2, '0')}:${v[4].toString().padStart(2, '0')}`;
+      }
+      if (typeof v === 'string' && v.includes(':') && !v.includes('T')) {
+        return v.substring(0, 5);
+      }
+      return new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
     formatPrice(v) { return `${Number(v || 0).toFixed(2)} €`; },
     stateClass(estado) {
       return {

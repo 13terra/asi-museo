@@ -24,6 +24,6 @@ export default {
    * @returns {Promise<Array>}
    */
   async getByReserva(idReserva) {
-    return (await HTTP.get(`reservas/${idReserva}/entradas`)).data;
+    return (await HTTP.get(`mis-reservas/${idReserva}/entradas`)).data;
   }
 };

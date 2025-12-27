@@ -1,110 +1,138 @@
 <template>
-  <div class="panel-container">
-    <div class="panel-header">
+  <div class="container py-5 animate-slide-up">
+    <div class="d-flex justify-content-between align-items-start mb-5">
       <div>
-        <p class="eyebrow">Panel de administración</p>
-        <h1>Resumen general</h1>
-        <p class="subtitle">Visión rápida de usuarios, salas y exposiciones. </p>
+        <p class="text-uppercase text-gold ls-1 mb-2 fw-bold">Panel de administración</p>
+        <h1 class="display-5 font-playfair mb-2">Resumen general</h1>
+        <p class="text-muted lead mb-0">Visión rápida de usuarios, salas y exposiciones.</p>
       </div>
     </div>
 
     <!-- ESTADÍSTICAS -->
-    <section class="stats-grid">
-      <article class="stat-card">
-        <div class="stat-icon bg-primary">
-          <i class="bi bi-people"></i>
-        </div>
-        <div class="stat-content">
-          <p class="stat-label">Usuarios totales</p>
-          <h2 class="stat-value">{{ stats.users }}</h2>
-          <p class="stat-detail">
-            Admins: {{ stats.admins }} · Gestores: {{ stats.gestores }} · Visitantes: {{ stats.visitantes }}
-          </p>
-        </div>
-      </article>
+    <section class="row g-4 mb-5">
+      <div class="col-md-4">
+        <article class="card shadow-sm border-0 h-100">
+          <div class="card-body p-4 d-flex align-items-start gap-3">
+            <div class="rounded-3 bg-primary text-white p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="bi bi-people fs-4"></i>
+            </div>
+            <div>
+              <p class="text-muted small text-uppercase fw-bold mb-1">Usuarios totales</p>
+              <h2 class="display-6 fw-bold text-dark mb-1">{{ stats.users }}</h2>
+              <p class="small text-muted mb-0">
+                Admins: {{ stats.admins }} · Gestores: {{ stats.gestores }} · Visitantes: {{ stats.visitantes }}
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
 
-      <article class="stat-card">
-        <div class="stat-icon bg-warning">
-          <i class="bi bi-building"></i>
-        </div>
-        <div class="stat-content">
-          <p class="stat-label">Salas registradas</p>
-          <h2 class="stat-value">{{ stats.salas }}</h2>
-          <p class="stat-detail">Todas las salas disponibles para planificar sesiones</p>
-        </div>
-      </article>
+      <div class="col-md-4">
+        <article class="card shadow-sm border-0 h-100">
+          <div class="card-body p-4 d-flex align-items-start gap-3">
+            <div class="rounded-3 bg-gold text-white p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="bi bi-building fs-4"></i>
+            </div>
+            <div>
+              <p class="text-muted small text-uppercase fw-bold mb-1">Salas registradas</p>
+              <h2 class="display-6 fw-bold text-dark mb-1">{{ stats.salas }}</h2>
+              <p class="small text-muted mb-0">Todas las salas disponibles para planificar sesiones</p>
+            </div>
+          </div>
+        </article>
+      </div>
 
-      <article class="stat-card">
-        <div class="stat-icon bg-success">
-          <i class="bi bi-kanban"></i>
-        </div>
-        <div class="stat-content">
-          <p class="stat-label">Exposiciones</p>
-          <h2 class="stat-value">{{ stats.expos }}</h2>
-          <p class="stat-detail">{{ stats.archivadas }} archivadas</p>
-        </div>
-      </article>
+      <div class="col-md-4">
+        <article class="card shadow-sm border-0 h-100">
+          <div class="card-body p-4 d-flex align-items-start gap-3">
+            <div class="rounded-3 bg-success text-white p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="bi bi-kanban fs-4"></i>
+            </div>
+            <div>
+              <p class="text-muted small text-uppercase fw-bold mb-1">Exposiciones</p>
+              <h2 class="display-6 fw-bold text-dark mb-1">{{ stats.expos }}</h2>
+              <p class="small text-muted mb-0">{{ stats.archivadas }} archivadas</p>
+            </div>
+          </div>
+        </article>
+      </div>
     </section>
 
     <!-- ACCESOS DIRECTOS -->
-    <section class="shortcuts-section">
-      <h3 class="section-title">Accesos rápidos</h3>
-      <div class="shortcuts-grid">
-        <div class="shortcut-card" @click="go('GestionUsuarios')">
-          <div class="shortcut-icon bg-primary">
-            <i class="bi bi-people-fill"></i>
+    <section>
+      <h3 class="h4 font-playfair mb-4">Accesos rápidos</h3>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="card shadow-sm border-0 h-100 cursor-pointer hover-lift" @click="go('GestionUsuarios')">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+              <div class="rounded-3 bg-primary bg-opacity-10 text-primary p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-people-fill fs-5"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h4 class="h6 fw-bold mb-1">Gestionar usuarios</h4>
+                <p class="small text-muted mb-0">Altas, bajas y roles</p>
+              </div>
+              <i class="bi bi-arrow-right text-muted"></i>
+            </div>
           </div>
-          <div class="shortcut-content">
-            <h4>Gestionar usuarios</h4>
-            <p>Altas, bajas y roles</p>
-          </div>
-          <i class="bi bi-arrow-right shortcut-arrow"></i>
         </div>
 
-        <div class="shortcut-card" @click="go('GestionSalasAdmin')">
-          <div class="shortcut-icon bg-warning">
-            <i class="bi bi-building"></i>
+        <div class="col-md-6 col-lg-3">
+          <div class="card shadow-sm border-0 h-100 cursor-pointer hover-lift" @click="go('GestionSalasAdmin')">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+              <div class="rounded-3 bg-warning bg-opacity-10 text-warning p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-building fs-5"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h4 class="h6 fw-bold mb-1">Gestionar salas</h4>
+                <p class="small text-muted mb-0">Inventario de salas</p>
+              </div>
+              <i class="bi bi-arrow-right text-muted"></i>
+            </div>
           </div>
-          <div class="shortcut-content">
-            <h4>Gestionar salas</h4>
-            <p>Mantén el inventario de salas actualizado</p>
-          </div>
-          <i class="bi bi-arrow-right shortcut-arrow"></i>
         </div>
 
-        <div class="shortcut-card" @click="go('AdminExposList')">
-          <div class="shortcut-icon bg-success">
-            <i class="bi bi-kanban-fill"></i>
+        <div class="col-md-6 col-lg-3">
+          <div class="card shadow-sm border-0 h-100 cursor-pointer hover-lift" @click="go('AdminExposList')">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+              <div class="rounded-3 bg-success bg-opacity-10 text-success p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-kanban-fill fs-5"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h4 class="h6 fw-bold mb-1">Ver exposiciones</h4>
+                <p class="small text-muted mb-0">Consulta y crea expos</p>
+              </div>
+              <i class="bi bi-arrow-right text-muted"></i>
+            </div>
           </div>
-          <div class="shortcut-content">
-            <h4>Ver exposiciones</h4>
-            <p>Consulta y crea exposiciones</p>
-          </div>
-          <i class="bi bi-arrow-right shortcut-arrow"></i>
         </div>
 
-        <div class="shortcut-card" @click="go('AdminCatalogoObras')">
-          <div class="shortcut-icon bg-info">
-            <i class="bi bi-collection"></i>
+        <div class="col-md-6 col-lg-3">
+          <div class="card shadow-sm border-0 h-100 cursor-pointer hover-lift" @click="go('AdminCatalogoObras')">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+              <div class="rounded-3 bg-info bg-opacity-10 text-info p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-collection fs-5"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h4 class="h6 fw-bold mb-1">Catálogo de obras</h4>
+                <p class="small text-muted mb-0">Consulta e importa obras</p>
+              </div>
+              <i class="bi bi-arrow-right text-muted"></i>
+            </div>
           </div>
-          <div class="shortcut-content">
-            <h4>Catálogo de obras</h4>
-            <p>Consulta e importa obras</p>
-          </div>
-          <i class="bi bi-arrow-right shortcut-arrow"></i>
         </div>
       </div>
     </section>
 
     <!-- LOADING/ERROR -->
-    <div v-if="loading" class="loading-container">
-      <div class="spinner-border text-primary" role="status">
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-gold" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
     </div>
 
-    <div v-if="error" class="alert alert-danger" role="alert">
-      <i class="bi bi-exclamation-triangle"></i> {{ error }}
+    <div v-if="error" class="alert alert-danger mt-4 shadow-sm" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
     </div>
   </div>
 </template>
@@ -192,204 +220,14 @@ export default {
 </script>
 
 <style scoped>
-.panel-container {
-  max-width:  1400px;
-  margin: 0 auto;
-  padding: 24px;
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items:  flex-start;
-  margin-bottom: 32px;
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
-
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 12px;
-  color: #6c7685;
-  margin:  0 0 8px;
-  font-weight: 700;
-}
-
-h1 {
-  margin: 0 0 8px;
-  font-size: 32px;
-  font-weight:  800;
-}
-
-.subtitle {
-  color: #4a5460;
-  margin: 0;
-}
-
-.btn-secondary {
-  background: #f8f9fa;
-  border: 1px solid #d9deea;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-weight: 700;
+.cursor-pointer {
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: #e9ecef;
-  transform: translateY(-1px);
-}
-
-.btn-secondary:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-bottom:  40px;
-}
-
-.stat-card {
-  background: #fff;
-  border:  1px solid #e4e8f2;
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  gap: 16px;
-  align-items:  flex-start;
-  transition: all 0.2s ease;
-}
-
-.stat-card:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
-
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: white;
-  flex-shrink: 0;
-}
-
-.bg-primary { background: linear-gradient(135deg, #1f4b99, #153a7a); }
-.bg-warning { background: linear-gradient(135deg, #ffc107, #ff9800); }
-.bg-success { background: linear-gradient(135deg, #28a745, #20c997); }
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #6c7685;
-  margin:  0 0 8px;
-  font-weight: 600;
-}
-
-.stat-value {
-  font-size: 36px;
-  font-weight:  800;
-  margin:  0 0 8px;
-  color: #1f2a44;
-}
-
-.stat-detail {
-  font-size: 14px;
-  color: #6c7685;
-  margin: 0;
-}
-
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin:  0 0 16px;
-}
-
-.shortcuts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.shortcut-card {
-  background: #fff;
-  border: 1px solid #e4e8f2;
-  border-radius: 14px;
-  padding: 18px;
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.shortcut-card:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  transform: translateX(4px);
-  border-color: #1f4b99;
-}
-
-.shortcut-icon {
-  width:  48px;
-  height: 48px;
-  border-radius:  10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: white;
-  flex-shrink: 0;
-}
-
-.shortcut-content {
-  flex: 1;
-}
-
-.shortcut-content h4 {
-  margin: 0 0 4px;
-  font-size:  16px;
-  font-weight: 700;
-}
-
-.shortcut-content p {
-  margin: 0;
-  font-size: 14px;
-  color: #6c7685;
-}
-
-.shortcut-arrow {
-  color: #d9deea;
-  font-size: 20px;
-  transition: all 0.2s ease;
-}
-
-.shortcut-card:hover .shortcut-arrow {
-  color: #1f4b99;
-  transform: translateX(4px);
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  padding: 48px;
-}
-
-@media (max-width: 768px) {
-  .panel-header {
-    flex-direction:  column;
-    gap: 16px;
-  }
 }
 </style>

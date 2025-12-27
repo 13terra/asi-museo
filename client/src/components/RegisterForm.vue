@@ -1,23 +1,65 @@
 <template>
-  <div class="auth-shell">
-    <div class="auth-card">
-      <button class="btn-ghost" @click="$router.back()">Volver atrás</button>
-      <h2 class="auth-title">Registro de visitante</h2>
-      <div class="auth-field">
-        <label for="login">Login nuevo</label>
-        <input type="text" id="login" v-model="auxLogin" @keyup.enter="registrarme" />
+  <div class="container d-flex align-items-center justify-content-center min-vh-100 animate-slide-up">
+    <div class="card shadow-lg border-0" style="max-width: 450px; width: 100%;">
+      <div class="card-body p-5">
+        <button class="btn btn-link text-decoration-none text-muted p-0 mb-4" @click="$router.back()">
+          <i class="bi bi-arrow-left"></i> Volver atrás
+        </button>
+        
+        <h2 class="card-title text-center mb-4 fw-bold">Registro de visitante</h2>
+        
+        <div class="mb-3">
+          <label for="login" class="form-label">Usuario</label>
+          <input 
+            type="text" 
+            class="form-control form-control-lg" 
+            id="login" 
+            v-model="auxLogin" 
+            @keyup.enter="registrarme"
+            placeholder="Elige un nombre de usuario"
+          />
+        </div>
+        
+        <div class="mb-3">
+          <label for="pass" class="form-label">Contraseña</label>
+          <input 
+            type="password" 
+            class="form-control form-control-lg" 
+            id="pass" 
+            v-model="auxPass" 
+            @keyup.enter="registrarme"
+            placeholder="Crea una contraseña"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="confirmPass" class="form-label">Repetir contraseña</label>
+          <input 
+            type="password" 
+            class="form-control form-control-lg" 
+            id="confirmPass" 
+            v-model="auxConfirmPass" 
+            @keyup.enter="registrarme"
+            placeholder="Repite tu contraseña"
+          />
+        </div>
+
+        <div class="d-grid gap-2 mb-4">
+          <button class="btn btn-primary btn-lg" @click="registrarme" :disabled="loading">
+            <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <span v-else>Registrarme</span>
+          </button>
+        </div>
+
+        <div class="text-center">
+          <p class="mb-0">¿Ya tienes cuenta? <router-link to="/login" class="fw-bold text-primary text-decoration-none">Inicia sesión</router-link></p>
+        </div>
+
+        <div v-if="error" class="alert alert-danger mt-4 mb-0 d-flex align-items-center" role="alert">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>
+          <div>{{ error }}</div>
+        </div>
       </div>
-      <div class="auth-field">
-        <label for="pass">Contraseña</label>
-        <input type="password" id="pass" v-model="auxPass" @keyup.enter="registrarme" />
-      </div>
-      <div class="auth-field">
-        <label for="confirmPass">Repetir contraseña</label>
-        <input type="password" id="confirmPass" v-model="auxConfirmPass" @keyup.enter="registrarme" />
-      </div>
-      <button class="btn-primary" @click="registrarme" :disabled="loading">Registrarme</button>
-      <p class="auth-link">¿Ya tienes cuenta? <router-link to="/login">Inicia sesión</router-link></p>
-      <p v-if="error" class="auth-error">{{ error }}</p>
     </div>
   </div>
 </template>
@@ -68,93 +110,5 @@ export default {
 </script>
 
 <style scoped>
-.auth-shell {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%);
-}
-
-.auth-card {
-  width: min(420px, 90vw);
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.auth-title {
-  margin: 4px 0 12px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-}
-
-.auth-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.auth-field input {
-  border-radius: 10px;
-  border: 1px solid #d9deea;
-  padding: 12px 14px;
-  font-size: 16px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.auth-field input:focus {
-  outline: none;
-  border-color: #1f4b99;
-  box-shadow: 0 0 0 3px rgba(31, 75, 153, 0.15);
-}
-
-.btn-primary {
-  background: #1f4b99;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-}
-
-.btn-primary:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  box-shadow: 0 10px 24px rgba(31, 75, 153, 0.2);
-  transform: translateY(-1px);
-}
-
-.btn-ghost {
-  align-self: flex-start;
-  background: transparent;
-  border: 1px solid #d9deea;
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.auth-link {
-  margin: 0;
-  font-weight: 600;
-}
-
-.auth-link a {
-  color: #1f4b99;
-}
-
-.auth-error {
-  color: #b3261e;
-  font-weight: 600;
-}
+/* Styles are now handled by global main.css */
 </style>

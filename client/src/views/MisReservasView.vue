@@ -1,40 +1,73 @@
 <template>
-  <div class="page">
-    <header class="head">
-      <h1>Mis reservas</h1>
-      <div class="filters">
-        <label>
-          Estado
-          <select v-model="estado" @change="load">
-            <option value="">Todas</option>
-            <option value="CONFIRMADA">Confirmada</option>
-            <option value="FINALIZADA">Finalizada</option>
-            <option value="CANCELADA">Cancelada</option>
-          </select>
-        </label>
+  <div class="container animate-slide-up">
+    <header class="d-flex justify-content-between align-items-center mb-5">
+      <h1 class="display-5 mb-0">Mis Reservas</h1>
+      <div class="d-flex align-items-center gap-2">
+        <label class="form-label mb-0 me-2 fw-bold text-muted">Filtrar por estado:</label>
+        <select v-model="estado" @change="load" class="form-select w-auto">
+          <option value="">Todas</option>
+          <option value="CONFIRMADA">Confirmada</option>
+          <option value="FINALIZADA">Finalizada</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
       </div>
     </header>
 
-    <div v-if="loading" class="center"><div class="spinner-border" role="status"></div></div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
-    <div v-else-if="reservas.length === 0" class="empty">No tienes reservas todavía.</div>
-    <div v-else class="grid">
-      <article v-for="reserva in reservas" :key="reserva.idReserva" class="card">
-        <div class="card-top">
-          <div>
-            <p class="eyebrow">Reserva #{{ reserva.idReserva }}</p>
-            <h3>{{ reserva.exposicion?.titulo || 'Exposición' }}</h3>
-            <p class="muted">{{ formatFecha(reserva.sesion?.fecha) }} · {{ formatHora(reserva.sesion?.horaInicio) }}</p>
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div v-else-if="error" class="alert alert-danger shadow-sm" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+    </div>
+
+    <div v-else-if="reservas.length === 0" class="text-center py-5">
+      <div class="p-5 border border-dashed rounded-3 bg-light">
+        <i class="bi bi-ticket-perforated display-4 text-muted mb-3"></i>
+        <p class="h5 text-muted">No tienes reservas todavía.</p>
+        <router-link to="/catalogo" class="btn btn-primary mt-3">Explorar catálogo</router-link>
+      </div>
+    </div>
+
+    <div v-else class="row g-4">
+      <div class="col-md-6 col-lg-4" v-for="reserva in reservas" :key="reserva.idReserva">
+        <article class="card h-100 shadow-hover border-0">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <p class="text-uppercase text-muted small fw-bold mb-1">Reserva #{{ reserva.idReserva }}</p>
+                <h3 class="h5 fw-bold mb-1">{{ reserva.nombreExposicion || 'Exposición' }}</h3>
+                <p class="text-muted small mb-0">
+                  <i class="bi bi-calendar-event me-1"></i> {{ formatFecha(reserva.fechaSesion) }}
+                  <span class="mx-1">·</span>
+                  <i class="bi bi-clock me-1"></i> {{ formatHora(reserva.fechaSesion) }}
+                </p>
+              </div>
+              <span class="badge rounded-pill" :class="stateClass(reserva.estado)">{{ reserva.estado }}</span>
+            </div>
+            
+            <div class="mb-3">
+              <p class="text-muted small mb-2">{{ reserva.edicion?.nombre || reserva.edicion?.idEdicion }}</p>
+              <div class="bg-light rounded p-2 d-inline-block">
+                <span class="fw-bold text-primary">{{ reserva.entradas?.length || reserva.numEntradas || 0 }} entradas</span>
+                <span class="mx-2 text-muted">|</span>
+                <span class="fw-bold">{{ formatPrice(reserva.importeTotal || 0) }}</span>
+              </div>
+            </div>
+
+            <div class="mt-auto d-flex gap-2">
+              <router-link :to="{ name: 'ReservaDetalle', params: { id: reserva.idReserva } }" class="btn btn-outline-primary flex-grow-1">
+                Ver detalle
+              </router-link>
+              <button class="btn btn-danger" :disabled="!puedeCancelar(reserva)" @click="cancelar(reserva.idReserva)" v-if="puedeCancelar(reserva)">
+                Cancelar
+              </button>
+            </div>
           </div>
-          <span class="chip" :class="stateClass(reserva.estado)">{{ reserva.estado }}</span>
-        </div>
-        <p class="muted">{{ reserva.edicion?.nombre || reserva.edicion?.idEdicion }}</p>
-        <div class="pill">{{ reserva.entradas?.length || reserva.numEntradas || 0 }} entradas · {{ formatPrice(reserva.importeTotal || 0) }}</div>
-        <div class="actions">
-          <router-link :to="{ name: 'ReservaDetalle', params: { id: reserva.idReserva } }" class="btn-ghost">Ver detalle</router-link>
-          <button class="btn-primary" :disabled="!puedeCancelar(reserva)" @click="cancelar(reserva.idReserva)">Cancelar</button>
-        </div>
-      </article>
+        </article>
+      </div>
     </div>
   </div>
 </template>
@@ -77,15 +110,33 @@ export default {
         alert('No se pudo cancelar la reserva.');
       }
     },
-    formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },
-    formatHora(v) { return v ? new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''; },
+    formatFecha(v) {
+      if (!v) return '';
+      let d;
+      if (Array.isArray(v)) {
+        d = new Date(v[0], v[1] - 1, v[2], v[3], v[4]);
+      } else {
+        d = new Date(v);
+      }
+      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+    },
+    formatHora(v) {
+      if (!v) return '';
+      let d;
+      if (Array.isArray(v)) {
+        d = new Date(v[0], v[1] - 1, v[2], v[3], v[4]);
+      } else {
+        d = new Date(v);
+      }
+      return isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
     formatPrice(v) { return `${Number(v || 0).toFixed(2)} €`; },
     stateClass(estado) {
       return {
-        [ESTADOS_RESERVA.CONFIRMADA]: 'chip-green',
-        [ESTADOS_RESERVA.CANCELADA]: 'chip-red',
-        [ESTADOS_RESERVA.FINALIZADA]: 'chip-dark'
-      }[estado] || 'chip-gray';
+        [ESTADOS_RESERVA.CONFIRMADA]: 'bg-success',
+        [ESTADOS_RESERVA.CANCELADA]: 'bg-danger',
+        [ESTADOS_RESERVA.FINALIZADA]: 'bg-dark'
+      }[estado] || 'bg-secondary';
     },
     puedeCancelar(reserva) {
       return reserva.estado === ESTADOS_RESERVA.CONFIRMADA;
@@ -95,25 +146,5 @@ export default {
 </script>
 
 <style scoped>
-.page { max-width: 1100px; margin: 0 auto; padding: 28px 18px 48px; display: flex; flex-direction: column; gap: 16px; }
-.head { display: flex; justify-content: space-between; align-items: center; }
-.filters { display: flex; gap: 12px; }
-select, input { border: 1px solid #d9deea; border-radius: 10px; padding: 8px; }
-
-.center { display: flex; justify-content: center; padding: 30px 0; }
-.empty { padding: 14px; background: #f6f8ff; border-radius: 10px; color: #4a5460; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 12px; }
-.card { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 14px; box-shadow: 0 8px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
-.card-top { display: flex; justify-content: space-between; gap: 10px; }
-.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: #5b6472; margin: 0; }
-.muted { color: #5b6472; margin: 0; }
-.pill { background: #eef1f6; padding: 6px 10px; border-radius: 10px; font-weight: 700; width: fit-content; }
-.chip { padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; background: #eef1f6; color: #2a2f36; }
-.chip-green { background: #e3f7e9; color: #1f7a3d; }
-.chip-red { background: #fff0f0; color: #d23b3b; }
-.chip-dark { background: #dfe2e7; color: #2a2f36; }
-.chip-gray { background: #eef1f6; color: #4a5460; }
-.actions { display: flex; gap: 10px; }
-.btn-primary { border: none; background: linear-gradient(135deg,#1f4b99,#153a7a); color: #fff; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.btn-ghost { border: 1px solid #d9deea; background: #fff; color: #1f4b99; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; }
+/* Styles are now handled by global main.css */
 </style>

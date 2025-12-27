@@ -2,9 +2,9 @@
   <div class="page">
     <header class="header" v-if="sesion && edicion">
       <div>
-        <p class="eyebrow">{{ edicion.exposicion?.titulo || 'Exposición' }}</p>
-        <h1>Reserva para {{ formatFecha(sesion.fecha) }}</h1>
-        <p class="muted">{{ formatHora(sesion.horaInicio) }} · {{ formatHora(sesion.horaFin) }} · Salas {{ salasTexto(sesion.salas) }}</p>
+        <p class="eyebrow">{{ edicion.tituloExpo || 'Exposición' }}</p>
+        <h1>Reserva para {{ formatFecha(sesion.horaInicio) }}</h1>
+        <p class="muted">{{ formatHora(sesion.horaInicio) }} · {{ formatHora(sesion.horaFin) }} · {{ salasTexto(sesion.salas) }}</p>
       </div>
       <div class="pill">Aforo: {{ sesion.aforoOcupado ?? 0 }} / {{ sesion.aforo }}</div>
     </header>
@@ -35,38 +35,40 @@
       </section>
 
       <section class="card form">
-        <h3>Datos del comprador</h3>
-        <div class="form-grid">
-          <label>Nombre<input v-model="comprador.nombrePila" /></label>
-          <label>Apellido 1<input v-model="comprador.apellido1" /></label>
-          <label>Apellido 2<input v-model="comprador.apellido2" /></label>
-          <label>Email<input v-model="comprador.email" type="email" /></label>
-          <label>Teléfono<input v-model="comprador.telefono" /></label>
-          <label>País<input v-model="comprador.pais" /></label>
-        </div>
+        <form @submit.prevent="reservar">
+          <h3>Datos del comprador</h3>
+          <div class="form-grid">
+            <label>Nombre *<input v-model="comprador.nombrePila" placeholder="Ej: Juan" required maxlength="50" /></label>
+            <label>Apellido 1 *<input v-model="comprador.apellido1" placeholder="Ej: Pérez" required maxlength="50" /></label>
+            <label>Apellido 2<input v-model="comprador.apellido2" placeholder="Ej: García" maxlength="50" /></label>
+            <label>Email *<input v-model="comprador.email" type="email" placeholder="ejemplo@correo.com" required maxlength="100" /></label>
+            <label>Teléfono *<input v-model="comprador.telefono" type="tel" placeholder="+34 600 000 000" required maxlength="20" /></label>
+            <label>País<input v-model="comprador.pais" placeholder="España" maxlength="50" /></label>
+          </div>
 
-        <div class="asistentes">
-          <h4>Datos de asistentes</h4>
-          <p class="muted">Introduce nombre y DNI para cada entrada.</p>
-          <div v-if="totalEntradas === 0" class="empty">Añade entradas para completar los datos.</div>
-          <div v-else class="assist-grid">
-            <div v-for="(entrada, index) in entradasDetalle" :key="index" class="assist-card">
-              <div class="muted">{{ entrada.tipo.nombre }}</div>
-              <label>Nombre<input v-model="entrada.nombrePila" /></label>
-              <label>Apellido 1<input v-model="entrada.apellido1" /></label>
-              <label>Apellido 2<input v-model="entrada.apellido2" /></label>
-              <label>DNI<input v-model="entrada.dni" /></label>
+          <div class="asistentes">
+            <h4>Datos de asistentes</h4>
+            <p class="muted">Introduce nombre y DNI para cada entrada.</p>
+            <div v-if="totalEntradas === 0" class="empty">Añade entradas para completar los datos.</div>
+            <div v-else class="assist-grid">
+              <div v-for="(entrada, index) in entradasDetalle" :key="index" class="assist-card">
+                <div class="muted">{{ entrada.tipo.nombre }}</div>
+                <label>Nombre *<input v-model="entrada.nombrePila" placeholder="Nombre" required maxlength="50" /></label>
+                <label>Apellido 1 *<input v-model="entrada.apellido1" placeholder="Primer apellido" required maxlength="50" /></label>
+                <label>Apellido 2<input v-model="entrada.apellido2" placeholder="Segundo apellido" maxlength="50" /></label>
+                <label>DNI *<input v-model="entrada.dni" placeholder="12345678Z" required maxlength="15" /></label>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="actions">
-          <button class="btn-ghost" @click="$router.back()">Cancelar</button>
-          <button class="btn-primary" :disabled="!canSubmit || submitting" @click="reservar">
-            {{ submitting ? 'Procesando...' : 'Reservar' }}
-          </button>
-        </div>
-        <p class="note">El pago se realizará presencialmente al hacer check-in.</p>
+          <div class="actions">
+            <button type="button" class="btn-ghost" @click="$router.back()">Cancelar</button>
+            <button type="submit" class="btn-primary" :disabled="submitting">
+              {{ submitting ? 'Procesando...' : 'Reservar' }}
+            </button>
+          </div>
+          <p class="note">El pago se realizará presencialmente al hacer check-in.</p>
+        </form>
       </section>
     </div>
   </div>
@@ -138,10 +140,28 @@ export default {
         this.loading = false;
       }
     },
-    formatFecha(value) { return new Date(value).toLocaleDateString(); },
-    formatHora(value) { return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); },
+    formatFecha(value) {
+      if (!value) return '';
+      if (Array.isArray(value)) return new Date(value[0], value[1] - 1, value[2]).toLocaleDateString();
+      return new Date(value).toLocaleDateString();
+    },
+    formatHora(value) {
+      if (!value) return '';
+      if (Array.isArray(value)) {
+        if (value.length === 2) return `${value[0].toString().padStart(2, '0')}:${value[1].toString().padStart(2, '0')}`;
+        if (value.length >= 5) return `${value[3].toString().padStart(2, '0')}:${value[4].toString().padStart(2, '0')}`;
+      }
+      if (typeof value === 'string' && value.includes(':') && !value.includes('T')) {
+        return value.substring(0, 5);
+      }
+      return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
     formatPrice(value) { return `${Number(value || 0).toFixed(2)} €`; },
-    salasTexto(salas = []) { return salas.length ? salas.map(s => s.nombre || s.idSala).join(', ') : 'Sin salas'; },
+    salasTexto(salas = []) {
+      if (!salas.length) return 'Sin salas';
+      const names = salas.map(s => s.nombre || s.idSala).join(', ');
+      return salas.length === 1 ? `Sala: ${names}` : `Salas: ${names}`;
+    },
     inc(idTipo) {
       const current = this.cantidades[idTipo] || 0;
       this.cantidades = { ...this.cantidades, [idTipo]: current + 1 };
@@ -191,20 +211,48 @@ export default {
         datosAsistentes
       };
     },
+    validate() {
+      if (this.totalEntradas <= 0) return 'Debes seleccionar al menos una entrada.';
+      if (!this.comprador.nombrePila || !this.comprador.apellido1 || !this.comprador.email || !this.comprador.telefono) {
+        return 'Por favor, completa todos los datos obligatorios del comprador.';
+      }
+      
+      const dniRegex = /^\d{8}[A-Za-z]$/;
+      for (const e of this.entradasDetalle) {
+        if (!e.nombrePila || !e.apellido1 || !e.dni) {
+          return `Faltan datos para la entrada de tipo ${e.tipo.nombre}.`;
+        }
+        if (!dniRegex.test(e.dni)) {
+          return `El DNI ${e.dni} no es válido (8 números y 1 letra).`;
+        }
+      }
+
+      if (this.sesion?.estado !== ESTADOS_SESION.DISPONIBLE) {
+        return 'Esta sesión no está disponible para reservas.';
+      }
+      return null;
+    },
     async reservar() {
-      if (!this.canSubmit) return;
+      console.log('Reservar clicked');
+      const errorMsg = this.validate();
+      if (errorMsg) {
+        console.warn('Cannot submit: validation failed', errorMsg);
+        setNotification(errorMsg, 'warning');
+        return;
+      }
       this.submitting = true;
       this.error = '';
       try {
         const payload = this.buildPayload();
+        console.log('Sending payload:', payload);
         // ReservaRepository.create espera (idSesion, reservaObject)
         // reservaObject se mezcla con idSesion dentro del repo, así que pasamos payload completo como 2o arg
         await ReservaRepository.create(this.sesion.idSesion, payload);
         setNotification('Reserva creada correctamente.', 'success');
         this.$router.push({ name: 'MisReservas' });
       } catch (e) {
-        console.error(e);
-        this.error = 'No se pudo crear la reserva. Verifique los datos.';
+        console.error('Error creating reserva:', e);
+        this.error = e.response?.data?.message || 'No se pudo crear la reserva. Verifique los datos.';
       } finally {
         this.submitting = false;
       }

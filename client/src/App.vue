@@ -124,8 +124,12 @@
       <button type="button" class="btn-close" @click="clearNotification"></button>
     </div>
 
-    <main class="container-fluid mt-4">
-      <router-view />
+    <main class="container-fluid mt-4 main-content">
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
 
     <footer class="bg-dark text-light text-center py-3 mt-5">

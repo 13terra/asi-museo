@@ -1,6 +1,7 @@
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "./assets/main.css"; // Custom styles
 import { createApp } from "vue";
 import App from "./App.vue"; //importamos la raiz desde otro archivo
 import router from "./router";

@@ -54,8 +54,22 @@ export default {
         this.loading = false;
       }
     },
-    formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },
-    formatHora(v) { return v ? new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''; },
+    formatFecha(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) return new Date(v[0], v[1] - 1, v[2]).toLocaleDateString();
+      return new Date(v).toLocaleDateString();
+    },
+    formatHora(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) {
+        if (v.length === 2) return `${v[0].toString().padStart(2, '0')}:${v[1].toString().padStart(2, '0')}`;
+        if (v.length >= 5) return `${v[3].toString().padStart(2, '0')}:${v[4].toString().padStart(2, '0')}`;
+      }
+      if (typeof v === 'string' && v.includes(':') && !v.includes('T')) {
+        return v.substring(0, 5);
+      }
+      return new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
     formatPrice(v) { return `${Number(v || 0).toFixed(2)} €`; },
     stateClass(estado) {
       return {

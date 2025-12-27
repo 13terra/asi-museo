@@ -222,6 +222,28 @@ public class ReservaService {
     return new ReservaDetalleDTO(reserva, true);
   }
 
+  /**
+   * HU53/58 - Ver entradas de mi reserva
+   */
+  @PreAuthorize("hasAuthority('VISITANTE')")
+  public Collection<es.museum.asi.model.service.dto.EntradaDTO> findMisEntradasByReserva(Long idReserva)
+    throws NotFoundException, OperationNotAllowed {
+
+    Reserva reserva = reservaDao.findById(idReserva);
+    if (reserva == null) {
+      throw new NotFoundException(idReserva.toString(), Reserva.class);
+    }
+
+    User currentUser = getCurrentUser();
+    if (!reserva.getUser().getIdUser().equals(currentUser.getIdUser())) {
+      throw new OperationNotAllowed("No tiene permisos para ver las entradas de esta reserva");
+    }
+
+    return reserva.getEntradas().stream()
+      .map(es.museum.asi.model.service.dto.EntradaDTO::new)
+      .collect(Collectors.toList());
+  }
+
 
   /**
    * HU54 - Cancelar reserva

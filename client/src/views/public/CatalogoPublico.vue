@@ -82,7 +82,9 @@ export default {
     },
     proxDateValue(expo) {
       const fecha = expo.proximaEdicion?.fechaInicio || expo.fechaInicioProximaEdicion || expo.fechaProximaEdicion || expo.proximaFecha;
-      return fecha ? new Date(fecha).getTime() : null;
+      if (!fecha) return null;
+      if (Array.isArray(fecha)) return new Date(fecha[0], fecha[1] - 1, fecha[2]).getTime();
+      return new Date(fecha).getTime();
     },
     proxFecha(expo) {
       const ts = this.proxDateValue(expo);

@@ -43,11 +43,11 @@
       <div v-else class="grid">
         <article v-for="sesion in sesiones" :key="sesion.idSesion" class="item">
           <div v-if="editId !== sesion.idSesion">
-            <p class="eyebrow">#{{ sesion.idSesion }} · {{ formatFecha(sesion.fecha) }}</p>
+            <p class="eyebrow">#{{ sesion.idSesion }} · {{ formatFecha(sesion.horaInicio) }}</p>
             <h4>{{ formatHora(sesion.horaInicio) }} - {{ formatHora(sesion.horaFin) }}</h4>
             <p class="muted">Salas: {{ salasTexto(sesion.salas) }}</p>
             <p class="pill">Aforo: {{ sesion.aforoOcupado ?? 0 }} / {{ sesion.aforo }}</p>
-            <span class="chip" :class="stateClass(sesion.estado)">{{ sesion.estado }}</span>
+            <span class="chip" :class="stateClass(sesion.estadoSesion)">{{ sesion.estadoSesion }}</span>
           </div>
           <div v-else class="edit-grid">
             <label>Fecha<input type="date" v-model="editDraft.fecha" /></label>
@@ -148,12 +148,17 @@ export default {
     },
     formatFecha(v) {
       if (!v) return "";
+      if (Array.isArray(v)) return new Date(v[0], v[1] - 1, v[2]).toLocaleDateString();
       const d = new Date(v);
       return Number.isNaN(d.getTime()) ? v : d.toLocaleDateString();
     },
     formatHora(v) {
       if (!v) return "";
-      const d = new Date(v.includes("T") ? v : `1970-01-01T${v}`);
+      if (Array.isArray(v)) {
+        if (v.length === 2) return `${v[0].toString().padStart(2, '0')}:${v[1].toString().padStart(2, '0')}`;
+        if (v.length >= 5) return `${v[3].toString().padStart(2, '0')}:${v[4].toString().padStart(2, '0')}`;
+      }
+      const d = new Date(v.includes && v.includes("T") ? v : `1970-01-01T${v}`);
       return Number.isNaN(d.getTime())
         ? v
         : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

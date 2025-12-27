@@ -19,9 +19,9 @@ export default {
   async getByEdicion(idEdicion, filters = {}) {
     const params = new URLSearchParams();
     if (filters.estado) params.append('estado', filters.estado);
-    if (filters.fecha) params.append('fecha', filters. fecha);
+    if (filters.fecha) params.append('fecha', filters.fecha);
 
-    return (await HTTP.get(`ediciones/${idEdicion}/reservas?${params. toString()}`)).data;
+    return (await HTTP.get(`ediciones/${idEdicion}/reservas?${params.toString()}`)).data;
   },
 
   /**
@@ -40,7 +40,7 @@ export default {
   async create(idSesion, reserva) {
     return (await HTTP.post('reservas', {
       idSesion,
-      ... reserva
+      ...reserva
     })).data;
   },
 

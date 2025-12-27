@@ -23,13 +23,12 @@
         <div class="card-top">
           <div>
             <p class="eyebrow">Reserva #{{ reserva.idReserva }}</p>
-            <h3>{{ reserva.exposicion?.titulo || 'Exposición' }}</h3>
-            <p class="muted">{{ formatFecha(reserva.sesion?.fecha) }} · {{ formatHora(reserva.sesion?.horaInicio) }}</p>
+            <h3>{{ reserva.nombreExposicion || 'Exposición' }}</h3>
+            <p class="muted">{{ formatFecha(reserva.fechaSesion) }} · {{ formatHora(reserva.fechaSesion) }}</p>
           </div>
           <span class="chip" :class="stateClass(reserva.estado)">{{ reserva.estado }}</span>
         </div>
-        <p class="muted">{{ reserva.edicion?.nombre || reserva.edicion?.idEdicion }}</p>
-        <div class="pill">{{ reserva.entradas?.length || reserva.numEntradas || 0 }} entradas · {{ formatPrice(reserva.importeTotal || 0) }}</div>
+        <div class="pill">{{ reserva.numEntradas || 0 }} entradas · {{ formatPrice(reserva.importeTotal || 0) }}</div>
         <div class="actions">
           <router-link :to="{ name: 'ReservaDetalle', params: { idReserva: reserva.idReserva } }" class="btn-ghost">Ver detalle</router-link>
           <button class="btn-primary" :disabled="!puedeCancelar(reserva)" @click="cancelar(reserva.idReserva)">Cancelar</button>
@@ -57,6 +56,7 @@ export default {
       try {
         this.reservas = await ReservaRepository.getMisReservas({ estado: this.estado });
       } catch (e) {
+        console.error('Error loading reservas:', e);
         this.error = 'No se pudieron cargar tus reservas.';
       } finally {
         this.loading = false;
@@ -71,8 +71,22 @@ export default {
         setNotification('No se pudo cancelar la reserva.', 'error');
       }
     },
-    formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },
-    formatHora(v) { return v ? new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''; },
+    formatFecha(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) return new Date(v[0], v[1] - 1, v[2]).toLocaleDateString();
+      return new Date(v).toLocaleDateString();
+    },
+    formatHora(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) {
+        if (v.length === 2) return `${v[0].toString().padStart(2, '0')}:${v[1].toString().padStart(2, '0')}`;
+        if (v.length >= 5) return `${v[3].toString().padStart(2, '0')}:${v[4].toString().padStart(2, '0')}`;
+      }
+      if (typeof v === 'string' && v.includes(':') && !v.includes('T')) {
+        return v.substring(0, 5);
+      }
+      return new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
     formatPrice(v) { return `${Number(v || 0).toFixed(2)} €`; },
     stateClass(estado) {
       return {

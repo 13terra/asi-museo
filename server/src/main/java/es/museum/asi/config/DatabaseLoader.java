@@ -19,6 +19,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class DatabaseLoader {
@@ -33,6 +36,7 @@ public class DatabaseLoader {
   @Autowired private EdicionService edicionService;
   @Autowired private SesionService sesionService;
   @Autowired private PiezaExpuestaService piezaExpuestaService;
+  @Autowired private ReservaService reservaService;
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
   public void loadData() throws Exception {
@@ -52,8 +56,8 @@ public class DatabaseLoader {
       logger.info("Usuarios creados");
 
       // 2. TIPOS DE ENTRADA
-      createTipoEntrada("General", 15.0f, "Entrada general para adultos");
-      createTipoEntrada("Reducida", 7.5f, "Mayores de 65 años y grupos");
+      TipoEntrada tGeneral = createTipoEntrada("General", 15.0f, "Entrada general para adultos");
+      TipoEntrada tReducida = createTipoEntrada("Reducida", 7.5f, "Mayores de 65 años y grupos");
       createTipoEntrada("Estudiante", 5.0f, "Estudiantes con carnet");
       logger.info("Tipos de entrada creados");
 
@@ -84,7 +88,7 @@ public class DatabaseLoader {
       piezaExpuestaService.create(obra2.getIdObra(), edicion1.getIdEdicion(), sala1.getIdSala(), 2, "Icono del expresionismo.", false);
       
       // Sesiones
-      sesionService.create(edicion1.getIdEdicion(), LocalDate.now().plusDays(1), LocalTime.of(10, 0), LocalTime.of(11, 30), 50, Arrays.asList(sala1.getIdSala()));
+      SesionDTO sesion1 = sesionService.create(edicion1.getIdEdicion(), LocalDate.now().plusDays(1), LocalTime.of(10, 0), LocalTime.of(11, 30), 50, Arrays.asList(sala1.getIdSala()));
       sesionService.create(edicion1.getIdEdicion(), LocalDate.now().plusDays(1), LocalTime.of(12, 0), LocalTime.of(13, 30), 50, Arrays.asList(sala1.getIdSala()));
 
       edicionService.publicar(edicion1.getIdEdicion());
@@ -101,17 +105,59 @@ public class DatabaseLoader {
       expoService.update(expoEgipto.getIdExposicion(), null, null, null, "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/AmenhotepIII-Statue-BritishMuseum-August19-2008.jpg/800px-AmenhotepIII-Statue-BritishMuseum-August19-2008.jpg");
       expoService.archivar(expoEgipto.getIdExposicion());
 
+      // 6. RESERVA PARA VISITANTE
+      SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("visitante", "N/A", Collections.singletonList(new SimpleGrantedAuthority(UserAuthority.VISITANTE.name()))));
+      
+      ReservarEntradasDTO reservaDTO = new ReservarEntradasDTO();
+      reservaDTO.setIdSesion(sesion1.getIdSesion());
+      reservaDTO.setNombrePila("Visitante");
+      reservaDTO.setApellido1("Ejemplo");
+      reservaDTO.setApellido2("Museo");
+      reservaDTO.setEmail("visitante@museum.es");
+      reservaDTO.setTelefono("600123456");
+      reservaDTO.setPais("España");
+
+      Map<Long, Integer> entradasMap = new HashMap<>();
+      entradasMap.put(tGeneral.getIdTipoEntrada(), 2);
+      entradasMap.put(tReducida.getIdTipoEntrada(), 1);
+      reservaDTO.setEntradasPorTipo(entradasMap);
+
+      ReservarEntradasDTO.DatosAsistente a1 = new ReservarEntradasDTO.DatosAsistente();
+      a1.setDni("12345678A");
+      a1.setNombrePila("Juan");
+      a1.setApellido1("Pérez");
+      a1.setApellido2("García");
+
+      ReservarEntradasDTO.DatosAsistente a2 = new ReservarEntradasDTO.DatosAsistente();
+      a2.setDni("87654321B");
+      a2.setNombrePila("María");
+      a2.setApellido1("López");
+      a2.setApellido2("Sánchez");
+
+      ReservarEntradasDTO.DatosAsistente a3 = new ReservarEntradasDTO.DatosAsistente();
+      a3.setDni("11223344C");
+      a3.setNombrePila("Abuelo");
+      a3.setApellido1("Pérez");
+      a3.setApellido2("García");
+
+      List<ReservarEntradasDTO.DatosAsistente> asistentes = Arrays.asList(a1, a2, a3);
+      reservaDTO.setDatosAsistentes(asistentes);
+
+      reservaService.reservarEntradas(reservaDTO);
+      logger.info("Reserva creada para usuario visitante");
+
       logger.info("Datos semilla cargados correctamente");
     } finally {
       SecurityContextHolder.clearContext();
     }
   }
 
-  private void createTipoEntrada(String nombre, float precio, String desc) {
+  private TipoEntrada createTipoEntrada(String nombre, float precio, String desc) {
     TipoEntrada t = new TipoEntrada();
     t.setNombre(nombre);
     t.setPrecio(precio);
     t.setDescripcion(desc);
     tipoEntradaDao.create(t);
+    return t;
   }
 }

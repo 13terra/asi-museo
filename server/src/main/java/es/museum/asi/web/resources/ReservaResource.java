@@ -77,6 +77,19 @@ public class ReservaResource {
     }
   }
 
+  @GetMapping("/mis-reservas/{idReserva}/entradas")
+  public ResponseEntity<?> findMisEntradasByReserva(@PathVariable Long idReserva) {
+    try {
+      return ResponseEntity.ok(reservaService.findMisEntradasByReserva(idReserva));
+    } catch (NotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO(e.getMessage()));
+    } catch (OperationNotAllowed e) {
+      return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDTO("Error interno"));
+    }
+  }
+
   @PutMapping("/mis-reservas/{idReserva}/cancelar")
   public ResponseEntity<?> cancelarMiReserva(@PathVariable Long idReserva) {
     try {

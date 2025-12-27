@@ -1,34 +1,77 @@
 <template>
-  <div class="page">
-    <header class="head" v-if="entrada">
-      <div>
-        <p class="eyebrow">Entrada #{{ entrada.idEntrada }}</p>
-        <h1>{{ entrada.exposicion?.titulo || 'Exposición' }}</h1>
-        <p class="muted">{{ entrada.edicion?.nombre || entrada.edicion?.idEdicion }} · {{ formatFecha(entrada.sesion?.fecha) }} · {{ formatHora(entrada.sesion?.horaInicio) }}</p>
-      </div>
-      <span class="chip chip-green">{{ entrada.estado || 'VÁLIDA' }}</span>
-    </header>
+  <div class="container animate-slide-up">
+    <div v-if="entrada">
+      <header class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+          <router-link class="btn btn-link text-decoration-none text-muted p-0 mb-3" :to="{ name: 'ReservaDetalle', params: { id: entrada.idReserva } }">
+            <i class="bi bi-arrow-left"></i> Volver a la reserva
+          </router-link>
+          <p class="text-uppercase text-muted small fw-bold mb-1">Entrada #{{ entrada.idEntrada }}</p>
+          <h1 class="display-5 mb-1">{{ entrada.nombreExposicion || 'Exposición' }}</h1>
+          <p class="text-muted mb-0">
+            <i class="bi bi-calendar-event me-1"></i> {{ formatFecha(entrada.fechaHoraSesion) }}
+            <span class="mx-1">·</span>
+            <i class="bi bi-clock me-1"></i> {{ formatHora(entrada.fechaHoraSesion) }}
+          </p>
+        </div>
+        <span class="badge rounded-pill bg-success fs-6">{{ entrada.estado || 'VÁLIDA' }}</span>
+      </header>
 
-    <div v-if="loading" class="center"><div class="spinner-border" role="status"></div></div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
-    <div v-else-if="!entrada" class="empty">Entrada no encontrada.</div>
-    <div v-else class="card">
-      <div class="row">
-        <div>
-          <p class="label">Asistente</p>
-          <h3>{{ entrada.nombrePila }} {{ entrada.apellido1 }} {{ entrada.apellido2 }}</h3>
-          <p class="muted">DNI: {{ entrada.dni }}</p>
-        </div>
-        <div>
-          <p class="label">Tipo</p>
-          <p class="body">{{ entrada.tipoEntrada?.nombre }} · {{ formatPrice(entrada.precio || entrada.tipoEntrada?.precio) }}</p>
-        </div>
-        <div>
-          <p class="label">Sala(s)</p>
-          <p class="body">{{ entrada.sesion?.salas?.map(s=>s.nombre).join(', ') || '—' }}</p>
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center py-4">
+              <h3 class="h5 fw-bold mb-0">Ticket de Acceso</h3>
+            </div>
+            <div class="card-body p-5">
+              <div class="text-center mb-4">
+                <h4 class="fw-bold mb-1">{{ entrada.nombrePila }} {{ entrada.apellido1 }} {{ entrada.apellido2 }}</h4>
+                <p class="text-muted mb-0">DNI: {{ entrada.dni }}</p>
+              </div>
+
+              <hr class="my-4">
+
+              <div class="row g-4 mb-4">
+                <div class="col-6">
+                  <p class="text-uppercase text-muted small fw-bold mb-1">Tipo de Entrada</p>
+                  <p class="fw-bold mb-0">{{ entrada.tipoEntrada }}</p>
+                  <p class="text-primary small mb-0">{{ formatPrice(entrada.precio) }}</p>
+                </div>
+                <div class="col-6 text-end">
+                  <p class="text-uppercase text-muted small fw-bold mb-1">Sala(s)</p>
+                  <p class="fw-bold mb-0">{{ entrada.nombresSalas || '—' }}</p>
+                </div>
+              </div>
+
+              <div class="bg-light rounded-3 p-4 text-center border border-dashed">
+                <i class="bi bi-qr-code-scan display-1 text-dark mb-3"></i>
+                <p class="fw-bold font-monospace mb-0 text-break">{{ entrada.idEntrada }}</p>
+                <p class="small text-muted mt-2 mb-0">Presenta este código en la entrada</p>
+              </div>
+            </div>
+            <div class="card-footer bg-white text-center py-3 border-top-0">
+              <small class="text-muted">Museo de Arte y Diseño</small>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="qr">Código: {{ entrada.idEntrada }}</div>
+    </div>
+
+    <div v-else-if="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div v-else-if="error" class="alert alert-danger shadow-sm mt-5" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+    </div>
+
+    <div v-else class="text-center py-5">
+      <div class="p-5 border border-dashed rounded-3 bg-light">
+        <i class="bi bi-ticket-detailed display-4 text-muted mb-3"></i>
+        <p class="h5 text-muted">Entrada no encontrada.</p>
+      </div>
     </div>
   </div>
 </template>
@@ -60,27 +103,26 @@ export default {
         this.loading = false;
       }
     },
-    formatFecha(v) { return v ? new Date(v).toLocaleDateString() : ''; },
-    formatHora(v) { return v ? new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''; },
+    formatFecha(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) return new Date(v[0], v[1] - 1, v[2]).toLocaleDateString();
+      const d = new Date(v);
+      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+    },
+    formatHora(v) {
+      if (!v) return '';
+      if (Array.isArray(v)) {
+        if (v.length === 2) return `${v[0].toString().padStart(2, '0')}:${v[1].toString().padStart(2, '0')}`;
+        if (v.length >= 5) return `${v[3].toString().padStart(2, '0')}:${v[4].toString().padStart(2, '0')}`;
+      }
+      const d = new Date(v);
+      return isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
     formatPrice(v) { return `${Number(v || 0).toFixed(2)} €`; }
   }
 };
 </script>
 
 <style scoped>
-.page { max-width: 900px; margin: 0 auto; padding: 28px 18px 48px; display: flex; flex-direction: column; gap: 16px; }
-.head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: #5b6472; margin: 0; }
-h1 { margin: 4px 0 6px; }
-.muted { color: #5b6472; margin: 0; }
-.chip { padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; background: #eef1f6; color: #2a2f36; }
-.chip-green { background: #e3f7e9; color: #1f7a3d; }
-
-.center { display: flex; justify-content: center; padding: 30px 0; }
-.empty { padding: 14px; background: #f6f8ff; border-radius: 10px; color: #4a5460; }
-.card { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 16px; box-shadow: 0 8px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
-.row { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 12px; }
-.label { text-transform: uppercase; letter-spacing: .06em; font-size: 11px; color: #5b6472; margin: 0; }
-.body { color: #2f3540; margin: 0; }
-.qr { margin-top: 6px; padding: 12px; border: 1px dashed #d9deea; border-radius: 12px; text-align: center; font-weight: 700; }
+/* Styles are now handled by global main.css */
 </style>

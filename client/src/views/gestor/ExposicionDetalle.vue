@@ -1,62 +1,103 @@
 <template>
-  <div class="detail-shell" v-if="!loading && expo">
-    <div class="detail-header">
-      <div class="breadcrumbs">
-        <router-link to="/gestor">Exposiciones</router-link>
-        <span>/</span>
-        <span>{{ expo.titulo }}</span>
-      </div>
-      <div class="status">
-        <span class="badge" :class="badgeClass(expo.estadoExpo)">{{ expo.estadoExpo }}</span>
-      </div>
+  <div class="container py-5 animate-slide-up" v-if="!loading && expo">
+    <!-- Header & Breadcrumbs -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><router-link to="/gestor" class="text-decoration-none text-muted">Exposiciones</router-link></li>
+          <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">{{ expo.titulo }}</li>
+        </ol>
+      </nav>
+      <span class="badge rounded-pill" :class="badgeClass(expo.estadoExpo)">{{ expo.estadoExpo }}</span>
     </div>
 
-    <div class="hero">
-      <div>
-        <p class="eyebrow">Detalle de exposición</p>
-        <h1>{{ expo.titulo }}</h1>
-        <p class="subtitle">{{ expo.descripcion || 'Sin descripción' }}</p>
-        <div class="meta">
-          <div class="pill">Creador: {{ expo.creador?.login || 'ADMIN' }}</div>
-          <div class="pill">Gestores: {{ expo.gestores?.length || 0 }}</div>
-          <div class="pill">Ediciones: {{ ediciones.length }}</div>
+    <!-- Hero Section -->
+    <div class="card shadow-sm border-0 mb-5">
+      <div class="card-body p-4 p-lg-5">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-8">
+            <p class="text-uppercase text-gold ls-1 mb-2 fw-bold small">Detalle de exposición</p>
+            <h1 class="display-5 font-playfair mb-3">{{ expo.titulo }}</h1>
+            <p class="lead text-muted mb-4">{{ expo.descripcion || 'Sin descripción disponible.' }}</p>
+            
+            <div class="d-flex flex-wrap gap-3">
+              <span class="badge bg-light text-dark border">
+                <i class="bi bi-person-circle me-1"></i>Creador: {{ expo.creador?.login || 'ADMIN' }}
+              </span>
+              <span class="badge bg-light text-dark border">
+                <i class="bi bi-people me-1"></i>Gestores: {{ expo.gestores?.length || 0 }}
+              </span>
+              <span class="badge bg-light text-dark border">
+                <i class="bi bi-calendar-event me-1"></i>Ediciones: {{ ediciones.length }}
+              </span>
+            </div>
+          </div>
+          <div class="col-lg-4 text-lg-end">
+            <router-link class="btn btn-primary px-4 shadow-sm" :to="`/gestor/exposiciones/${expo.idExposicion}/permisos`">
+              <i class="bi bi-shield-lock me-2"></i>Gestionar Permisos
+            </router-link>
+          </div>
         </div>
       </div>
-      <div class="hero-actions">
-        <router-link class="btn-primary" :to="`/gestor/exposiciones/${expo.idExposicion}/permisos`">Permisos</router-link>
-      </div>
     </div>
 
-    <section class="card-box">
-      <header class="ed-header">
+    <!-- Ediciones Section -->
+    <section class="card shadow-sm border-0">
+      <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
         <div>
-          <p class="eyebrow">Ediciones</p>
-          <h3>Ediciones asociadas</h3>
+          <p class="text-uppercase text-muted ls-1 mb-1 fw-bold small">Gestión de Ediciones</p>
+          <h3 class="font-playfair h4 mb-0">Ediciones asociadas</h3>
         </div>
-        <div class="ed-actions">
-          <input type="date" v-model="edicionForm.fechaInicio" />
-          <input type="date" v-model="edicionForm.fechaFin" />
-          <button class="btn-primary" @click="createEdicion" :disabled="edSaving">Crear edición</button>
+        
+        <div class="d-flex flex-wrap gap-2 align-items-center bg-light p-2 rounded-3">
+          <input type="date" v-model="edicionForm.fechaInicio" class="form-control form-control-sm" style="width: auto;" />
+          <span class="text-muted small">a</span>
+          <input type="date" v-model="edicionForm.fechaFin" class="form-control form-control-sm" style="width: auto;" />
+          <button class="btn btn-sm btn-primary" @click="createEdicion" :disabled="edSaving">
+            <span v-if="edSaving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Crear edición
+          </button>
         </div>
-      </header>
-      <p v-if="edError" class="error">{{ edError }}</p>
-      <div class="editions">
-        <div v-for="ed in ediciones" :key="ed.idEdicion" class="edition-row">
-          <div>
-            <h4>{{ ed.nombre || ed.fechaInicio }}</h4>
-            <p class="muted">{{ ed.fechaInicio }} → {{ ed.fechaFin }}</p>
+      </div>
+
+      <div class="card-body px-4 pb-4">
+        <div v-if="edError" class="alert alert-danger py-2 mb-3 small">
+          <i class="bi bi-exclamation-circle me-2"></i>{{ edError }}
+        </div>
+
+        <div v-if="ediciones.length === 0" class="alert alert-light text-center border border-dashed py-5 text-muted mb-0">
+          <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+          <p class="mb-0">Aún no hay ediciones creadas para esta exposición.</p>
+        </div>
+
+        <div v-else class="list-group list-group-flush">
+          <div v-for="ed in ediciones" :key="ed.idEdicion" class="list-group-item px-0 py-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div>
+                <h5 class="mb-1 fw-bold">{{ ed.nombre || 'Edición sin nombre' }}</h5>
+                <div class="d-flex align-items-center text-muted small">
+                  <i class="bi bi-calendar3 me-2"></i>
+                  {{ ed.fechaInicio }} <i class="bi bi-arrow-right mx-2"></i> {{ ed.fechaFin }}
+                </div>
+              </div>
+              
+              <div class="d-flex align-items-center gap-3">
+                <span class="badge rounded-pill" :class="edBadgeClass(ed.estadoEdicion)">{{ ed.estadoEdicion }}</span>
+                <router-link :to="`/gestor/exposiciones/${expo.idExposicion}/ediciones/${ed.idEdicion}`" class="btn btn-sm btn-outline-primary">
+                  Gestionar <i class="bi bi-chevron-right ms-1"></i>
+                </router-link>
+              </div>
+            </div>
           </div>
-          <div class="row-actions">
-            <router-link :to="`/gestor/exposiciones/${expo.idExposicion}/ediciones/${ed.idEdicion}`" class="btn-ghost">Gestionar</router-link>
-            <span class="chip" :class="edBadge(ed.estadoEdicion)">{{ ed.estadoEdicion }}</span>
-          </div>
         </div>
-        <p v-if="ediciones.length === 0" class="muted">Aún no hay ediciones creadas.</p>
       </div>
     </section>
   </div>
-  <div v-else class="loading">
-    <div class="spinner-border" role="status"></div>
+
+  <div v-else class="text-center py-5">
+    <div class="spinner-border text-gold" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
   </div>
 </template>
 
@@ -79,11 +120,22 @@ export default {
   created() { this.load(); },
   methods: {
     badgeClass(estado) {
-      const map = { ACTIVA: 'badge-success', EN_PREPARACION: 'badge-secondary', BORRADOR: 'badge-secondary', ARCHIVADA: 'badge-dark' };
-      return map[estado] || 'badge-secondary';
+      const map = { 
+        ACTIVA: 'bg-success', 
+        EN_PREPARACION: 'bg-warning text-dark', 
+        BORRADOR: 'bg-secondary', 
+        ARCHIVADA: 'bg-dark' 
+      };
+      return map[estado] || 'bg-secondary';
     },
-    edBadge(estado) {
-      return { PUBLICADA: 'chip chip-green', BORRADOR: 'chip chip-gray', FINALIZADA: 'chip chip-dark', CANCELADA: 'chip chip-red' }[estado] || 'chip';
+    edBadgeClass(estado) {
+      const map = {
+        PUBLICADA: 'bg-success',
+        BORRADOR: 'bg-secondary',
+        FINALIZADA: 'bg-dark',
+        CANCELADA: 'bg-danger'
+      };
+      return map[estado] || 'bg-secondary';
     },
     async load() {
       this.loading = true; this.edError = '';
@@ -114,32 +166,5 @@ export default {
 </script>
 
 <style scoped>
-.detail-shell { max-width: 1100px; margin: 0 auto; padding: 32px 20px 48px; display: flex; flex-direction: column; gap: 16px; }
-.detail-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.breadcrumbs { display: flex; gap: 6px; align-items: center; color: #4a5460; }
-.breadcrumbs a { color: #1f4b99; text-decoration: none; font-weight: 700; }
-.status .badge { padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; }
-.badge-success { background: #e3f7e9; color: #1f7a3d; }
-.badge-secondary { background: #eef1f6; color: #5b6472; }
-.badge-dark { background: #dfe2e7; color: #2a2f36; }
-.hero { display: flex; justify-content: space-between; gap: 16px; align-items: center; border: 1px solid #e5e9f4; border-radius: 14px; padding: 16px; background: #fff; box-shadow: 0 6px 16px rgba(0,0,0,0.05); }
-.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: #5b6472; margin: 0; }
-.subtitle { color: #4a5460; }
-.meta { display: flex; gap: 10px; flex-wrap: wrap; }
-.pill { background: #eef1f6; padding: 6px 10px; border-radius: 10px; font-weight: 700; }
-.btn-primary { border: none; background: linear-gradient(135deg,#1f4b99,#153a7a); color: #fff; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; }
-.btn-ghost { border: 1px solid #d9deea; background: #fff; color: #1f4b99; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.card-box { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 16px; box-shadow: 0 8px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
-.ed-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ed-actions { display: flex; gap: 8px; align-items: center; }
-.editions { display: flex; flex-direction: column; gap: 10px; }
-.edition-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eef1f6; border-radius: 12px; padding: 10px; gap: 10px; }
-.row-actions { display: flex; gap: 10px; align-items: center; }
-.chip { padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; }
-.chip-green { background: #e3f7e9; color: #1f7a3d; }
-.chip-gray { background: #eef1f6; color: #4a5460; }
-.chip-dark { background: #dfe2e7; color: #2a2f36; }
-.chip-red { background: #fff0f0; color: #d23b3b; }
-.error { color: #d23b3b; margin: 0; }
-.loading { display: flex; justify-content: center; padding: 48px 0; }
+/* Scoped styles removed in favor of Bootstrap classes */
 </style>

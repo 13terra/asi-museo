@@ -1,79 +1,179 @@
 <template>
-  <div class="page">
-    <header class="header" v-if="sesion && edicion">
-      <div>
-        <p class="eyebrow">{{ edicion.exposicion?.titulo || 'Exposición' }}</p>
-        <h1>Reserva para {{ formatFecha(sesion.horaInicio) }}</h1>
-        <p class="muted">{{ formatHora(sesion.horaInicio) }} · {{ formatHora(sesion.horaFin) }} · Salas {{ salasTexto(sesion.salas) }}</p>
+  <div class="container py-5 animate-slide-up">
+    <!-- Header de la Sesión -->
+    <header class="mb-5 text-center" v-if="sesion && edicion">
+      <p class="text-uppercase text-gold ls-1 mb-2 fw-bold">{{ edicion.exposicion?.titulo || 'Exposición' }}</p>
+      <h1 class="display-5 font-playfair mb-3">Reserva para {{ formatFecha(sesion.horaInicio) }}</h1>
+      <div class="d-flex justify-content-center align-items-center gap-3 text-muted">
+        <span><i class="bi bi-clock me-1"></i>{{ formatHora(sesion.horaInicio) }} - {{ formatHora(sesion.horaFin) }}</span>
+        <span><i class="bi bi-geo-alt me-1"></i>Salas {{ salasTexto(sesion.salas) }}</span>
       </div>
-      <div class="pill">Aforo: {{ sesion.aforoOcupado ?? 0 }} / {{ sesion.aforo }}</div>
+      <div class="mt-3">
+        <span class="badge bg-light text-dark border">
+          Aforo: {{ sesion.aforoOcupado ?? 0 }} / {{ sesion.aforo }}
+        </span>
+      </div>
     </header>
 
-    <div v-if="loading" class="center"><div class="spinner-border" role="status"></div></div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
-    <div v-else class="grid">
-      <section class="card">
-        <h3>Entradas</h3>
-        <div class="ticket-list">
-          <div v-for="tipo in tipos" :key="tipo.idTipoEntrada" class="ticket-row">
-            <div>
-              <strong>{{ tipo.nombre }}</strong>
-              <p class="muted">{{ tipo.descripcion || 'Sin descripción' }}</p>
-            </div>
-            <div class="price">{{ formatPrice(tipo.precio) }}</div>
-            <div class="qty">
-              <button @click="dec(tipo.idTipoEntrada)" :disabled="cantidades[tipo.idTipoEntrada] <= 0">-</button>
-              <span>{{ cantidades[tipo.idTipoEntrada] || 0 }}</span>
-              <button @click="inc(tipo.idTipoEntrada)" :disabled="isMaxReached">+</button>
-            </div>
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-gold" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div v-else-if="error" class="alert alert-danger shadow-sm" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+    </div>
+
+    <div v-else class="row g-4">
+      <!-- Selección de Entradas -->
+      <div class="col-lg-5">
+        <section class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+            <h3 class="font-playfair h4 mb-0">Selección de Entradas</h3>
           </div>
-        </div>
-        <div class="summary">
-          <span>Total entradas: {{ totalEntradas }}</span>
-          <strong>{{ formatPrice(totalPrecio) }}</strong>
-        </div>
-        <div v-if="isMaxReached" class="alert alert-warning mt-2">
-          <small v-if="totalEntradas >= 10">Máximo 10 entradas por compra.</small>
-          <small v-else>Aforo completo.</small>
-        </div>
-      </section>
-
-      <section class="card form">
-        <h3>Datos del comprador</h3>
-        <div class="form-grid">
-          <label>Nombre *<input v-model="comprador.nombrePila" placeholder="Ej: Juan" required /></label>
-          <label>Apellido 1 *<input v-model="comprador.apellido1" placeholder="Ej: Pérez" required /></label>
-          <label>Apellido 2<input v-model="comprador.apellido2" placeholder="Ej: García" /></label>
-          <label>Email *<input v-model="comprador.email" type="email" placeholder="ejemplo@correo.com" required /></label>
-          <label>Teléfono *<input v-model="comprador.telefono" placeholder="+34 600 000 000" required /></label>
-          <label>País<input v-model="comprador.pais" placeholder="España" /></label>
-        </div>
-
-        <div class="asistentes">
-          <h4>Datos de asistentes</h4>
-          <p class="muted">Introduce nombre y DNI para cada entrada.</p>
-          <div v-if="totalEntradas === 0" class="empty">Añade entradas para completar los datos.</div>
-          <div v-else class="assist-grid">
-            <template v-for="tipo in tipos" :key="tipo.idTipoEntrada">
-              <div v-for="(asistente, idx) in asistentes[tipo.idTipoEntrada]" :key="`${tipo.idTipoEntrada}-${idx}`" class="assist-card">
-                <div class="muted">{{ tipo.nombre }} #{{ idx + 1 }}</div>
-                <label>Nombre *<input v-model="asistente.nombrePila" placeholder="Nombre del asistente" required /></label>
-                <label>Apellido 1 *<input v-model="asistente.apellido1" placeholder="Primer apellido" required /></label>
-                <label>Apellido 2<input v-model="asistente.apellido2" placeholder="Segundo apellido" /></label>
-                <label>DNI *<input v-model="asistente.dni" placeholder="12345678Z" required /></label>
+          <div class="card-body px-4">
+            <div class="d-flex flex-column gap-3">
+              <div v-for="tipo in tipos" :key="tipo.idTipoEntrada" class="card border-light bg-light">
+                <div class="card-body d-flex justify-content-between align-items-center p-3">
+                  <div>
+                    <h5 class="mb-1 fw-bold">{{ tipo.nombre }}</h5>
+                    <p class="small text-muted mb-0">{{ tipo.descripcion || 'Entrada general' }}</p>
+                    <div class="text-gold fw-bold mt-1">{{ formatPrice(tipo.precio) }}</div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2 bg-white rounded-pill border p-1 shadow-sm">
+                    <button 
+                      class="btn btn-sm btn-link text-dark text-decoration-none px-2" 
+                      @click="dec(tipo.idTipoEntrada)" 
+                      :disabled="cantidades[tipo.idTipoEntrada] <= 0"
+                    >
+                      <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <span class="fw-bold px-2" style="min-width: 20px; text-align: center;">
+                      {{ cantidades[tipo.idTipoEntrada] || 0 }}
+                    </span>
+                    <button 
+                      class="btn btn-sm btn-link text-dark text-decoration-none px-2" 
+                      @click="inc(tipo.idTipoEntrada)" 
+                      :disabled="isMaxReached"
+                    >
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </template>
-          </div>
-        </div>
+            </div>
 
-        <div class="actions">
-          <button class="btn-ghost" @click="$router.back()">Cancelar</button>
-          <button class="btn-primary" :disabled="!canSubmit || submitting" @click="reservar">
-            {{ submitting ? 'Procesando...' : 'Reservar' }}
-          </button>
-        </div>
-        <p class="note">El pago se realizará presencialmente al hacer check-in.</p>
-      </section>
+            <div class="mt-4 pt-3 border-top">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted">Total entradas</span>
+                <span class="fw-bold">{{ totalEntradas }}</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="h5 mb-0 font-playfair">Total a pagar</span>
+                <span class="h4 mb-0 text-gold fw-bold">{{ formatPrice(totalPrecio) }}</span>
+              </div>
+            </div>
+
+            <div v-if="isMaxReached" class="alert alert-warning mt-3 mb-0 d-flex align-items-center">
+              <i class="bi bi-info-circle me-2"></i>
+              <small v-if="totalEntradas >= 10">Máximo 10 entradas por compra.</small>
+              <small v-else>Aforo completo para esta sesión.</small>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Formulario de Datos -->
+      <div class="col-lg-7">
+        <section class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+            <h3 class="font-playfair h4 mb-0">Datos de la Reserva</h3>
+          </div>
+          <div class="card-body px-4">
+            <form @submit.prevent="reservar">
+              <h5 class="mb-3 text-muted border-bottom pb-2">Datos del Comprador</h5>
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Nombre *</label>
+                  <input v-model="comprador.nombrePila" class="form-control" placeholder="Ej: Juan" required maxlength="50" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Primer Apellido *</label>
+                  <input v-model="comprador.apellido1" class="form-control" placeholder="Ej: Pérez" required maxlength="50" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Segundo Apellido</label>
+                  <input v-model="comprador.apellido2" class="form-control" placeholder="Ej: García" maxlength="50" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-uppercase text-muted">País</label>
+                  <input v-model="comprador.pais" class="form-control" placeholder="España" maxlength="50" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Email *</label>
+                  <input v-model="comprador.email" type="email" class="form-control" placeholder="ejemplo@correo.com" required maxlength="100" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Teléfono *</label>
+                  <input v-model="comprador.telefono" type="tel" class="form-control" placeholder="+34 600 000 000" required maxlength="20" />
+                </div>
+              </div>
+
+              <h5 class="mb-3 text-muted border-bottom pb-2 d-flex justify-content-between align-items-center">
+                Datos de Asistentes
+                <small class="fw-normal fs-6 text-muted" v-if="totalEntradas > 0">Completa los datos para cada entrada</small>
+              </h5>
+              
+              <div v-if="totalEntradas === 0" class="alert alert-light text-center border border-dashed py-4 text-muted">
+                <i class="bi bi-ticket-perforated fs-3 d-block mb-2"></i>
+                Selecciona entradas para añadir los datos de los asistentes.
+              </div>
+              
+              <div v-else class="d-flex flex-column gap-3 mb-4">
+                <template v-for="tipo in tipos" :key="tipo.idTipoEntrada">
+                  <div v-for="(asistente, idx) in asistentes[tipo.idTipoEntrada]" :key="`${tipo.idTipoEntrada}-${idx}`" class="card bg-light border-0">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-dark me-2">{{ tipo.nombre }}</span>
+                        <span class="text-muted small">Asistente #{{ idx + 1 }}</span>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-md-6">
+                          <input v-model="asistente.nombrePila" class="form-control form-control-sm" placeholder="Nombre *" required maxlength="50" />
+                        </div>
+                        <div class="col-md-6">
+                          <input v-model="asistente.apellido1" class="form-control form-control-sm" placeholder="Primer Apellido *" required maxlength="50" />
+                        </div>
+                        <div class="col-md-6">
+                          <input v-model="asistente.apellido2" class="form-control form-control-sm" placeholder="Segundo Apellido" maxlength="50" />
+                        </div>
+                        <div class="col-md-6">
+                          <input v-model="asistente.dni" class="form-control form-control-sm" placeholder="DNI/Pasaporte *" required maxlength="15" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                <p class="small text-muted mb-0">
+                  <i class="bi bi-info-circle me-1"></i>
+                  El pago se realizará presencialmente en taquilla.
+                </p>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-outline-secondary" @click="$router.back()">Cancelar</button>
+                  <button type="submit" class="btn btn-primary px-4" :disabled="submitting">
+                    <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    {{ submitting ? 'Procesando...' : 'Confirmar Reserva' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -158,7 +258,9 @@ export default {
         this.tipos.forEach(t => {
           this.asistentes[t.idTipoEntrada] = [];
         });
+        console.log('ReservaEntradasView loaded', this.sesion);
       } catch (e) {
+        console.error('Error loading reserva view', e);
         this.error = 'No se pudo cargar la sesión o los tipos de entrada.';
       } finally {
         this.loading = false;
@@ -166,15 +268,18 @@ export default {
     },
     formatFecha(value) {
       if (!value) return '';
+      if (Array.isArray(value)) return new Date(value[0], value[1] - 1, value[2]).toLocaleDateString();
       const d = new Date(value);
-      return d.toLocaleDateString();
+      return isNaN(d.getTime()) ? 'Fecha inválida' : d.toLocaleDateString();
     },
     formatHora(value) {
       if (!value) return '';
-      if (value.includes('T')) {
-         return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (Array.isArray(value)) {
+        if (value.length === 2) return `${value[0].toString().padStart(2, '0')}:${value[1].toString().padStart(2, '0')}`;
+        if (value.length >= 5) return `${value[3].toString().padStart(2, '0')}:${value[4].toString().padStart(2, '0')}`;
       }
-      return value.substring(0, 5);
+      const d = new Date(value);
+      return isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     },
     formatPrice(value) {
       const v = Number(value || 0).toFixed(2);
@@ -217,8 +322,33 @@ export default {
         entradas
       };
     },
+    validate() {
+      if (this.totalEntradas <= 0) return 'Debes seleccionar al menos una entrada.';
+      if (!this.comprador.nombrePila || !this.comprador.apellido1 || !this.comprador.email || !this.comprador.telefono) {
+        return 'Por favor, completa todos los datos del comprador.';
+      }
+      
+      for (const tipo of this.tipos) {
+        const list = this.asistentes[tipo.idTipoEntrada] || [];
+        if (list.some(a => !a.nombrePila || !a.apellido1 || !a.dni)) {
+          return 'Por favor, completa los datos de todos los asistentes.';
+        }
+      }
+
+      if (this.sesion?.estado !== ESTADOS_SESION.DISPONIBLE) {
+        return 'Esta sesión no está disponible para reservas.';
+      }
+      return null;
+    },
     async reservar() {
-      if (!this.canSubmit) return;
+      console.log('Attempting to reserve...');
+      const errorMsg = this.validate();
+      if (errorMsg) {
+        console.warn('Validation failed:', errorMsg);
+        Swal.fire('Datos incompletos', errorMsg, 'warning');
+        return;
+      }
+
       this.submitting = true;
       this.error = '';
       try {
@@ -237,37 +367,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.page { max-width: 1100px; margin: 0 auto; padding: 28px 18px 48px; display: flex; flex-direction: column; gap: 18px; }
-.header { background: #f6f8ff; border: 1px solid #e0e5f4; border-radius: 14px; padding: 18px; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
-.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: #5b6472; margin: 0; }
-h1 { margin: 4px 0 6px; }
-.muted { color: #5b6472; margin: 0; }
-.pill { background: #eef1f6; padding: 8px 12px; border-radius: 999px; font-weight: 700; }
-
-.center { display: flex; justify-content: center; padding: 30px 0; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-.card { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
-.ticket-list { display: flex; flex-direction: column; gap: 10px; }
-.ticket-row { display: grid; grid-template-columns: 1.4fr 0.6fr 0.6fr; align-items: center; gap: 10px; padding: 10px; border: 1px solid #eef1f6; border-radius: 12px; }
-.price { font-weight: 800; text-align: right; }
-.qty { display: flex; gap: 10px; align-items: center; justify-content: flex-end; }
-.qty button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #d9deea; background: #fff; cursor: pointer; }
-.summary { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-top: 1px solid #eef1f6; font-weight: 700; }
-
-.form { gap: 14px; }
-.form-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 10px; }
-label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; color: #2f3540; }
-input { border: 1px solid #d9deea; border-radius: 10px; padding: 10px; }
-.asistentes { display: flex; flex-direction: column; gap: 10px; }
-.assist-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 10px; }
-.assist-card { border: 1px solid #eef1f6; border-radius: 12px; padding: 10px; background: #fafbff; display: flex; flex-direction: column; gap: 6px; }
-.actions { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
-.btn-primary { border: none; background: linear-gradient(135deg,#1f4b99,#153a7a); color: #fff; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-.btn-ghost { border: 1px solid #d9deea; background: #fff; color: #1f4b99; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.note { color: #4a5460; margin: 0; font-size: 13px; }
-.empty { padding: 12px; color: #5b6472; background: #f6f8ff; border-radius: 10px; }
-</style>
