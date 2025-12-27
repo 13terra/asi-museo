@@ -63,22 +63,26 @@ public class SecurityConfiguration {
         // OPCIONES Y PÚBLICO
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-        // AUTENTICACÓN (HU1-HU3)
+        // AUTENTICACÓN
         .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
 
-        // USUARIOS (HU4-HU8) - SOLO ADMIN
+        // USUARIOS (HU4-HU8) - CORREGIDO
+        // Permitir que Gestores y Admins listen usuarios (necesario para asignar permisos)
+        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
+        // Crear, editar, borrar usuarios sigue siendo SOLO ADMIN
         .requestMatchers("/api/users/**").hasAuthority(UserAuthority.ADMIN.toString())
 
-        // SALAS (HU37-HU40) - SOLO ADMIN
+        // SALAS (HU37-HU40) - CORREGIDO
+        .requestMatchers(HttpMethod.GET, "/api/salas/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
         .requestMatchers("/api/salas/**").hasAuthority(UserAuthority.ADMIN.toString())
 
         // EXPOS (HU9 - HU19)
         .requestMatchers(HttpMethod.GET, "/api/exposiciones/publico/**").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/exposiciones/*/publico").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/exposiciones/*/ediciones/publico").permitAll() // MOVED UP
+        .requestMatchers(HttpMethod.GET, "/api/exposiciones/*/ediciones/publico").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/exposiciones/admin").hasAuthority(UserAuthority.ADMIN.toString())
         .requestMatchers(HttpMethod.GET, "/api/exposiciones/gestor").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
         .requestMatchers("/api/exposiciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
@@ -86,7 +90,7 @@ public class SecurityConfiguration {
         // EDICIONES (HU20 - HU26)
         .requestMatchers(HttpMethod.GET, "/api/ediciones/*/publico").permitAll()
         .requestMatchers(HttpMethod.GET, "/api/ediciones/*/piezas-expuestas").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/ediciones/*/sesiones/publico").permitAll() // MOVED UP FROM SESIONES
+        .requestMatchers(HttpMethod.GET, "/api/ediciones/*/sesiones/publico").permitAll()
         .requestMatchers("/api/ediciones/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // SESIONES HU31-HU36
@@ -97,7 +101,7 @@ public class SecurityConfiguration {
         .requestMatchers("/api/piezas-expuestas/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // OBRAS HU43-HU47
-        .requestMatchers(HttpMethod.GET, "/api/obras/**").permitAll() // Público puede ver catálogo
+        .requestMatchers(HttpMethod.GET, "/api/obras/**").permitAll()
         .requestMatchers("/api/obras/**").hasAnyAuthority(UserAuthority.ADMIN.toString(), UserAuthority.GESTOR.toString())
 
         // THE MET HU48-HU49
@@ -114,7 +118,6 @@ public class SecurityConfiguration {
         // ENTRADAS HU55,56
         .requestMatchers("/api/mis-entradas/**").hasAuthority(UserAuthority.VISITANTE.toString())
 
-        // por defecto...
         .requestMatchers("/**").authenticated())
       .with(securityConfigurerAdapter(), Customizer.withDefaults());
     // @formatter:on
@@ -133,7 +136,7 @@ public class SecurityConfiguration {
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-      throws Exception {
+    throws Exception {
     return authenticationConfiguration.getAuthenticationManager();
   }
 

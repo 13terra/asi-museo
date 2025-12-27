@@ -88,8 +88,8 @@ export default {
         this.edicion = await EdicionRepository.getDetalleForAdmin(id);
 
         // ✅ FIX: Load parent Exposition
-        if (this.edicion.idExpo) {
-          this.exposicion = await ExpoRepository.detailAdmin(this.edicion.idExpo);
+        if (this.edicion.idExposicion) {
+          this.exposicion = await ExpoRepository.getById(this.edicion.idExposicion);
         }
 
         const estado =
