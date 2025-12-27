@@ -83,20 +83,41 @@ export default {
 <style scoped>
 .page { max-width: 1100px; margin: 0 auto; padding: 28px 18px 48px; display: flex; flex-direction: column; gap: 16px; }
 .head { display: flex; flex-direction: column; gap: 4px; }
-.muted { color: #5b6472; margin: 0; }
+.muted { color: #5b6472; margin: 0; font-size: 0.95rem; }
 .center { display: flex; justify-content: center; padding: 30px 0; }
 .empty { padding: 14px; background: #f6f8ff; border-radius: 10px; color: #4a5460; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 12px; }
-.card { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 14px; box-shadow: 0 8px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
-.card-top { display: flex; justify-content: space-between; gap: 10px; }
-.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: #5b6472; margin: 0; }
-.chip { padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; background: #eef1f6; color: #2a2f36; }
-.chip-green { background: #e3f7e9; color: #1f7a3d; }
-.chip-red { background: #fff0f0; color: #d23b3b; }
-.chip-dark { background: #dfe2e7; color: #2a2f36; }
-.chip-gray { background: #eef1f6; color: #4a5460; }
-.pill { background: #eef1f6; padding: 6px 10px; border-radius: 10px; font-weight: 700; width: fit-content; }
-.actions { display: flex; gap: 10px; align-items: center; }
-.btn-ghost { border: 1px solid #d9deea; background: #fff; color: #1f4b99; padding: 8px 12px; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; }
-.btn-link { color: #1f4b99; text-decoration: none; font-weight: 700; }
+
+.card { background: #fff; border: 1px solid #e9ecf5; border-radius: 14px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 10px; }
+
+/* FIX: align-items: flex-start evita que el chip se estire verticalmente */
+.card-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+
+.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 11px; color: #6c757d; margin: 0; font-weight: 600; }
+
+/* CHIP REDISEÑADO: Más sutil, borde suave, fuente ajustada */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.chip-green { background: #f0fdf4; color: #166534; border-color: #dcfce7; }
+.chip-red { background: #fef2f2; color: #991b1b; border-color: #fee2e2; }
+.chip-dark { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
+.chip-gray { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
+
+.pill { background: #f8f9fa; color: #495057; padding: 6px 10px; border-radius: 8px; font-weight: 600; font-size: 13px; width: fit-content; border: 1px solid #e9ecef; }
+
+.actions { display: flex; gap: 10px; align-items: center; margin-top: auto; }
+.btn-ghost { border: 1px solid #dee2e6; background: #fff; color: #1f4b99; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+.btn-ghost:hover { background: #f8f9fa; border-color: #cdd4db; }
+.btn-link { color: #1f4b99; text-decoration: none; font-weight: 600; font-size: 13px; }
+.btn-link:hover { text-decoration: underline; }
 </style>
