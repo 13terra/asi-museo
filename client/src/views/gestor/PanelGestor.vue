@@ -72,16 +72,16 @@
               </div>
               <span class="badge rounded-pill" :class="badgeClass(expo.estadoExpo)">{{ expo.estadoExpo }}</span>
             </div>
-            
+
             <p class="text-muted small flex-grow-1 mb-3 line-clamp-3">
               {{ expo.descripcion || 'Sin descripción disponible.' }}
             </p>
-            
+
             <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top">
               <span class="badge bg-light text-dark border">
                 <i class="bi bi-shield-lock me-1"></i>{{ expo.miPermiso || '-' }}
               </span>
-              
+
               <div class="dropdown">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Acciones
@@ -135,11 +135,11 @@ export default {
       return false;
     },
     badgeClass(estado) {
-      const map = { 
-        ACTIVA: 'bg-success', 
-        EN_PREPARACION: 'bg-warning text-dark', 
-        BORRADOR: 'bg-secondary', 
-        ARCHIVADA: 'bg-dark' 
+      const map = {
+        ACTIVA: 'bg-success',
+        EN_PREPARACION: 'bg-warning text-dark',
+        BORRADOR: 'bg-secondary',
+        ARCHIVADA: 'bg-dark'
       };
       return map[estado] || 'bg-secondary';
     },
